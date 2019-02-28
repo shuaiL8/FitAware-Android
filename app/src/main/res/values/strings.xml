@@ -2,7 +2,18 @@
     <string name="app_name">FitAwear</string>
     <string name="title_home">Home</string>
     <string name="title_dashboard">Dashboard</string>
-    <string name="title_notifications">Notifications</string>
+    <string name="title_awards">Awards</string>
     <string name="title_me">Me</string>
+
+
+    <string-array name="UserStatus">
+        <item>Log out</item>
+        <item>Change Password</item>
+        <item>Setting</item>
+        <item>Contact Us</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 </resources>

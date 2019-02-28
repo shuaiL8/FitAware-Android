@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context="com.carlos.myapplication.MainActivity">
+
+    <item
+        android:id="@+id/share"
+        android:icon="@drawable/ic_share_black_24dp"
+        android:title="share"
+        app:showAsAction="always"/>
+
+    <item
+            android:id="@+id/add"
+            android:icon="@drawable/ic_add_black_24dp"
+            android:title="add"
+            app:showAsAction="always"/>
+
+
+</menu>
