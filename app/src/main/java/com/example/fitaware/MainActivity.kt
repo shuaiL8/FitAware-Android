@@ -1,4 +1,4 @@
-package com.example.fitawear
+package com.example.fitaware
 
 import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
