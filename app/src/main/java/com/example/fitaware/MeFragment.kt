@@ -19,7 +19,7 @@ class MeFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view: View = inflater!!.inflate(R.layout.fragment_me, container,
+        val view: View = inflater.inflate(R.layout.fragment_me, container,
             false)
         setHasOptionsMenu(true)
 
@@ -28,6 +28,14 @@ class MeFragment : Fragment() {
         val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
         progressBar.setVisibility(View.GONE)
 
+        val tv_name = view.findViewById<TextView>(R.id.tv_name)
+        tv_name.text = "4Fit"
+
+        val tv_email = view.findViewById<TextView>(R.id.tv_email)
+        tv_email.text = "4fit@vt.edu"
+
+        val tv_group = view.findViewById<TextView>(R.id.tv_group)
+        tv_group.text = "Group CS5714"
 
         val user = resources.getStringArray(R.array.UserStatus)
         val adapter = ArrayAdapter<String>(
@@ -59,9 +67,7 @@ class MeFragment : Fragment() {
 
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.tool_bar, menu)
-        val share = menu.findItem(R.id.share)
-        share.isVisible = false
+        inflater.inflate(R.menu.tool_bar2, menu)
     }
 
 

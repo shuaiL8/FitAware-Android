@@ -3,4 +3,12 @@
     <color name="colorPrimary">#008577</color>
     <color name="colorPrimaryDark">#00574B</color>
     <color name="colorAccent">#D81B60</color>
+
+    <color name="colorTime">#ff6347</color>
+    <color name="colorCals">#2e8b57</color>
+    <color name="colorDis">#6a5acd</color>
+
+    <color name="colorHeart">#8B2323</color>
+    <color name="colorSteps">#104E8B</color>
+    <color name="colorMap">#a4c639</color>
 </resources>

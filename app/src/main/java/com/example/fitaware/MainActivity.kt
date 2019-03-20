@@ -4,11 +4,8 @@ import android.os.Bundle
 import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import android.view.Menu
-import android.view.MenuItem
-import android.widget.ListView
 import android.widget.TextView
-import android.widget.Toolbar
+import com.example.fitaware.home.HomeFragment
 
 
 class MainActivity : AppCompatActivity() {
@@ -28,17 +25,17 @@ class MainActivity : AppCompatActivity() {
                 transaction.replace(R.id.content, homeFragment).addToBackStack(null).commit()
                 return@OnNavigationItemSelectedListener true
             }
-            R.id.navigation_dashboard -> {
+            R.id.navigation_discover -> {
 //                val actionBar = supportActionBar
 //                actionBar?.show()
 
                 val toolbarTiltle = findViewById<TextView>(R.id.toolbar_title)
-                toolbarTiltle.text = "Dashboard"
+                toolbarTiltle.text = "Discover"
 
-                val dashboardFragment = DashboardFragment()
+                val discoverFragment = DiscoverFragment()
                 val manager = supportFragmentManager
                 val transaction = manager.beginTransaction()
-                transaction.replace(R.id.content, dashboardFragment).addToBackStack(null).commit()
+                transaction.replace(R.id.content, discoverFragment).addToBackStack(null).commit()
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_notifications -> {

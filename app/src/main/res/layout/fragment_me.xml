@@ -64,7 +64,7 @@
                                     android:textAppearance="?android:attr/textAppearanceMedium"/>
 
                             <TextView
-                                    android:id="@+id/tv_date"
+                                    android:id="@+id/tv_group"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
                                     android:layout_below="@+id/tv_email"

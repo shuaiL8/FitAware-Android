@@ -10,11 +10,6 @@
         android:title="share"
         app:showAsAction="always"/>
 
-    <item
-            android:id="@+id/add"
-            android:icon="@drawable/ic_add_black_24dp"
-            android:title="add"
-            app:showAsAction="always"/>
 
 
 </menu>
