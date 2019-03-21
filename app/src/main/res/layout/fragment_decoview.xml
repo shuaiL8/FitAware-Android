@@ -3,15 +3,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:padding="@dimen/activity_horizontal_margin"
-    tools:context=".home.DecoviewFragment">
+    tools:context=".Home.DecoviewFragment">
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/textActivity3">
+        android:layout_above="@+id/imageActivity3">
 
         <TextView
-            android:id="@+id/textPercentage"
+                android:id="@+id/textPercentage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
@@ -26,6 +26,7 @@
             android:layout_below="@+id/textPercentage"
             android:layout_centerHorizontal="true"
             android:maxWidth="200dp"
+            android:textSize="13dp"
             android:textAppearance="?android:attr/textAppearanceSmall"/>
 
         <com.hookedonplay.decoviewlib.DecoView xmlns:custom="http://schemas.android.com/apk/res-auto"
@@ -39,8 +40,8 @@
 
         <com.hookedonplay.decoviewlib.DecoView xmlns:custom="http://schemas.android.com/apk/res-auto"
             android:id="@+id/dynamicArcView2"
-            android:layout_width="232dp"
-            android:layout_height="232dp"
+            android:layout_width="227dp"
+            android:layout_height="227dp"
             android:layout_centerInParent="true"
             custom:dv_lineWidth="22dp">
 
@@ -48,8 +49,8 @@
 
         <com.hookedonplay.decoviewlib.DecoView xmlns:custom="http://schemas.android.com/apk/res-auto"
             android:id="@+id/dynamicArcView3"
-            android:layout_width="185dp"
-            android:layout_height="185dp"
+            android:layout_width="180dp"
+            android:layout_height="180dp"
             android:layout_centerInParent="true"
             custom:dv_lineWidth="22dp">
 
@@ -58,14 +59,15 @@
 
 
     <ImageView
+        android:layout_marginTop="8dp"
         android:id="@+id/imageActivity3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/demo2"
+        android:layout_above="@+id/textActivity3"
         android:layout_centerHorizontal="true"
         android:background="@drawable/circle_activity3"
         android:padding="12dp"
-        android:src="@drawable/ic_directions_run_black_24dp" />
+        android:src="@drawable/ic_person_black_24dp" />
 
     <ImageView
         android:id="@+id/imageActivity2"
@@ -76,7 +78,7 @@
         android:layout_alignTop="@+id/imageActivity3"
         android:background="@drawable/circle_activity2"
         android:padding="12dp"
-        android:src="@drawable/ic_whatshot_white_24dp"/>
+        android:src="@drawable/ic_winner_on_the_podium"/>
 
     <ImageView
         android:id="@+id/imageActivity1"
@@ -85,47 +87,42 @@
         android:layout_alignTop="@+id/imageActivity3"
         android:background="@drawable/circle_activity1"
         android:padding="12dp"
-        android:src="@drawable/ic_timer" />
+        android:src="@drawable/ic_group_black_24dp" />
 
     <TextView
+        android:textSize="15dp"
         android:id="@+id/textActivity3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/imageActivity2"
+        android:layout_above="@+id/demo2"
         android:layout_centerHorizontal="true"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     <TextView
+        android:textSize="15dp"
         android:id="@+id/textActivity1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/imageActivity1"
-        android:layout_alignEnd="@+id/imageActivity1"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignRight="@+id/imageActivity1"
-        android:gravity="center_horizontal"
+        android:layout_alignTop="@+id/textActivity3"
         android:paddingLeft="4dp"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     <TextView
+        android:textSize="15dp"
         android:id="@+id/textActivity2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/imageActivity2"
-        android:layout_alignLeft="@+id/imageActivity2"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignStart="@+id/imageActivity2"
-        android:gravity="center_horizontal"
+        android:layout_alignTop="@+id/textActivity3"
         android:paddingRight="4dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>z
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     <Button
         android:id="@+id/demo1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/imageActivity3"
+        android:layout_alignTop="@+id/demo2"
         android:padding="12dp"
         android:text="today%" />
 

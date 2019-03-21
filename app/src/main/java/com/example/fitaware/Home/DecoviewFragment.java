@@ -1,4 +1,4 @@
-package com.example.fitaware.home;
+package com.example.fitaware.Home;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -24,7 +24,7 @@ public class DecoviewFragment extends Fragment {
     private int mSeries1Index;
     private int mSeries2Index;
     private int mSeries3Index;
-    private final float mSeriesMax = 50f;
+    private final float mSeriesMax = 6000;
     TextView textPercentage;
     TextView textRemaining;
     TextView textActivity1;
@@ -36,9 +36,9 @@ public class DecoviewFragment extends Fragment {
     float remainingKm = 0;
     float remainingCals = 0;
 
-    float time = 30;
-    float distance = 3.8f;
-    float cals = 400;
+    float time = 4100;
+    float distance = 1200;
+    float cals = 1500;
 
     public DecoviewFragment() {
         // Required empty public constructor
@@ -156,7 +156,7 @@ public class DecoviewFragment extends Fragment {
         seriesItem.addArcSeriesItemListener(new SeriesItem.SeriesItemListener() {
             @Override
             public void onSeriesItemAnimationProgress(float percentComplete, float currentPosition) {
-                textActivity1.setText(String.format("%.0f mins", currentPosition));
+                textActivity1.setText(String.format("%.0f / 6000", currentPosition));
             }
 
             @Override
@@ -170,7 +170,7 @@ public class DecoviewFragment extends Fragment {
 
     private void createDataSeries2() {
         SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor("#2e8b57")) //colorCals
-                .setRange(0, 600, 0)
+                .setRange(0, 2000, 0)
                 .setInitialVisibility(false)
                 .build();
 
@@ -178,7 +178,7 @@ public class DecoviewFragment extends Fragment {
         seriesItem.addArcSeriesItemListener(new SeriesItem.SeriesItemListener() {
             @Override
             public void onSeriesItemAnimationProgress(float percentComplete, float currentPosition) {
-                textActivity2.setText(String.format("%.0f cals", currentPosition));
+                textActivity2.setText(String.format("%.0f / 2000", currentPosition));
             }
 
             @Override
@@ -192,7 +192,7 @@ public class DecoviewFragment extends Fragment {
 
     private void createDataSeries3() {
         final SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor("#6a5acd")) //colorDis
-                .setRange(0, 5, 0)
+                .setRange(0, 2000, 0)
                 .setInitialVisibility(false)
                 .build();
 
@@ -200,7 +200,7 @@ public class DecoviewFragment extends Fragment {
         seriesItem.addArcSeriesItemListener(new SeriesItem.SeriesItemListener() {
             @Override
             public void onSeriesItemAnimationProgress(float percentComplete, float currentPosition) {
-                textActivity3.setText(String.format("%.2f km", currentPosition));
+                textActivity3.setText(String.format("%.0f / 2000", currentPosition));
             }
 
             @Override
@@ -227,9 +227,9 @@ public class DecoviewFragment extends Fragment {
         seriesItem.addArcSeriesItemListener(new SeriesItem.SeriesItemListener() {
             @Override
             public void onSeriesItemAnimationProgress(float percentComplete, float currentPosition) {
-                remainingKm = 5 - currentPosition;
+                remainingKm = 2000 - currentPosition;
 
-                textRemaining.setText(String.format("%.1f km to goal", remainingKm));
+                textRemaining.setText(String.format("%.0f steps to goal", remainingKm));
 
             }
 
@@ -248,35 +248,35 @@ public class DecoviewFragment extends Fragment {
 
         mDecoView.addEvent(new DecoEvent.Builder(mSeriesMax)
                 .setIndex(mBackIndex)
-                .setDuration(3000)
+                .setDuration(1000)
                 .setDelay(100)
                 .build());
         mDecoView2.addEvent(new DecoEvent.Builder(mSeriesMax)
                 .setIndex(mBackIndex2)
-                .setDuration(3000)
+                .setDuration(1000)
                 .setDelay(100)
                 .build());
         mDecoView3.addEvent(new DecoEvent.Builder(mSeriesMax)
                 .setIndex(mBackIndex3)
-                .setDuration(3000)
+                .setDuration(1000)
                 .setDelay(100)
                 .build());
 
 
         mDecoView.addEvent(new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_OUT)
                 .setIndex(mSeries3Index)
-                .setDuration(2000)
-                .setDelay(1250)
+                .setDuration(1000)
+                .setDelay(300)
                 .build());
         mDecoView2.addEvent(new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_OUT)
                 .setIndex(mSeries2Index)
-                .setDuration(2000)
-                .setDelay(1250)
+                .setDuration(1000)
+                .setDelay(300)
                 .build());
         mDecoView3.addEvent(new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_OUT)
                 .setIndex(mSeries1Index)
-                .setDuration(2000)
-                .setDelay(1250)
+                .setDuration(1000)
+                .setDelay(300)
                 .build());
     }
 
@@ -284,47 +284,50 @@ public class DecoviewFragment extends Fragment {
 
         mDecoView.addEvent(new DecoEvent.Builder(time)
                 .setIndex(mSeries1Index)
+                .setDuration(1000)
                 .setDelay(100)
                 .build());
         mDecoView2.addEvent(new DecoEvent.Builder(cals)
                 .setIndex(mSeries2Index)
+                .setDuration(1000)
                 .setDelay(100)
                 .build());
         mDecoView3.addEvent(new DecoEvent.Builder(distance)
                 .setIndex(mSeries3Index)
+                .setDuration(1000)
                 .setDelay(100)
                 .build());
     }
 
     private void demo2() {
 
-        mDecoView.addEvent(new DecoEvent.Builder(mSeriesMax).setIndex(mSeries1Index).setDelay(100).setDuration(3000).build());
+        mDecoView.addEvent(new DecoEvent.Builder(mSeriesMax).setIndex(mSeries1Index).setDelay(100).setDuration(1000).build());
 
-        mDecoView2.addEvent(new DecoEvent.Builder(600).setIndex(mSeries2Index).setDelay(100).setDuration(3000).build());
+        mDecoView2.addEvent(new DecoEvent.Builder(2000).setIndex(mSeries2Index).setDelay(100).setDuration(1000).build());
 
-        mDecoView3.addEvent(new DecoEvent.Builder(5)
+        mDecoView3.addEvent(new DecoEvent.Builder(2000)
                 .setIndex(mSeries3Index)
                 .setDelay(100)
-                .setDuration(3000)
+                .setDuration(1000)
                 .build());
 
         mDecoView3.addEvent(new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
                 .setIndex(mSeries1Index)
-                .setDelay(3500)
-                .setDuration(3000)
+                .setDelay(1500)
+                .setDuration(2000)
                 .build());
 
         mDecoView2.addEvent(new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
                 .setIndex(mSeries1Index)
-                .setDelay(3500)
-                .setDuration(3000)
+                .setDelay(1500)
+                .setDuration(2000)
                 .build());
 
 
         mDecoView.addEvent(new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
                 .setIndex(mSeries1Index)
-                .setDelay(3500)
-                .setDuration(3000)
+                .setDelay(1500)
+                .setDuration(2000)
                 .setDisplayText("Nice Job!")
                 .setListener(new DecoEvent.ExecuteEventListener() {
                     @Override
@@ -336,17 +339,17 @@ public class DecoviewFragment extends Fragment {
                     public void onEventEnd(DecoEvent decoEvent) {
                         mDecoView.addEvent(new DecoEvent.Builder(mSeriesMax)
                                 .setIndex(mBackIndex)
-                                .setDuration(3000)
+                                .setDuration(2000)
                                 .setDelay(100)
                                 .build());
                         mDecoView2.addEvent(new DecoEvent.Builder(mSeriesMax)
                                 .setIndex(mBackIndex2)
-                                .setDuration(3000)
+                                .setDuration(2000)
                                 .setDelay(100)
                                 .build());
                         mDecoView3.addEvent(new DecoEvent.Builder(mSeriesMax)
                                 .setIndex(mBackIndex3)
-                                .setDuration(3000)
+                                .setDuration(2000)
                                 .setDelay(100)
                                 .build());
 
@@ -354,11 +357,11 @@ public class DecoviewFragment extends Fragment {
                                 .setIndex(mSeries1Index)
                                 .setDelay(110)
                                 .build());
-                        mDecoView2.addEvent(new DecoEvent.Builder(600)
+                        mDecoView2.addEvent(new DecoEvent.Builder(2000)
                                 .setIndex(mSeries2Index)
                                 .setDelay(120)
                                 .build());
-                        mDecoView3.addEvent(new DecoEvent.Builder(5)
+                        mDecoView3.addEvent(new DecoEvent.Builder(2000)
                                 .setIndex(mSeries3Index)
                                 .setDelay(130)
                                 .build());

@@ -5,7 +5,8 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import android.widget.TextView
-import com.example.fitaware.home.HomeFragment
+import com.example.fitaware.Award.AwardsFragment
+import com.example.fitaware.Home.HomeFragment
 
 
 class MainActivity : AppCompatActivity() {

@@ -1,30 +1,23 @@
-package com.example.fitaware.home
+package com.example.fitaware.Award
 
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.*
-import android.view.MenuInflater
-import com.example.fitaware.DiscoverFragment
 import com.example.fitaware.R
 
 
-class HomeFragment : Fragment() {
+class AwardsFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        val view: View = inflater!!.inflate(
-            R.layout.fragment_home, container,
+        val view: View = inflater.inflate(
+            R.layout.fragment_awards, container,
             false)
         setHasOptionsMenu(true)
-
-        val decoviewFragment = DecoviewFragment()
-        val manager = fragmentManager
-        val transaction = manager!!.beginTransaction()
-        transaction.replace(R.id.content, decoviewFragment).addToBackStack(null).commit()
 
         return view
     }

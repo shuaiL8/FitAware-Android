@@ -26,7 +26,7 @@ class MeFragment : Fragment() {
         val userListView = view.findViewById<ListView>(R.id.userListView)
         val icon = view.findViewById<ImageView>(R.id.icon)
         val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
-        progressBar.setVisibility(View.GONE)
+        progressBar.visibility = View.GONE
 
         val tv_name = view.findViewById<TextView>(R.id.tv_name)
         tv_name.text = "4Fit"
