@@ -26,17 +26,30 @@ class MainActivity : AppCompatActivity() {
                 transaction.replace(R.id.content, homeFragment).addToBackStack(null).commit()
                 return@OnNavigationItemSelectedListener true
             }
-            R.id.navigation_discover -> {
+            R.id.navigation_me -> {
 //                val actionBar = supportActionBar
 //                actionBar?.show()
 
                 val toolbarTiltle = findViewById<TextView>(R.id.toolbar_title)
-                toolbarTiltle.text = "Discover"
+                toolbarTiltle.text = "Me"
 
-                val discoverFragment = DiscoverFragment()
+                val meFragment = MeFragment()
                 val manager = supportFragmentManager
                 val transaction = manager.beginTransaction()
-                transaction.replace(R.id.content, discoverFragment).addToBackStack(null).commit()
+                transaction.replace(R.id.content, meFragment).addToBackStack(null).commit()
+                return@OnNavigationItemSelectedListener true
+            }
+            R.id.navigation_team -> {
+//                val actionBar = supportActionBar
+//                actionBar?.show()
+
+                val toolbarTiltle = findViewById<TextView>(R.id.toolbar_title)
+                toolbarTiltle.text = "Team"
+
+                val teamFragment = TeamFragment()
+                val manager = supportFragmentManager
+                val transaction = manager.beginTransaction()
+                transaction.replace(R.id.content, teamFragment).addToBackStack(null).commit()
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_notifications -> {
@@ -52,17 +65,17 @@ class MainActivity : AppCompatActivity() {
                 transaction.replace(R.id.content, awardsFragment).addToBackStack(null).commit()
                 return@OnNavigationItemSelectedListener true
             }
-            R.id.navigation_me -> {
+            R.id.navigation_setting -> {
 //                val actionBar = supportActionBar
 //                actionBar?.hide()
 
                 val toolbarTiltle = findViewById<TextView>(R.id.toolbar_title)
                 toolbarTiltle.text = ""
 
-                val meFragment = MeFragment()
+                val settingFragment = SettingFragment()
                 val manager = supportFragmentManager
                 val transaction = manager.beginTransaction()
-                transaction.replace(R.id.content, meFragment).addToBackStack(null).commit()
+                transaction.replace(R.id.content, settingFragment).addToBackStack(null).commit()
                 return@OnNavigationItemSelectedListener true
             }
         }

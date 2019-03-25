@@ -7,9 +7,14 @@
             android:title="@string/title_home"/>
 
     <item
-            android:id="@+id/navigation_discover"
-            android:icon="@drawable/ic_dashboard_black_24dp"
-            android:title="@string/title_discover"/>
+            android:id="@+id/navigation_me"
+            android:icon="@drawable/ic_person_black_24dp"
+            android:title="@string/title_me"/>
+
+    <item
+            android:id="@+id/navigation_team"
+            android:icon="@drawable/ic_group_black_24dp"
+            android:title="@string/title_team"/>
 
     <item
             android:id="@+id/navigation_notifications"
@@ -17,8 +22,8 @@
             android:title="@string/title_awards"/>
 
     <item
-            android:id="@+id/navigation_me"
-            android:icon="@drawable/ic_person_black_24dp"
-            android:title="@string/title_me"/>
+            android:id="@+id/navigation_setting"
+            android:icon="@drawable/ic_settings_black_24dp"
+            android:title="@string/title_setting"/>
 
 </menu>

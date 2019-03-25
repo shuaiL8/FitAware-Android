@@ -28,6 +28,9 @@ public class DecoviewDialogFragment extends DialogFragment {
     TextView textActivity1;
     TextView textActivity2;
     TextView textActivity3;
+    TextView rankActivity1;
+    TextView rankActivity2;
+    TextView rankActivity3;
     TextView textDate;
 
     float percentFilled = 0;
@@ -57,9 +60,14 @@ public class DecoviewDialogFragment extends DialogFragment {
 
         textPercentage = view.findViewById(R.id.textPercentage);
         textRemaining = view.findViewById(R.id.textRemaining);
+
         textActivity1 = view.findViewById(R.id.textActivity1);
         textActivity2 = view.findViewById(R.id.textActivity2);
         textActivity3 = view.findViewById(R.id.textActivity3);
+
+        rankActivity1 = view.findViewById(R.id.rankActivity1);
+        rankActivity2 = view.findViewById(R.id.rankActivity2);
+        rankActivity3 = view.findViewById(R.id.rankActivity3);
         textDate = view.findViewById(R.id.textDate);
 
         if(getArguments() != null) {
@@ -133,13 +141,15 @@ public class DecoviewDialogFragment extends DialogFragment {
 
     private void createDataSeries1() {
         SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor("#ff6347")) //colorTime
-                .setRange(0, mSeriesMax, 0)
+                .setRange(0, 2000, 0)
                 .setInitialVisibility(false)
                 .build();
 
         seriesItem.addArcSeriesItemListener(new SeriesItem.SeriesItemListener() {
             @Override
             public void onSeriesItemAnimationProgress(float percentComplete, float currentPosition) {
+                rankActivity1.setText("No. 1");
+
                 textActivity1.setText(String.format("%.0f / 2000", currentPosition));
             }
 
@@ -153,8 +163,8 @@ public class DecoviewDialogFragment extends DialogFragment {
     }
 
     private void createDataSeries2() {
-        SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor("#2e8b57")) //colorCals
-                .setRange(0, 2000, 0)
+        SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor("#3ebfab")) //colorCals
+                .setRange(0, mSeriesMax, 0)
                 .setInitialVisibility(false)
                 .build();
 
@@ -162,7 +172,9 @@ public class DecoviewDialogFragment extends DialogFragment {
         seriesItem.addArcSeriesItemListener(new SeriesItem.SeriesItemListener() {
             @Override
             public void onSeriesItemAnimationProgress(float percentComplete, float currentPosition) {
-                textActivity2.setText(String.format("%.0f / 2000", currentPosition));
+                rankActivity2.setText("No. 2");
+
+                textActivity2.setText(String.format("%.0f / 6000", currentPosition));
             }
 
             @Override
@@ -175,7 +187,7 @@ public class DecoviewDialogFragment extends DialogFragment {
     }
 
     private void createDataSeries3() {
-        final SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor("#6a5acd")) //colorDis
+        final SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor("#77e6f1")) //colorDis
                 .setRange(0, 2000, 0)
                 .setInitialVisibility(false)
                 .build();
@@ -184,6 +196,8 @@ public class DecoviewDialogFragment extends DialogFragment {
         seriesItem.addArcSeriesItemListener(new SeriesItem.SeriesItemListener() {
             @Override
             public void onSeriesItemAnimationProgress(float percentComplete, float currentPosition) {
+                rankActivity3.setText("No. 3");
+
                 textActivity3.setText(String.format("%.0f / 2000", currentPosition));
             }
 

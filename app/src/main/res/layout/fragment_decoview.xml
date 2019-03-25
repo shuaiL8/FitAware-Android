@@ -8,14 +8,15 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/imageActivity3">
+        android:layout_above="@+id/imageActivity2">
 
         <TextView
-                android:id="@+id/textPercentage"
+            android:id="@+id/textPercentage"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
             android:layout_centerVertical="true"
+            android:textColor="@color/colorCals"
             android:textAppearance="?android:attr/textAppearanceLarge"
             android:textSize="40sp"/>
 
@@ -25,73 +26,112 @@
             android:layout_height="wrap_content"
             android:layout_below="@+id/textPercentage"
             android:layout_centerHorizontal="true"
+            android:textColor="@color/colorCals"
             android:maxWidth="200dp"
-            android:textSize="13dp"
+            android:textSize="10dp"
             android:textAppearance="?android:attr/textAppearanceSmall"/>
-
         <com.hookedonplay.decoviewlib.DecoView xmlns:custom="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/dynamicArcView"
-            android:layout_width="280dp"
-            android:layout_height="280dp"
-            android:layout_centerInParent="true"
-            custom:dv_lineWidth="22dp">
+                                               android:id="@+id/dynamicArcView"
+                                               android:layout_width="161dp"
+                                               android:layout_height="161dp"
+                                               android:layout_centerInParent="true"
+                                               custom:dv_lineWidth="22dp">
 
         </com.hookedonplay.decoviewlib.DecoView>
 
         <com.hookedonplay.decoviewlib.DecoView xmlns:custom="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/dynamicArcView2"
-            android:layout_width="227dp"
-            android:layout_height="227dp"
-            android:layout_centerInParent="true"
-            custom:dv_lineWidth="22dp">
+                                               android:id="@+id/dynamicArcView2"
+                                               android:layout_width="207dp"
+                                               android:layout_height="207dp"
+                                               android:layout_centerInParent="true"
+                                               custom:dv_lineWidth="22dp">
 
         </com.hookedonplay.decoviewlib.DecoView>
 
         <com.hookedonplay.decoviewlib.DecoView xmlns:custom="http://schemas.android.com/apk/res-auto"
-            android:id="@+id/dynamicArcView3"
-            android:layout_width="180dp"
-            android:layout_height="180dp"
-            android:layout_centerInParent="true"
-            custom:dv_lineWidth="22dp">
+                                               android:id="@+id/dynamicArcView3"
+                                               android:layout_width="280dp"
+                                               android:layout_height="280dp"
+                                               android:layout_centerInParent="true"
+                                               custom:dv_lineWidth="22dp">
 
         </com.hookedonplay.decoviewlib.DecoView>
+
     </RelativeLayout>
 
+    <ImageView
+            android:id="@+id/imageActivity1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/imageActivity2"
+            android:background="@drawable/circle_activity_1"
+            android:padding="12dp"
+            android:src="@drawable/ic_add_black_24dp" />
 
     <ImageView
         android:layout_marginTop="8dp"
-        android:id="@+id/imageActivity3"
+        android:id="@+id/imageActivity2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_above="@+id/textActivity3"
+        android:layout_above="@+id/rankActivity2"
         android:layout_centerHorizontal="true"
-        android:background="@drawable/circle_activity3"
+        android:background="@drawable/circle_activity_2"
         android:padding="12dp"
         android:src="@drawable/ic_person_black_24dp" />
 
     <ImageView
-        android:id="@+id/imageActivity2"
+        android:id="@+id/imageActivity3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/imageActivity3"
-        android:background="@drawable/circle_activity2"
+        android:layout_alignTop="@+id/imageActivity2"
+        android:background="@drawable/circle_activity_3"
         android:padding="12dp"
-        android:src="@drawable/ic_winner_on_the_podium"/>
+        android:src="@drawable/ic_group_black_24dp"/>
 
-    <ImageView
-        android:id="@+id/imageActivity1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/imageActivity3"
-        android:background="@drawable/circle_activity1"
-        android:padding="12dp"
-        android:src="@drawable/ic_group_black_24dp" />
+
+    <TextView
+            android:textSize="15dp"
+            android:id="@+id/rankActivity1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/rankActivity2"
+            android:paddingLeft="4dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TextView
+            android:textSize="15dp"
+            android:id="@+id/rankActivity2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/textActivity2"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TextView
+            android:textSize="15dp"
+            android:id="@+id/rankActivity3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/rankActivity2"
+            android:paddingRight="4dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TextView
+            android:textSize="15dp"
+            android:id="@+id/textActivity1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/textActivity2"
+            android:paddingLeft="4dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     <TextView
         android:textSize="15dp"
-        android:id="@+id/textActivity3"
+        android:id="@+id/textActivity2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_above="@+id/demo2"
@@ -100,21 +140,12 @@
 
     <TextView
         android:textSize="15dp"
-        android:id="@+id/textActivity1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignTop="@+id/textActivity3"
-        android:paddingLeft="4dp"
-        android:textAppearance="?android:attr/textAppearanceMedium"/>
-
-    <TextView
-        android:textSize="15dp"
-        android:id="@+id/textActivity2"
+        android:id="@+id/textActivity3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentEnd="true"
         android:layout_alignParentRight="true"
-        android:layout_alignTop="@+id/textActivity3"
+        android:layout_alignTop="@+id/textActivity2"
         android:paddingRight="4dp"
         android:textAppearance="?android:attr/textAppearanceMedium"/>
 

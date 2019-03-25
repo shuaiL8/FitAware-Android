@@ -74,9 +74,9 @@
             android:id="@+id/imageActivity3"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_above="@+id/textActivity3"
+            android:layout_above="@+id/rankActivity3"
             android:layout_centerHorizontal="true"
-            android:background="@drawable/circle_activity3"
+            android:background="@drawable/circle_activity_2"
             android:padding="12dp"
             android:src="@drawable/ic_person_black_24dp" />
 
@@ -87,18 +87,47 @@
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
             android:layout_alignTop="@+id/imageActivity3"
-            android:background="@drawable/circle_activity2"
+            android:background="@drawable/circle_activity_3"
             android:padding="12dp"
-            android:src="@drawable/ic_winner_on_the_podium"/>
+            android:src="@drawable/ic_group_black_24dp"/>
 
     <ImageView
             android:id="@+id/imageActivity1"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/imageActivity3"
-            android:background="@drawable/circle_activity1"
+            android:background="@drawable/circle_activity_1"
             android:padding="12dp"
-            android:src="@drawable/ic_group_black_24dp" />
+            android:src="@drawable/ic_person_black_24dp" />
+
+    <TextView
+            android:textSize="15dp"
+            android:id="@+id/rankActivity3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/textActivity3"
+            android:layout_centerHorizontal="true"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TextView
+            android:textSize="15dp"
+            android:id="@+id/rankActivity1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignTop="@+id/rankActivity3"
+            android:paddingLeft="4dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TextView
+            android:textSize="15dp"
+            android:id="@+id/rankActivity2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_alignTop="@+id/rankActivity3"
+            android:paddingRight="4dp"
+            android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     <TextView
             android:textSize="15dp"

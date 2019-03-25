@@ -49,7 +49,7 @@ class HomeFragment : Fragment() {
         val textDate = view.findViewById<TextView>(R.id.textDate)
 
         val calendar = Calendar.getInstance()
-        val simpleDateFormat = SimpleDateFormat("YYYY-MMMM-dd")
+        val simpleDateFormat = SimpleDateFormat("MMMM-dd")
         val currentDate = simpleDateFormat.format(calendar.time)
         textDate.text = currentDate
 
@@ -119,7 +119,7 @@ class HomeFragment : Fragment() {
     }
 
     private fun createDataSeries() {
-        val seriesItem = SeriesItem.Builder(Color.parseColor("#6a5acd")) //colorDis
+        val seriesItem = SeriesItem.Builder(Color.parseColor("#3ebfab")) //colorDis
             .setRange(0f, 2000f, 0f)
             .setInitialVisibility(false)
             .build()

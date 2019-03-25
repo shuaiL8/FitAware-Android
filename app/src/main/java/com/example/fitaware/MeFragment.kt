@@ -1,18 +1,26 @@
 package com.example.fitaware
 
 
+import android.graphics.Color
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.view.*
-import android.widget.*
+import android.view.LayoutInflater
+import android.view.View
+import android.view.ViewGroup
+import android.widget.TextView
+import com.hookedonplay.decoviewlib.DecoView
+import com.hookedonplay.decoviewlib.charts.DecoDrawEffect
+import com.hookedonplay.decoviewlib.charts.SeriesItem
+import com.hookedonplay.decoviewlib.events.DecoEvent
 
 
-/**
- * A simple [Fragment] subclass.
- *
- */
 class MeFragment : Fragment() {
 
+    private var mDecoView: DecoView? = null
+    private var mBackIndex: Int = 0
+    private var mSeries1Index: Int = 0
+
+    private var personSteps: Float = 1200f
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -21,67 +29,72 @@ class MeFragment : Fragment() {
         // Inflate the layout for this fragment
         val view: View = inflater.inflate(R.layout.fragment_me, container,
             false)
-        setHasOptionsMenu(true)
 
-        val userListView = view.findViewById<ListView>(R.id.userListView)
-        val icon = view.findViewById<ImageView>(R.id.icon)
-        val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
-        progressBar.visibility = View.GONE
 
-        val tv_name = view.findViewById<TextView>(R.id.tv_name)
-        tv_name.text = "4Fit"
+        val textRank = view.findViewById<TextView>(R.id.textRank)
+        val textSteps= view.findViewById<TextView>(R.id.textSteps)
+        mDecoView = view.findViewById<DecoView>(R.id.dynamicArcView)
 
-        val tv_email = view.findViewById<TextView>(R.id.tv_email)
-        tv_email.text = "4fit@vt.edu"
 
-        val tv_group = view.findViewById<TextView>(R.id.tv_group)
-        tv_group.text = "Group CS5714"
+        textRank.text = "No. 3"
+        textSteps.text = String.format("%.0f steps", personSteps)
 
-        val user = resources.getStringArray(R.array.UserStatus)
-        val adapter = ArrayAdapter<String>(
-            activity!!,
-            android.R.layout.simple_list_item_1, user
-        )
+        createBackSeries()
+        createDataSeries()
+        createEvents()
 
-        userListView.adapter = adapter
-
-        icon.setBackgroundResource(R.drawable.ic_person_black_24dp)
-
-        userListView.setOnItemClickListener(AdapterView.OnItemClickListener { adapterView, view, position, id ->
-            if (position == 0) {
-//                logout()
-            }
-            if (position == 1) {
-//                showChangepasswordDialog()
-            }
-            if (position == 2) {
-
-            }
-            if (position == 3) {
-
-            }
-        })
 
         return view
     }
 
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.tool_bar2, menu)
+    private fun createBackSeries() {
+        val seriesItem = SeriesItem.Builder(Color.parseColor("#FFE2E2E2"))
+            .setRange(0f, 2000f, 0f)
+            .setInitialVisibility(true)
+            .build()
+
+        mBackIndex = mDecoView!!.addSeries(seriesItem)
+
     }
 
+    private fun createDataSeries() {
+        val seriesItem = SeriesItem.Builder(Color.parseColor("#3ebfab")) //colorDis
+            .setRange(0f, 2000f, 0f)
+            .setInitialVisibility(false)
+            .build()
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.add -> {
-            // User chose the "Settings" item, show the app settings UI...
-            true
-        }
+        mSeries1Index = mDecoView!!.addSeries(seriesItem)
 
-        else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            super.onOptionsItemSelected(item)
-        }
+
+    }
+
+    private fun createEvents() {
+        mDecoView!!.executeReset()
+
+        mDecoView!!.addEvent(
+            DecoEvent.Builder(2000f)
+                .setIndex(mBackIndex)
+                .setDuration(1000)
+                .setDelay(100)
+                .build()
+        )
+
+        mDecoView!!.addEvent(
+            DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_OUT)
+                .setIndex(mSeries1Index)
+                .setDuration(1000)
+                .setDelay(300)
+                .build()
+        )
+
+        mDecoView!!.addEvent(
+            DecoEvent.Builder(personSteps)
+                .setIndex(mSeries1Index)
+                .setDuration(1000)
+                .setDelay(100)
+                .build()
+        )
     }
 
 }

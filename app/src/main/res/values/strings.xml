@@ -1,19 +1,41 @@
 <resources>
     <string name="app_name">FitAware</string>
     <string name="title_home">Home</string>
-    <string name="title_discover">Discover</string>
+    <string name="title_team">Team</string>
     <string name="title_awards">Awards</string>
     <string name="title_me">Me</string>
+    <string name="title_setting">Setting</string>
+
 
 
     <string-array name="UserStatus">
-        <item>Log out</item>
-        <item>Change Password</item>
-        <item>Setting</item>
-        <item>Contact Us</item>
+    <item>Change Profile</item>
+    <item>Setting</item>
+    <item>Change Password</item>
+    <item>Log out</item>
+    <item>Contact Us</item>
+</string-array>
+
+
+    <string-array name="Rank">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+
     </string-array>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string-array name="memberNames">
+        <item>4Fit1</item>
+        <item>4Fit2</item>
+        <item>Me</item>
+
+    </string-array>
+
+    <string-array name="Steps">
+        <item>1500</item>
+        <item>1300</item>
+        <item>1200</item>
+
+    </string-array>
 
 </resources>

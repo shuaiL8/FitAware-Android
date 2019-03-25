@@ -8,7 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 
 
-class DiscoverFragment : Fragment() {
+class TeamFragment : Fragment() {
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -16,7 +16,7 @@ class DiscoverFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view: View = inflater!!.inflate(
-            R.layout.fragment_discover, container,
+            R.layout.fragment_team, container,
             false)
         setHasOptionsMenu(false)
 
