@@ -353,21 +353,21 @@ public class DecoviewFragment extends Fragment {
                 .setDuration(1000)
                 .build());
 
-        mDecoView3.addEvent(new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
+        mDecoView.addEvent(new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
                 .setIndex(mSeries1Index)
                 .setDelay(1500)
                 .setDuration(2000)
                 .build());
 
         mDecoView2.addEvent(new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
-                .setIndex(mSeries1Index)
+                .setIndex(mSeries2Index)
                 .setDelay(1500)
                 .setDuration(2000)
                 .build());
 
 
-        mDecoView.addEvent(new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
-                .setIndex(mSeries1Index)
+        mDecoView3.addEvent(new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
+                .setIndex(mSeries3Index)
                 .setDelay(1500)
                 .setDuration(2000)
                 .setDisplayText("Nice Job!")

@@ -1,24 +1,20 @@
 package com.example.fitaware.Award
 
 
-import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.support.v4.widget.SwipeRefreshLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.fitaware.R
 import android.widget.AdapterView
 import android.widget.GridView
-import android.widget.ListView
-import com.example.fitaware.Team.Member
-import com.example.fitaware.Team.MemberAdapter
+import com.example.fitaware.R
+import kotlinx.android.synthetic.main.fragment_team_award.*
 import java.util.ArrayList
 
 
-class PersonalAwardFragment : Fragment() {
+class TeamAwardFragment : Fragment() {
 
     private var awards = ArrayList<Award>(1)
     private lateinit var awardsAdapter: AwardAdapter
@@ -29,14 +25,15 @@ class PersonalAwardFragment : Fragment() {
     ): View? {
         // Inflate the layout for this fragment
         val view: View = inflater.inflate(
-            R.layout.fragment_personal_award, container,
+            R.layout.fragment_team_award, container,
             false)
         setHasOptionsMenu(true)
 
-        val gridViewPersonalAwards = view.findViewById<GridView>(R.id.gridViewPersonalAwards)
 
-        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_first)
-        awards.add(Award(bitmap, "Best of Day", "4/10/2019"))
+        val gridViewTeamAwards = view.findViewById<GridView>(R.id.gridViewTeamAwards)
+
+        val bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_trophy)
+        awards.add(Award(bitmap, "Best of Year", "12/31/2018"))
 
 
         awardsAdapter = AwardAdapter(
@@ -44,9 +41,9 @@ class PersonalAwardFragment : Fragment() {
             R.layout.awards,
             awards
         )
-        gridViewPersonalAwards.adapter = awardsAdapter
+        gridViewTeamAwards.adapter = awardsAdapter
 
-        gridViewPersonalAwards.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+        gridViewTeamAwards.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
 
         }
 

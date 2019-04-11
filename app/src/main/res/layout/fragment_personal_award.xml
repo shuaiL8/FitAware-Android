@@ -6,15 +6,15 @@
              tools:context=".Award.PersonalAwardFragment">
 
     <GridView
-            android:id="@+id/gridview"
+            android:id="@+id/gridViewPersonalAwards"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:gravity="center"
-            android:columnWidth="100dp"
+            android:columnWidth="150dp"
             android:numColumns="auto_fit"
             android:verticalSpacing="24dp"
             android:horizontalSpacing="10dp"
             android:stretchMode="spacingWidthUniform"
-    />
+            android:padding="5dp"/>
 
 </FrameLayout>

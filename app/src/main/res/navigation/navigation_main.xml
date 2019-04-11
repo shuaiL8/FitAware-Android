@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+            xmlns:app="http://schemas.android.com/apk/res-auto"
+            xmlns:tools="http://schemas.android.com/tools" android:id="@+id/navigation_graph"
+            app:startDestination="@id/homeFragment">
+
+    <fragment android:id="@+id/homeFragment" android:name="com.example.fitaware.Home.HomeFragment"
+              android:label="fragment_home" tools:layout="@layout/fragment_home">
+        <action android:id="@+id/action_homeFragment_to_meFragment" app:destination="@id/meFragment"/>
+    </fragment>
+    <fragment android:id="@+id/meFragment" android:name="com.example.fitaware.MeFragment" android:label="fragment_me"
+              tools:layout="@layout/fragment_me">
+        <action android:id="@+id/action_meFragment_to_teamFragment" app:destination="@id/teamFragment"/>
+    </fragment>
+    <fragment android:id="@+id/teamFragment" android:name="com.example.fitaware.Team.TeamFragment"
+              android:label="fragment_team" tools:layout="@layout/fragment_team">
+        <action android:id="@+id/action_teamFragment_to_awardsFragment" app:destination="@id/awardsFragment"/>
+    </fragment>
+    <fragment android:id="@+id/awardsFragment" android:name="com.example.fitaware.Award.AwardsFragment"
+              android:label="fragment_awards" tools:layout="@layout/fragment_awards">
+        <action android:id="@+id/action_awardsFragment_to_settingFragment" app:destination="@id/settingFragment"/>
+    </fragment>
+    <fragment android:id="@+id/settingFragment" android:name="com.example.fitaware.SettingFragment"
+              android:label="fragment_setting" tools:layout="@layout/fragment_setting">
+        <action android:id="@+id/action_settingFragment_to_homeFragment" app:destination="@id/homeFragment"/>
+    </fragment>
+</navigation>

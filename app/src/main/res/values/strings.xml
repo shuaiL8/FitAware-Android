@@ -7,35 +7,13 @@
     <string name="title_setting">Setting</string>
 
 
-
     <string-array name="UserStatus">
-    <item>Change Profile</item>
-    <item>Setting</item>
-    <item>Change Password</item>
-    <item>Log out</item>
-    <item>Contact Us</item>
-</string-array>
-
-
-    <string-array name="Rank">
-        <item>1</item>
-        <item>2</item>
-        <item>3</item>
-
+        <item>Change Profile</item>
+        <item>Setting</item>
+        <item>Change Password</item>
+        <item>Log out</item>
+        <item>Contact Us</item>
     </string-array>
 
-    <string-array name="memberNames">
-        <item>4Fit1</item>
-        <item>4Fit2</item>
-        <item>Me</item>
-
-    </string-array>
-
-    <string-array name="Steps">
-        <item>1500</item>
-        <item>1300</item>
-        <item>1200</item>
-
-    </string-array>
 
 </resources>

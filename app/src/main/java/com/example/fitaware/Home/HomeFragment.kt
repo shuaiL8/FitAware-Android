@@ -49,7 +49,7 @@ class HomeFragment : Fragment() {
         val textDate = view.findViewById<TextView>(R.id.textDate)
 
         val calendar = Calendar.getInstance()
-        val simpleDateFormat = SimpleDateFormat("MMMM-dd")
+        val simpleDateFormat = SimpleDateFormat("MMMM dd")
         val currentDate = simpleDateFormat.format(calendar.time)
         textDate.text = currentDate
 

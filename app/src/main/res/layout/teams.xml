@@ -16,20 +16,19 @@
                 android:scaleType="centerCrop"/>
 
         <ImageView
-                android:id="@+id/imageView_awards"
+                android:id="@+id/imageView_teams"
                 android:layout_width="wrap_content"
                 android:layout_height="250dp"
-                android:src="@drawable/ic_first"
+                android:src="@drawable/teamwork"
                 android:layout_gravity="bottom|right"/>
-
     </FrameLayout>
 
     <TextView
-            android:id="@+id/award_name"
+            android:id="@+id/team_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            tools:text="1st"
+            android:textSize="20sp"
+            tools:text="Team name"
             android:textStyle="bold"
             android:paddingTop="4dp"
             android:paddingLeft="8dp"
@@ -37,11 +36,19 @@
             android:gravity="center_horizontal"/>
 
     <TextView
-            android:id="@+id/award_date"
+            android:id="@+id/team_captain"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="12sp"
-            tools:text="date"
+            android:textSize="15sp"
+            tools:text="captain"
+            android:gravity="center_horizontal"/>
+
+    <TextView
+            android:id="@+id/team_rank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            tools:text="1st"
             android:gravity="center_horizontal"/>
 
 </LinearLayout>

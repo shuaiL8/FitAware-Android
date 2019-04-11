@@ -26,6 +26,7 @@ class HwAdapter extends BaseAdapter {
     private Calendar month;
     public GregorianCalendar pmonth;
 
+
     /**
      * calendar instance for previous month for getting complete view
      */
@@ -38,6 +39,7 @@ class HwAdapter extends BaseAdapter {
     int mnthlength;
     String itemvalue, curentDateString;
     DateFormat df;
+    int cDay, cMonth, vMonth;
 
     private ArrayList<String> items;
     public static List<String> day_string;
@@ -78,7 +80,7 @@ class HwAdapter extends BaseAdapter {
     // create a new view for each item referenced by the Adapter
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
-        TextView dayView;
+        TextView dayView, tv_month;
         if (convertView == null) { // if it's not recycled, initialize some
             // attributes
             LayoutInflater vi = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -86,8 +88,15 @@ class HwAdapter extends BaseAdapter {
 
         }
 
+        Calendar calander = Calendar.getInstance();
+        cDay = calander.get(Calendar.DAY_OF_MONTH);
+        cMonth = calander.get(Calendar.MONTH) + 1;
+        vMonth = month.get(Calendar.MONTH) + 1;
 
-        dayView = (TextView) v.findViewById(R.id.date);
+
+
+        dayView = v.findViewById(R.id.date);
+
         String[] separatedTime = day_string.get(position).split("-");
 
 
@@ -101,13 +110,18 @@ class HwAdapter extends BaseAdapter {
             dayView.setClickable(false);
             dayView.setFocusable(false);
         } else {
-            // setting curent month's days in blue color.
-            dayView.setTextColor(Color.parseColor("#696969"));
+
+            if(Integer.parseInt(gridvalue) == cDay && vMonth == cMonth) {
+                dayView.setTextColor(Color.parseColor("#ff1a1a"));
+            }
+            else {
+                dayView.setTextColor(Color.parseColor("#696969"));
+            }
+
         }
 
 
         if (day_string.get(position).equals(curentDateString)) {
-
             v.setBackgroundColor(Color.parseColor("#ffffff"));
         } else {
             v.setBackgroundColor(Color.parseColor("#ffffff"));
@@ -213,7 +227,12 @@ class HwAdapter extends BaseAdapter {
                             v.setBackgroundResource(R.drawable.rounded_calender_orange);
                         }
                         Log.i(TAG,  "strDate" + date + strDate );
-                        txt.setTextColor(Color.parseColor("#696969"));
+                        if(Integer.parseInt(gridvalue) == cDay && vMonth == cMonth) {
+                            txt.setTextColor(Color.parseColor("#ff1a1a"));
+                        }
+                        else {
+                            txt.setTextColor(Color.parseColor("#696969"));
+                        }
                     }
 
                 }
