@@ -9,13 +9,16 @@ public class Member {
     private String mRank;
     private String mName;
     private String mSteps;
+    private String mGoal;
     private String mColor;
-    public Member(String mRank, String mName, String mSteps, String mColor) {
+
+    public Member(String mRank, String mName, String mSteps, String mGoal, String mColor) {
         super();
 //        this.deco = deco;
         this.mRank = mRank;
         this.mName = mName;
         this.mSteps = mSteps;
+        this.mGoal = mGoal;
         this.mColor = mColor;
 
 
@@ -53,6 +56,14 @@ public class Member {
 
     public void setmColor(String mColor) {
         this.mColor = mColor;
+    }
+
+    public String getmGoal() {
+        return mGoal;
+    }
+
+    public void setmGoal(String mGoal) {
+        this.mGoal = mGoal;
     }
 
 }

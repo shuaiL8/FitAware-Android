@@ -3,6 +3,7 @@ package com.example.fitaware.Team;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Color;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -21,12 +22,14 @@ import java.util.ArrayList;
  */
 
 public class MemberAdapter extends ArrayAdapter<Member> {
+    private static final String TAG = "MemberAdapter";
 
     private DecoView mDecoView;
     private int mBackIndex = 0;
     private int mSeries1Index = 0;
 
     private float memberSteps = 0;
+    private float goal = 0;
 
     private String mColor;
 
@@ -63,8 +66,13 @@ public class MemberAdapter extends ArrayAdapter<Member> {
 
         Member item = data.get(position);
 
+        Log.i(TAG, "memberSteps: "+ item.getmSteps());
+        Log.i(TAG, "goal: "+ item.getmGoal());
+
         mColor = item.getmColor();
         memberSteps = Float.valueOf(item.getmSteps());
+        goal = Float.valueOf(item.getmGoal());
+
 
         holder.mRank.setText(item.getmRank());
         holder.mName.setText(item.getmName());
@@ -73,7 +81,6 @@ public class MemberAdapter extends ArrayAdapter<Member> {
         holder.mRank.setTextColor(Color.parseColor(mColor));
         holder.mName.setTextColor(Color.parseColor(mColor));
         holder.mSteps.setTextColor(Color.parseColor(mColor));
-
 
         createBackSeries();
         createDataSeries();
@@ -100,7 +107,7 @@ public class MemberAdapter extends ArrayAdapter<Member> {
 
     private void createDataSeries() {
         SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor(mColor))
-                .setRange(0, 2000f, 0)
+                .setRange(-1, goal, 0)
                 .setInitialVisibility(false)
                 .build();
 

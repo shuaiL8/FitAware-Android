@@ -9,6 +9,7 @@ public class Team {
     private String captain;
     private String rank;
 
+
     public Team(Bitmap image, String name, String captain, String rank) {
         super();
         this.image = image;

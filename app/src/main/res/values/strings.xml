@@ -6,14 +6,26 @@
     <string name="title_me">Me</string>
     <string name="title_setting">Setting</string>
 
+    <string name="userID">User/shuail8</string>
+
+    <string name="teammateID">User/jfan12</string>
 
     <string-array name="UserStatus">
-        <item>Change Profile</item>
-        <item>Setting</item>
+        <item>Profile</item>
+        <item>Advance Setting</item>
         <item>Change Password</item>
         <item>Log out</item>
         <item>Contact Us</item>
     </string-array>
+
+    <string-array name="Daily_Weekly_Monthly">
+        <item>Daily</item>
+        <item>Weekly</item>
+        <item>Monthly</item>
+    </string-array>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 
 
 </resources>

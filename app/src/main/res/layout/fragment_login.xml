@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <RelativeLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_margin="@dimen/activity_vertical_margin">
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/ti_email"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <EditText
+                    android:id="@+id/et_email"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="20dp"
+                    android:layout_height="60dp"
+                    android:drawableRight="@drawable/ic_email_black_24dp"
+                    android:hint="Email"
+                    android:inputType="textEmailAddress" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <android.support.design.widget.TextInputLayout
+                android:id="@+id/ti_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/ti_email"
+                app:passwordToggleEnabled="true">
+
+                <EditText
+                    android:id="@+id/et_password"
+                    android:layout_width="match_parent"
+                    android:layout_marginTop="20dp"
+
+                    android:layout_height="60dp"
+                    android:drawableRight="@drawable/ic_remove_red_eye_black_24dp"
+                    android:hint="Password"
+                    android:inputType="textPassword" />
+
+            </android.support.design.widget.TextInputLayout>
+
+            <Button
+                android:id="@+id/btn_login"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:layout_marginTop="20dp"
+                android:layout_below="@+id/ti_password"
+                android:drawableRight="@drawable/ic_arrow_forward_black_24dp"
+                android:text="Login" />
+
+            <TextView
+                android:id="@+id/tv_register"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/btn_login"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/colorPrimary"
+                android:text="Not Registered ? Register Now !"
+                android:textAlignment="center" />
+
+            <TextView
+                android:id="@+id/tv_forgot_password"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_register"
+                android:textColor="@color/colorPrimary"
+                android:layout_marginTop="20dp"
+                android:text="Forgot Password ?"
+                android:textAlignment="center" />
+
+
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_forgot_password"
+                android:layout_centerHorizontal="true"
+                android:visibility="gone"/>
+
+        </RelativeLayout>
+    </LinearLayout>
+</ScrollView>
