@@ -46,13 +46,10 @@ class SettingFragment : Fragment() {
         progressBar.visibility = View.GONE
 
         val tv_name = view.findViewById<TextView>(R.id.tv_name)
-        tv_name.text = "4Fit"
 
         val tv_email = view.findViewById<TextView>(R.id.tv_email)
-        tv_email.text = "4fit@vt.edu"
 
         val tv_group = view.findViewById<TextView>(R.id.tv_group)
-        tv_group.text = "Group CS5714"
 
         val user = resources.getStringArray(R.array.UserStatus)
         val adapter = ArrayAdapter<String>(

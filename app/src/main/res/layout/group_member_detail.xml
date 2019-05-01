@@ -37,9 +37,9 @@
     <TextView
             android:layout_weight="1"
             android:id="@+id/memberName"
-            android:layout_width="wrap_content"
+            android:layout_width="65dp"
             android:layout_height="wrap_content"
-            android:textSize="35sp"
+            android:textSize="25sp"
             android:textColor="@color/colorCals"
             android:text="4fit"
             android:layout_gravity="center"
@@ -47,7 +47,7 @@
 
     <TextView
             android:layout_weight="1"
-            android:layout_width="wrap_content"
+            android:layout_width="50dp"
             android:layout_height="wrap_content"
             android:id="@+id/memberSteps"
             android:textSize="35sp"

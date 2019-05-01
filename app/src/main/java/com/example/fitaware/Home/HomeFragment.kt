@@ -38,13 +38,16 @@ import com.google.firebase.database.*
 import com.jjoe64.graphview.GraphView
 import com.jjoe64.graphview.series.DataPoint
 import com.jjoe64.graphview.series.PointsGraphSeries
-import com.jjoe64.graphview.series.BarGraphSeries
+import com.jjoe64.graphview.series.LineGraphSeries
 import com.example.fitaware.User
 import java.util.HashMap
 import android.arch.lifecycle.Observer
 import android.os.Handler
 import android.widget.*
-
+import kotlin.math.absoluteValue
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.sql.Timestamp
 
 class HomeFragment : Fragment(){
 
@@ -69,8 +72,8 @@ class HomeFragment : Fragment(){
     private lateinit var personalStepsGraph: GraphView
     private lateinit var groupStepsGraph: GraphView
 
-    private var personalStepsSeries: BarGraphSeries<DataPoint>? = null
-    private var groupStepsSeries: BarGraphSeries<DataPoint>? = null
+    private var personalStepsSeries: LineGraphSeries<DataPoint>? = null
+    private var groupStepsSeries: LineGraphSeries<DataPoint>? = null
 
     private var mDecoView4: DecoView? = null
     private var mBackIndex4: Int = 0
@@ -117,10 +120,11 @@ class HomeFragment : Fragment(){
     internal lateinit var rankActivity3: TextView
 
     internal lateinit var imageActivity1: ImageView
-    internal lateinit var demo1: Button
-    internal lateinit var demo2:Button
-    internal lateinit var clear:Button
+//    internal lateinit var demo1: Button
+//    internal lateinit var demo2:Button
+//    internal lateinit var clear:Button
 
+    private var tempX : Long = 0L
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -131,6 +135,9 @@ class HomeFragment : Fragment(){
             false)
         setHasOptionsMenu(true)
 
+        personalStepsSeries = LineGraphSeries(arrayOf(DataPoint(0.0, my_steps.toDouble())))
+        groupStepsSeries = LineGraphSeries(arrayOf(DataPoint(0.0, team_steps.toDouble())))
+        tempX = System.currentTimeMillis()/1000L
 
         //updateUI
         mTimer = Timer()
@@ -139,8 +146,6 @@ class HomeFragment : Fragment(){
 
         mTimer!!.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {
-//                val stepsDataTask = StepsDataTask()
-//                stepsDataTask.execute()
 
                 updateUI()
             }
@@ -197,9 +202,9 @@ class HomeFragment : Fragment(){
         rankActivity2 = view.findViewById(R.id.rankActivity2)
         rankActivity3 = view.findViewById(R.id.rankActivity3)
 
-        demo1 = view.findViewById(R.id.demo1)
-        demo2 = view.findViewById(R.id.demo2)
-        clear = view.findViewById(R.id.clear)
+//        demo1 = view.findViewById(R.id.demo1)
+//        demo2 = view.findViewById(R.id.demo2)
+//        clear = view.findViewById(R.id.clear)
 
         mDecoView!!.visibility = View.GONE
         rankActivity1.visibility = View.GONE
@@ -208,30 +213,31 @@ class HomeFragment : Fragment(){
         imageActivity1 = view.findViewById(R.id.imageActivity1)
 
 
-        demo1.visibility = View.GONE
-        clear.visibility = View.GONE
-        demo2.text = "DEMO"
-
-        demo1.setOnClickListener { demo1(1500f, 1300f, 4000f) }
-
-        demo2.setOnClickListener {
-            if (demo2.text === "DEMO") {
-                demo1.visibility = View.VISIBLE
-                clear.visibility = View.VISIBLE
-                demo2.text = "100%"
-            } else if (demo2.text === "100%") {
-                demo2()
-                demo1.isEnabled = false
-            }
-        }
-
-        clear.setOnClickListener {
-            clear()
-            demo1.visibility = View.GONE
-            clear.visibility = View.GONE
-            demo2.text = "DEMO"
-            demo1.isEnabled = true
-        }
+//        demo1.visibility = View.GONE
+//        demo2.visibility = View.GONE
+//        clear.visibility = View.GONE
+//        demo2.text = "DEMO"
+//
+//        demo1.setOnClickListener { demo1(1500f, 1300f, 4000f) }
+//
+//        demo2.setOnClickListener {
+//            if (demo2.text === "DEMO") {
+//                demo1.visibility = View.VISIBLE
+//                clear.visibility = View.VISIBLE
+//                demo2.text = "100%"
+//            } else if (demo2.text === "100%") {
+//                demo2()
+//                demo1.isEnabled = false
+//            }
+//        }
+//
+//        clear.setOnClickListener {
+//            clear()
+//            demo1.visibility = View.GONE
+//            clear.visibility = View.GONE
+//            demo2.text = "DEMO"
+//            demo1.isEnabled = true
+//        }
 
 
         val model = ViewModelProviders.of(activity!!).get(Communicator::class.java)
@@ -306,7 +312,11 @@ class HomeFragment : Fragment(){
     }
 
 
-    private var refreshTime = 0
+
+    private var second : Long = 0L
+
+    private var unixTime : Long = 0L
+
 
     private fun updateUI() {
 
@@ -314,26 +324,13 @@ class HomeFragment : Fragment(){
         if (activity != null) {
             activity!!.runOnUiThread {
 
+                unixTime  = System.currentTimeMillis()/1000L
+
+                second = unixTime - tempX
+
                 refreshEvents(teammate_steps.toFloat(), my_steps.toFloat(), team_steps.toFloat())
 
-                personalStepsSeries = BarGraphSeries(arrayOf(DataPoint(0.0, my_steps.toDouble())))
-
-                personalStepsSeries!!.spacing = 2000
-
-                // draw values on top
-                personalStepsSeries!!.isDrawValuesOnTop = true
-                personalStepsSeries!!.valuesOnTopColor = Color.parseColor("#3ebfab")
-                personalStepsSeries!!.dataWidth = 10000.0
-
-                groupStepsSeries = BarGraphSeries(arrayOf(DataPoint(0.0, team_steps.toDouble())))
-
-                groupStepsSeries!!.spacing = 2000
-
-                groupStepsSeries!!.isDrawValuesOnTop = true
-                groupStepsSeries!!.valuesOnTopColor = Color.parseColor("#ff6347")
-                groupStepsSeries!!.dataWidth = 10000.0
-
-                personalStepsSeries!!.appendData(DataPoint(refreshTime++.toDouble(), my_steps.toDouble()), true, 60)
+                personalStepsSeries!!.appendData(DataPoint(second.toDouble(), my_steps.toDouble()), true, 60)
                 // set manual X bounds
                 personalStepsGraph.viewport.isYAxisBoundsManual = true
                 personalStepsGraph.viewport.setMinY(0.0)
@@ -341,7 +338,7 @@ class HomeFragment : Fragment(){
 
                 personalStepsGraph.viewport.isXAxisBoundsManual = true
                 personalStepsGraph.viewport.setMinX(0.0)
-                personalStepsGraph.viewport.setMaxX(10.0)
+                personalStepsGraph.viewport.setMaxX(second + second*0.3)
 
                 // enable scaling and scrolling
                 personalStepsGraph.viewport.isScalable = true
@@ -349,7 +346,7 @@ class HomeFragment : Fragment(){
                 personalStepsGraph.addSeries(personalStepsSeries)
 
 
-                groupStepsSeries!!.appendData(DataPoint(refreshTime++.toDouble(), team_steps.toDouble()), true, 60)
+                groupStepsSeries!!.appendData(DataPoint(second.toDouble(), team_steps.toDouble()), true, 60)
                 // set manual X bounds
                 groupStepsGraph.viewport.isYAxisBoundsManual = true
                 groupStepsGraph.viewport.setMinY(0.0)
@@ -357,21 +354,16 @@ class HomeFragment : Fragment(){
 
                 groupStepsGraph.viewport.isXAxisBoundsManual = true
                 groupStepsGraph.viewport.setMinX(0.0)
-                groupStepsGraph.viewport.setMaxX(10.0)
+                groupStepsGraph.viewport.setMaxX(second + second*0.3)
 
                 // enable scaling and scrolling
                 groupStepsGraph.viewport.isScalable = true
                 groupStepsGraph.viewport.setScalableY(true)
                 groupStepsGraph.addSeries(groupStepsSeries)
 
+                Log.w(TAG, "unixTime" + unixTime )
+                Log.w(TAG, "second" + second.toDouble() )
 
-
-
-                if (refreshTime > 10) {
-                    refreshTime = 0
-                    personalStepsGraph.removeAllSeries()
-                    groupStepsGraph.removeAllSeries()
-                }
             }
         }
     }
@@ -528,7 +520,7 @@ class HomeFragment : Fragment(){
             override fun onSeriesItemAnimationProgress(percentComplete: Float, currentPosition: Float) {
                 remainingKm = myGoal - currentPosition
 
-                textRemaining.text = String.format("%.0f steps to goal", remainingKm)
+                textRemaining.text = String.format("%.0f steps to goal", remainingKm.absoluteValue)
 
             }
 
@@ -670,6 +662,7 @@ class HomeFragment : Fragment(){
                 .setDelay(100)
                 .build()
         )
+
         mDecoView2!!.addEvent(
             DecoEvent.Builder(mySteps)
                 .setIndex(mSeries2Index)
@@ -677,6 +670,7 @@ class HomeFragment : Fragment(){
                 .setDelay(100)
                 .build()
         )
+
         mDecoView3!!.addEvent(
             DecoEvent.Builder(teamSteps)
                 .setIndex(mSeries3Index)
@@ -706,156 +700,156 @@ class HomeFragment : Fragment(){
 
 
 
-    private fun demo1(teammateSteps: Float, mySteps: Float, teamSteps: Float) {
-
-        mDecoView!!.addEvent(
-            DecoEvent.Builder(teammateSteps)
-                .setIndex(mSeries1Index)
-                .setDuration(1000)
-                .setDelay(100)
-                .build()
-        )
-        mDecoView2!!.addEvent(
-            DecoEvent.Builder(mySteps)
-                .setIndex(mSeries2Index)
-                .setDuration(1000)
-                .setDelay(100)
-                .build()
-        )
-        mDecoView3!!.addEvent(
-            DecoEvent.Builder(teamSteps)
-                .setIndex(mSeries3Index)
-                .setDuration(1000)
-                .setDelay(100)
-                .build()
-        )
-    }
-
-    private fun demo2() {
-
-        mDecoView!!.addEvent(DecoEvent.Builder(2000f).setIndex(mSeries1Index).setDelay(100).setDuration(1000).build())
-
-        mDecoView2!!.addEvent(DecoEvent.Builder(2000f).setIndex(mSeries2Index).setDelay(100).setDuration(1000).build())
-
-        mDecoView3!!.addEvent(
-            DecoEvent.Builder(mSeriesMax)
-                .setIndex(mSeries3Index)
-                .setDelay(100)
-                .setDuration(1000)
-                .build()
-        )
-
-        mDecoView!!.addEvent(
-            DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
-                .setIndex(mSeries1Index)
-                .setDelay(1500)
-                .setDuration(2000)
-                .build()
-        )
-
-        mDecoView2!!.addEvent(
-            DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
-                .setIndex(mSeries2Index)
-                .setDelay(1500)
-                .setDuration(2000)
-                .build()
-        )
-
-
-        mDecoView3!!.addEvent(
-            DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
-                .setIndex(mSeries3Index)
-                .setDelay(1500)
-                .setDuration(2000)
-                .setDisplayText("Nice Job!")
-                .setListener(object : DecoEvent.ExecuteEventListener {
-                    override fun onEventStart(decoEvent: DecoEvent) {
-                        resetText()
-                    }
-
-                    override fun onEventEnd(decoEvent: DecoEvent) {
-                        mDecoView!!.addEvent(
-                            DecoEvent.Builder(mSeriesMax)
-                                .setIndex(mBackIndex)
-                                .setDuration(2000)
-                                .setDelay(100)
-                                .build()
-                        )
-                        mDecoView2!!.addEvent(
-                            DecoEvent.Builder(mSeriesMax)
-                                .setIndex(mBackIndex2)
-                                .setDuration(2000)
-                                .setDelay(100)
-                                .build()
-                        )
-                        mDecoView3!!.addEvent(
-                            DecoEvent.Builder(mSeriesMax)
-                                .setIndex(mBackIndex3)
-                                .setDuration(2000)
-                                .setDelay(100)
-                                .build()
-                        )
-
-                        mDecoView!!.addEvent(
-                            DecoEvent.Builder(2000f)
-                                .setIndex(mSeries1Index)
-                                .setDelay(110)
-                                .build()
-                        )
-                        mDecoView2!!.addEvent(
-                            DecoEvent.Builder(2000f)
-                                .setIndex(mSeries2Index)
-                                .setDelay(120)
-                                .build()
-                        )
-                        mDecoView3!!.addEvent(
-                            DecoEvent.Builder(mSeriesMax)
-                                .setIndex(mSeries3Index)
-                                .setDelay(130)
-                                .build()
-                        )
-
-                    }
-                })
-                .build()
-        )
-    }
-
-    private fun clear() {
-        mDecoView!!.addEvent(
-            DecoEvent.Builder(0f)
-                .setIndex(mSeries1Index)
-                .setDelay(0)
-                .setDuration(0)
-                .build()
-        )
-        mDecoView2!!.addEvent(
-            DecoEvent.Builder(0f)
-                .setIndex(mSeries2Index)
-                .setDelay(0)
-                .setDuration(0)
-                .build()
-        )
-        mDecoView3!!.addEvent(
-            DecoEvent.Builder(0f)
-                .setIndex(mSeries3Index)
-                .setDelay(0)
-                .setDuration(0)
-                .build()
-        )
-    }
-
-    private fun resetText() {
-        //        textActivity1.setText("");
-        //        textActivity2.setText("");
-        //        textActivity3.setText("");
-        textPercentage.text = ""
-        textRemaining.text = ""
-
-        rankActivity1.text = ""
-        rankActivity2.text = ""
-        rankActivity3.text = ""
-
-    }
+//    private fun demo1(teammateSteps: Float, mySteps: Float, teamSteps: Float) {
+//
+//        mDecoView!!.addEvent(
+//            DecoEvent.Builder(teammateSteps)
+//                .setIndex(mSeries1Index)
+//                .setDuration(1000)
+//                .setDelay(100)
+//                .build()
+//        )
+//        mDecoView2!!.addEvent(
+//            DecoEvent.Builder(mySteps)
+//                .setIndex(mSeries2Index)
+//                .setDuration(1000)
+//                .setDelay(100)
+//                .build()
+//        )
+//        mDecoView3!!.addEvent(
+//            DecoEvent.Builder(teamSteps)
+//                .setIndex(mSeries3Index)
+//                .setDuration(1000)
+//                .setDelay(100)
+//                .build()
+//        )
+//    }
+//
+//    private fun demo2() {
+//
+//        mDecoView!!.addEvent(DecoEvent.Builder(2000f).setIndex(mSeries1Index).setDelay(100).setDuration(1000).build())
+//
+//        mDecoView2!!.addEvent(DecoEvent.Builder(2000f).setIndex(mSeries2Index).setDelay(100).setDuration(1000).build())
+//
+//        mDecoView3!!.addEvent(
+//            DecoEvent.Builder(mSeriesMax)
+//                .setIndex(mSeries3Index)
+//                .setDelay(100)
+//                .setDuration(1000)
+//                .build()
+//        )
+//
+//        mDecoView!!.addEvent(
+//            DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
+//                .setIndex(mSeries1Index)
+//                .setDelay(1500)
+//                .setDuration(2000)
+//                .build()
+//        )
+//
+//        mDecoView2!!.addEvent(
+//            DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
+//                .setIndex(mSeries2Index)
+//                .setDelay(1500)
+//                .setDuration(2000)
+//                .build()
+//        )
+//
+//
+//        mDecoView3!!.addEvent(
+//            DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_EXPLODE)
+//                .setIndex(mSeries3Index)
+//                .setDelay(1500)
+//                .setDuration(2000)
+//                .setDisplayText("Nice Job!")
+//                .setListener(object : DecoEvent.ExecuteEventListener {
+//                    override fun onEventStart(decoEvent: DecoEvent) {
+//                        resetText()
+//                    }
+//
+//                    override fun onEventEnd(decoEvent: DecoEvent) {
+//                        mDecoView!!.addEvent(
+//                            DecoEvent.Builder(mSeriesMax)
+//                                .setIndex(mBackIndex)
+//                                .setDuration(2000)
+//                                .setDelay(100)
+//                                .build()
+//                        )
+//                        mDecoView2!!.addEvent(
+//                            DecoEvent.Builder(mSeriesMax)
+//                                .setIndex(mBackIndex2)
+//                                .setDuration(2000)
+//                                .setDelay(100)
+//                                .build()
+//                        )
+//                        mDecoView3!!.addEvent(
+//                            DecoEvent.Builder(mSeriesMax)
+//                                .setIndex(mBackIndex3)
+//                                .setDuration(2000)
+//                                .setDelay(100)
+//                                .build()
+//                        )
+//
+//                        mDecoView!!.addEvent(
+//                            DecoEvent.Builder(2000f)
+//                                .setIndex(mSeries1Index)
+//                                .setDelay(110)
+//                                .build()
+//                        )
+//                        mDecoView2!!.addEvent(
+//                            DecoEvent.Builder(2000f)
+//                                .setIndex(mSeries2Index)
+//                                .setDelay(120)
+//                                .build()
+//                        )
+//                        mDecoView3!!.addEvent(
+//                            DecoEvent.Builder(mSeriesMax)
+//                                .setIndex(mSeries3Index)
+//                                .setDelay(130)
+//                                .build()
+//                        )
+//
+//                    }
+//                })
+//                .build()
+//        )
+//    }
+//
+//    private fun clear() {
+//        mDecoView!!.addEvent(
+//            DecoEvent.Builder(0f)
+//                .setIndex(mSeries1Index)
+//                .setDelay(0)
+//                .setDuration(0)
+//                .build()
+//        )
+//        mDecoView2!!.addEvent(
+//            DecoEvent.Builder(0f)
+//                .setIndex(mSeries2Index)
+//                .setDelay(0)
+//                .setDuration(0)
+//                .build()
+//        )
+//        mDecoView3!!.addEvent(
+//            DecoEvent.Builder(0f)
+//                .setIndex(mSeries3Index)
+//                .setDelay(0)
+//                .setDuration(0)
+//                .build()
+//        )
+//    }
+//
+//    private fun resetText() {
+//        //        textActivity1.setText("");
+//        //        textActivity2.setText("");
+//        //        textActivity3.setText("");
+//        textPercentage.text = ""
+//        textRemaining.text = ""
+//
+//        rankActivity1.text = ""
+//        rankActivity2.text = ""
+//        rankActivity3.text = ""
+//
+//    }
 
 }

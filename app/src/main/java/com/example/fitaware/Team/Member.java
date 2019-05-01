@@ -8,11 +8,11 @@ package com.example.fitaware.Team;
 public class Member {
     private String mRank;
     private String mName;
-    private String mSteps;
+    private int mSteps;
     private String mGoal;
     private String mColor;
 
-    public Member(String mRank, String mName, String mSteps, String mGoal, String mColor) {
+    public Member(String mRank, String mName, int mSteps, String mGoal, String mColor) {
         super();
 //        this.deco = deco;
         this.mRank = mRank;
@@ -42,11 +42,11 @@ public class Member {
         this.mName = mName;
     }
 
-    public String getmSteps() {
+    public int getmSteps() {
         return mSteps;
     }
 
-    public void setmSteps(String mSteps) {
+    public void setmSteps(int mSteps) {
         this.mSteps = mSteps;
     }
 

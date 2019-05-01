@@ -1,6 +1,8 @@
 package com.example.fitaware.Home.Calendar;
 
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -25,6 +27,7 @@ public class CalendarFragment extends Fragment {
     private String demo = "2019-03-15";
 
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -140,6 +143,7 @@ public class CalendarFragment extends Fragment {
         tv_month.setText(android.text.format.DateFormat.format("MMMM yyyy", cal_month));
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.O)
     public static String addOneDay(String date) {
         return LocalDate
                 .parse(date)

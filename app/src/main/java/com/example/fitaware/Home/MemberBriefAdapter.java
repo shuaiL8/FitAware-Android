@@ -56,16 +56,23 @@ public class MemberBriefAdapter extends ArrayAdapter<Member> {
         Log.i(TAG, "goal: "+ item.getmGoal());
 
         mColor = item.getmColor();
-        if(item.getmSteps() != "" && item.getmGoal() != "") {
+        if(item.getmGoal() != "") {
             memberSteps = Float.valueOf(item.getmSteps());
             goal = Float.valueOf(item.getmGoal());
         }
 
+        if(item.getmName() == "Display None") {
+            holder.mRank.setText("");
+            holder.mSteps.setText("");
+            holder.mName.setText("Display None");
 
+        }
+        else {
+            holder.mRank.setText("");
+            holder.mName.setText(item.getmName());
+            holder.mSteps.setText(Integer.toString(item.getmSteps()));
+        }
 
-        holder.mRank.setText(item.getmRank());
-        holder.mName.setText(item.getmName());
-        holder.mSteps.setText(item.getmSteps());
 
         holder.mRank.setTextColor(Color.parseColor(mColor));
         holder.mName.setTextColor(Color.parseColor(mColor));

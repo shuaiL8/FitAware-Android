@@ -206,6 +206,9 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                     // Get Post object and use the values to update the UI
                     val my = dataSnapshot.value as Map<String, Any>
 
+                    var iniTeamSteps = 0L
+                    var iniTeamGoal = 0L
+
                     for((key, value) in my){
                         val details = value as Map<String, String>
 
@@ -219,14 +222,21 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                             my_goal = details["goal"].toString().toLong()
                             periodical = details["periodical"].toString()
                         }
-                        team_steps = team_steps+details["currentSteps"].toString().toLong()
-                        team_goal = team_goal+details["goal"].toString().toLong()
+
+
+                        iniTeamSteps += details["currentSteps"].toString().toLong()
+                        iniTeamGoal += details["goal"].toString().toLong()
+
+
 
 
                         Log.i(TAG, "$key: $value")
                         Log.i(TAG, "details: $details")
 
                     }
+
+                    team_steps = iniTeamSteps
+                    team_goal = iniTeamGoal
 
                 }
                 override fun onCancelled(databaseError: DatabaseError) {

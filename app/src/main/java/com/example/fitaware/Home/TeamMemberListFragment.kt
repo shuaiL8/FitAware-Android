@@ -18,11 +18,9 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import java.util.*
 import android.app.Activity
-
-
-
-
-
+import android.arch.lifecycle.ViewModelProviders
+import com.example.fitaware.Communicator
+import android.arch.lifecycle.Observer
 
 
 class TeamMemberListFragment : DialogFragment() {
@@ -30,6 +28,7 @@ class TeamMemberListFragment : DialogFragment() {
     private val TAG = "TeamMemberListFragment"
     private var members = ArrayList<Member>(1)
     private lateinit var memberAdapter: MemberBriefAdapter
+    private var user_id: String = ""
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -44,6 +43,26 @@ class TeamMemberListFragment : DialogFragment() {
 
         val teamMemberList = view.findViewById<ListView>(R.id.teamMemberList)
 
+        val model = ViewModelProviders.of(activity!!).get(Communicator::class.java)
+        val `object` = Observer<Any> { o ->
+            // Update the UI
+
+            Log.w(TAG, "allSteps" + o!!.toString())
+
+            val value = o.toString().substring(1, o.toString().length - 1)
+            val keyValuePairs = value.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+            val allSteps = java.util.HashMap<String, String>()
+
+            for (pair in keyValuePairs) {
+                val entry = pair.split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
+                allSteps[entry[0].trim { it <= ' ' }] = entry[1].trim { it <= ' ' }
+            }
+
+            user_id = allSteps["user_id"]!!.toString()
+        }
+
+        model.message.observe(activity!!, `object`)
+
         val myRef = FirebaseDatabase.getInstance().reference.child("User")
 
         val postListener = object : ValueEventListener {
@@ -52,25 +71,23 @@ class TeamMemberListFragment : DialogFragment() {
                 val my = dataSnapshot.value as Map<String, Any>
 
                 Log.i(TAG, "my: $my")
-                members.add(Member("", "Display None", "", "", "#000000"))
+                members.add(Member("", "Display None", 0, "", "#000000"))
 
                 var index = 1
                 for((key, value) in my){
                     val details = value as Map<String, String>
 
-                    members.add(Member(index.toString(), key, details["currentSteps"], details["goal"], "#000000"))
-                    memberAdapter = MemberBriefAdapter(
-                        activity,
-                        R.layout.member_brief,
-                        members
-                    )
-                    teamMemberList.adapter = memberAdapter
+                    if(key != user_id) {
+                        members.add(Member(index.toString(), key, details.getValue("currentSteps").toInt(), details["goal"], "#000000"))
+                    }
 
                     index++
                     Log.i(TAG, "$key: $value")
                     Log.i(TAG, "details: $details")
 
                 }
+                Log.w(TAG, "members" + members.toString())
+
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -82,6 +99,14 @@ class TeamMemberListFragment : DialogFragment() {
         myRef.addValueEventListener(postListener)
 
 
+        Log.w(TAG, "members" + members.toString())
+
+        memberAdapter = MemberBriefAdapter(
+            activity,
+            R.layout.member_brief,
+            members
+        )
+        teamMemberList.adapter = memberAdapter
 
         teamMemberList.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, position, id ->
 

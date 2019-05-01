@@ -76,7 +76,7 @@ public class MemberAdapter extends ArrayAdapter<Member> {
 
         holder.mRank.setText(item.getmRank());
         holder.mName.setText(item.getmName());
-        holder.mSteps.setText(item.getmSteps());
+        holder.mSteps.setText(Integer.toString(item.getmSteps()));
 
         holder.mRank.setTextColor(Color.parseColor(mColor));
         holder.mName.setTextColor(Color.parseColor(mColor));
