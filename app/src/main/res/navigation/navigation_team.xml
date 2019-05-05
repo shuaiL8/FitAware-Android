@@ -2,7 +2,7 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools" android:id="@+id/navigation_team"
-            app:startDestination="@id/myTeamFragment">
+            app:startDestination="@id/allTeamsFragment">
 
     <fragment android:id="@+id/myTeamFragment" android:name="com.example.fitaware.Team.MyTeamFragment"
               android:label="fragment_my_team" tools:layout="@layout/fragment_my_team"/>

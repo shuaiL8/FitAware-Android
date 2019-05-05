@@ -31,21 +31,23 @@ class TeamFragment : Fragment() {
 
         val tabLayoutTeam = view.findViewById<TabLayout>(R.id.tabLayoutTeam)
 
-        val myTeam = tabLayoutTeam.newTab() // Create a new Tab names "First Tab"
-        myTeam.text = "My Team" // set the Text for the first Tab
-        tabLayoutTeam.addTab(myTeam, 0)
+
 
         val allTeams = tabLayoutTeam.newTab() // Create a new Tab names "First Tab"
         allTeams.text = "All Teams" // set the Text for the first Tab
-        tabLayoutTeam.addTab(allTeams, 1)
+        tabLayoutTeam.addTab(allTeams, 0)
+
+        val myTeam = tabLayoutTeam.newTab() // Create a new Tab names "First Tab"
+        myTeam.text = "My Team" // set the Text for the first Tab
+        tabLayoutTeam.addTab(myTeam, 1)
 
         tabLayoutTeam.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 // called when tab selected
                 if (tab.position == 0) {
-                    Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.myTeamFragment)
-                } else {
                     Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.allTeamsFragment)
+                } else {
+                    Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.myTeamFragment)
                 }
             }
 

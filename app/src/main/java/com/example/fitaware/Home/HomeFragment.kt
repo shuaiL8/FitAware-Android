@@ -4,7 +4,6 @@ package com.example.fitaware.Home
 import android.arch.lifecycle.ViewModelProviders
 import android.content.Context
 import android.content.IntentSender
-import android.graphics.Color
 import android.os.AsyncTask
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -42,8 +41,11 @@ import com.jjoe64.graphview.series.LineGraphSeries
 import com.example.fitaware.User
 import java.util.HashMap
 import android.arch.lifecycle.Observer
+import android.graphics.*
 import android.os.Handler
 import android.widget.*
+import com.example.fitaware.Team.Member
+import com.example.fitaware.Team.MemberAdapter
 import kotlin.math.absoluteValue
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -54,6 +56,7 @@ class HomeFragment : Fragment(){
 
 
     private val TAG = "HomeFragment"
+    private var user_id: String = ""
 
     private var selected_id: String = "Display None"
     private var temp: String = ""
@@ -123,8 +126,11 @@ class HomeFragment : Fragment(){
 //    internal lateinit var demo1: Button
 //    internal lateinit var demo2:Button
 //    internal lateinit var clear:Button
-
+    private var gridViewDecoViews: ExpandableHeightGridView? = null
     private var tempX : Long = 0L
+
+    private var teammates = ArrayList<Teammates>(1)
+    private var teammatesAdapter: TeammatesAdapter? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -156,21 +162,26 @@ class HomeFragment : Fragment(){
 
 
         val textDate = view.findViewById<TextView>(R.id.textDate)
+        val textGridView = view.findViewById<TextView>(R.id.textGridView)
 
         val calendar = Calendar.getInstance()
         val simpleDateFormat = SimpleDateFormat("MMMM dd")
         val currentDate = simpleDateFormat.format(calendar.time)
         textDate.text = currentDate
-
+        textGridView.text = "My Team"
         val calendar_frame = view.findViewById<FrameLayout>(R.id.calendar_frame)
         val dropDownButton = view.findViewById<ImageButton>(R.id.dropDownButton)
+        val dropDownButtonOfGridView = view.findViewById<ImageButton>(R.id.dropDownButtonOfGridView)
 
         val calendarFragment = CalendarFragment()
         fragmentManager!!.beginTransaction().replace(R.id.calendar_frame, calendarFragment).addToBackStack(null).commit()
 
+        gridViewDecoViews = view.findViewById(R.id.gridViewDecoViews)
+        gridViewDecoViews!!.isExpanded = true
 
         calendar_frame.visibility = View.GONE;
         dropDownButton.setImageResource(R.drawable. ic_keyboard_arrow_down_black_24dp)
+        dropDownButtonOfGridView.setImageResource(R.drawable. ic_keyboard_arrow_down_black_24dp)
 
         dropDownButton.setOnClickListener(View.OnClickListener {
             if(calendar_frame.visibility == View.GONE){
@@ -180,6 +191,18 @@ class HomeFragment : Fragment(){
             else {
                 calendar_frame.visibility = View.GONE
                 dropDownButton.setImageResource(R.drawable. ic_keyboard_arrow_down_black_24dp)
+            }
+        })
+        gridViewDecoViews!!.visibility = View.GONE
+
+        dropDownButtonOfGridView.setOnClickListener(View.OnClickListener {
+            if(gridViewDecoViews!!.visibility == View.GONE){
+                gridViewDecoViews!!.visibility = View.VISIBLE
+                dropDownButtonOfGridView.setImageResource(R.drawable. ic_keyboard_arrow_up_black_24dp)
+            }
+            else {
+                gridViewDecoViews!!.visibility = View.GONE
+                dropDownButtonOfGridView.setImageResource(R.drawable. ic_keyboard_arrow_down_black_24dp)
             }
         })
 
@@ -240,6 +263,8 @@ class HomeFragment : Fragment(){
 //        }
 
 
+
+
         val model = ViewModelProviders.of(activity!!).get(Communicator::class.java)
         val `object` = Observer<Any> { o ->
             // Update the UI
@@ -256,6 +281,8 @@ class HomeFragment : Fragment(){
             }
 
             Log.w(TAG, "my_steps" + allSteps["my_steps"]!!)
+
+            user_id = allSteps["user_id"]!!.toString()
 
             my_goal = allSteps["my_goal"]!!.toLong()
             teammate_goal = allSteps["teammate_goal"]!!.toLong()
@@ -292,8 +319,75 @@ class HomeFragment : Fragment(){
 
         }
 
+
         model.message.observe(activity!!, `object`)
 
+
+
+        val myRef = FirebaseDatabase.getInstance().reference.child("User")
+
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+                val my = dataSnapshot.value as Map<String, Any>
+
+                teammates.clear()
+                Log.i(TAG, "myTeamMember: $my")
+                var index = 1
+                for((key, value) in my){
+                    val details = value as Map<String, String>
+
+
+                    if(key == user_id) {
+                        Log.i(TAG, "3ebfab: $key")
+                        var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
+                        bitmap = getCroppedBitmap(bitmap)
+                        teammates.add(Teammates(bitmap, key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], "#3ebfab"))
+                    }
+                    else{
+                        var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
+                        bitmap = getCroppedBitmap(bitmap)
+                        teammates.add(Teammates(bitmap, key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], "#000000"))
+
+                    }
+
+
+
+                    index++
+                    Log.i(TAG, "$key: $value")
+                    Log.i(TAG, "details: $details")
+
+                }
+                Log.w(TAG, "teammates" + teammates.toString())
+                val teammatesSort = teammates.sortedWith(compareByDescending(Teammates::getSteps))
+                teammates = ArrayList(teammatesSort)
+                var indexM = 1
+                for(teammate in teammates) {
+                    teammate.rank = indexM.toString()
+                    indexM++
+                }
+                Log.w(TAG, "teammates" + teammates.toString())
+
+
+                teammatesAdapter = TeammatesAdapter(
+                    activity,
+                    R.layout.decoviews,
+                    teammates
+                )
+                gridViewDecoViews!!.adapter = teammatesAdapter
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                // ...
+            }
+        }
+        myRef.addValueEventListener(postListener)
+
+        gridViewDecoViews!!.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+
+        }
 
         val handler = Handler()
         handler.postDelayed({
@@ -307,6 +401,7 @@ class HomeFragment : Fragment(){
             val teamMemberListFragment = TeamMemberListFragment()
             teamMemberListFragment.show(activity!!.supportFragmentManager, DecoviewDialogFragment.TAG)
         }
+
 
         return view
     }
@@ -328,7 +423,6 @@ class HomeFragment : Fragment(){
 
                 second = unixTime - tempX
 
-                refreshEvents(teammate_steps.toFloat(), my_steps.toFloat(), team_steps.toFloat())
 
                 personalStepsSeries!!.appendData(DataPoint(second.toDouble(), my_steps.toDouble()), true, 60)
                 // set manual X bounds
@@ -368,6 +462,25 @@ class HomeFragment : Fragment(){
         }
     }
 
+    fun getCroppedBitmap(bitmap:Bitmap ):Bitmap {
+        var output  = Bitmap.createBitmap(bitmap.width,
+            bitmap.height, Bitmap.Config.ARGB_8888);
+        var  canvas:Canvas = Canvas(output)
+
+        var color:Int = 0xff424242.toInt()
+        var paint:Paint = Paint()
+        var rect:Rect = Rect(0, 0, bitmap.width, bitmap.height)
+
+        paint.isAntiAlias = true;
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.color = color
+        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        canvas.drawCircle((bitmap.width / 2).toFloat(), (bitmap.height / 2).toFloat(),
+            (bitmap.width / 2).toFloat(), paint);
+        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
+        canvas.drawBitmap(bitmap, rect, rect, paint)
+        return output
+    }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         inflater.inflate(R.menu.tool_bar, menu)
