@@ -83,7 +83,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 //                actionBar?.show()
 
                 val toolbarTiltle = findViewById<TextView>(R.id.toolbar_title)
-                toolbarTiltle.text = "FitAwear"
+                toolbarTiltle.text = "FitAware"
 
                 Navigation.findNavController(this, R.id.my_nav_host_fragment).navigate(R.id.homeFragment)
 
