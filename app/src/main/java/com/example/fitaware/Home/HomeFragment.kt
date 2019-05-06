@@ -308,7 +308,7 @@ class HomeFragment : Fragment(){
                     }
                 } else {
                 temp = selected_id
-                imageActivity1.setImageResource(R.drawable.ic_add_black_24dp)
+                imageActivity1.setImageResource(R.drawable.ic_person_add_black_24dp)
                 mDecoView!!.visibility = View.GONE
                 rankActivity1.visibility = View.GONE
                 textActivity1.visibility = View.GONE

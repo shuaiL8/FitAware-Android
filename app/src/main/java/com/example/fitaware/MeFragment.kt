@@ -5,6 +5,7 @@ import android.arch.lifecycle.Observer
 import android.arch.lifecycle.ViewModelProviders
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
@@ -33,6 +34,7 @@ import java.util.*
 class MeFragment : Fragment() {
     private val TAG = "MeFragment"
     private var my_steps: Long = 0
+    private var my_goal: Long = 0
 
     private var members = ArrayList<Member>(1)
     private lateinit var memberAdapter: MemberAdapter
@@ -64,9 +66,7 @@ class MeFragment : Fragment() {
 
         textSteps.text = String.format("%.0f steps", my_steps.toFloat())
 
-        createBackSeries()
-        createDataSeries()
-        createEvents()
+
 
 
         val model = ViewModelProviders.of(activity!!).get(Communicator::class.java)
@@ -89,6 +89,7 @@ class MeFragment : Fragment() {
             user_id = allSteps["user_id"]!!.toString()
 
             my_steps = allSteps["my_steps"]!!.toLong()
+            my_goal = allSteps["my_goal"]!!.toLong()
 
             textSteps.text = String.format("%.0f steps", my_steps.toFloat())
 
@@ -160,6 +161,12 @@ class MeFragment : Fragment() {
                 updateUI()
             }
         }, delay.toLong(), period.toLong())
+
+
+        createBackSeries(my_goal.toFloat())
+        createDataSeries(my_goal.toFloat())
+        createEvents()
+
         return view
     }
 
@@ -203,9 +210,9 @@ class MeFragment : Fragment() {
     }
 
 
-    private fun createBackSeries() {
+    private fun createBackSeries(goal: Float) {
         val seriesItem = SeriesItem.Builder(Color.parseColor("#FFE2E2E2"))
-            .setRange(0f, 2000f, 0f)
+            .setRange(-1f, goal, 0f)
             .setInitialVisibility(true)
             .build()
 
@@ -213,9 +220,9 @@ class MeFragment : Fragment() {
 
     }
 
-    private fun createDataSeries() {
+    private fun createDataSeries(goal: Float) {
         val seriesItem = SeriesItem.Builder(Color.parseColor("#3ebfab")) //colorDis
-            .setRange(0f, 2000f, 0f)
+            .setRange(-1f, goal, 0f)
             .setInitialVisibility(false)
             .build()
 
@@ -228,7 +235,7 @@ class MeFragment : Fragment() {
         mDecoView!!.executeReset()
 
         mDecoView!!.addEvent(
-            DecoEvent.Builder(2000f)
+            DecoEvent.Builder(my_goal.toFloat())
                 .setIndex(mBackIndex)
                 .setDuration(1000)
                 .setDelay(100)
