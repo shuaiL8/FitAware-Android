@@ -141,21 +141,7 @@ class HomeFragment : Fragment(){
             false)
         setHasOptionsMenu(true)
 
-        personalStepsSeries = LineGraphSeries(arrayOf(DataPoint(0.0, my_steps.toDouble())))
-        groupStepsSeries = LineGraphSeries(arrayOf(DataPoint(0.0, team_steps.toDouble())))
-        tempX = System.currentTimeMillis()/1000L
 
-        //updateUI
-        mTimer = Timer()
-        val delay = 1000 // delay for 0 sec.
-        val period = 5000 // repeat 5 sec.
-
-        mTimer!!.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-
-                updateUI()
-            }
-        }, delay.toLong(), period.toLong())
 
         personalStepsGraph = view.findViewById(R.id.personalStepsGraph)
         groupStepsGraph = view.findViewById(R.id.groupStepsGraph)
@@ -284,13 +270,15 @@ class HomeFragment : Fragment(){
 
             user_id = allSteps["user_id"]!!.toString()
 
+            my_steps = allSteps["my_steps"]!!.toLong()
+            teammate_steps = allSteps["teammate_steps"]!!.toLong()
+            team_steps = allSteps["team_steps"]!!.toLong()
+
             my_goal = allSteps["my_goal"]!!.toLong()
             teammate_goal = allSteps["teammate_goal"]!!.toLong()
             team_goal = allSteps["team_goal"]!!.toLong()
 
-            my_steps = allSteps["my_steps"]!!.toLong()
-            teammate_steps = allSteps["teammate_steps"]!!.toLong()
-            team_steps = allSteps["team_steps"]!!.toLong()
+
 
             selected_id = allSteps["selected_id"]!!.toString()
 
@@ -306,7 +294,8 @@ class HomeFragment : Fragment(){
                     createDataSeriesTeammate(teammate_goal.toFloat())
                     createEventsTeammate()
                     }
-                } else {
+                }
+            else {
                 temp = selected_id
                 imageActivity1.setImageResource(R.drawable.ic_person_add_black_24dp)
                 mDecoView!!.visibility = View.GONE
@@ -314,12 +303,10 @@ class HomeFragment : Fragment(){
                 textActivity1.visibility = View.GONE
             }
 
-
             refreshEvents(teammate_steps.toFloat(), my_steps.toFloat(), team_steps.toFloat())
 
+
         }
-
-
         model.message.observe(activity!!, `object`)
 
 
@@ -402,6 +389,22 @@ class HomeFragment : Fragment(){
             teamMemberListFragment.show(activity!!.supportFragmentManager, DecoviewDialogFragment.TAG)
         }
 
+
+        personalStepsSeries = LineGraphSeries(arrayOf(DataPoint(0.0, my_steps.toDouble())))
+        groupStepsSeries = LineGraphSeries(arrayOf(DataPoint(0.0, team_steps.toDouble())))
+        tempX = System.currentTimeMillis()/1000L
+
+        //updateUI
+        mTimer = Timer()
+        val delay = 1000 // delay for 0 sec.
+        val period = 5000 // repeat 5 sec.
+
+        mTimer!!.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+
+                updateUI()
+            }
+        }, delay.toLong(), period.toLong())
 
         return view
     }
@@ -769,11 +772,11 @@ class HomeFragment : Fragment(){
     private fun refreshEvents(teammateSteps: Float, mySteps: Float, teamSteps: Float) {
 
         mDecoView!!.addEvent(
-            DecoEvent.Builder(teammateSteps)
-                .setIndex(mSeries1Index)
-                .setDuration(1000)
-                .setDelay(100)
-                .build()
+                DecoEvent.Builder(teammateSteps)
+                        .setIndex(mSeries1Index)
+                        .setDuration(1000)
+                        .setDelay(100)
+                        .build()
         )
 
         mDecoView2!!.addEvent(
@@ -964,5 +967,10 @@ class HomeFragment : Fragment(){
 //        rankActivity3.text = ""
 //
 //    }
+
+    override fun onStop() {
+        super.onStop()
+        mTimer!!.cancel()
+    }
 
 }

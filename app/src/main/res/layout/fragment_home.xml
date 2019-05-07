@@ -198,7 +198,8 @@
                                 android:layout_alignTop="@+id/imageActivity2"
                                 android:background="@drawable/circle_activity_1"
                                 android:padding="12dp"
-                                android:src="@drawable/ic_add_black_24dp" android:layout_marginTop="-2dp"/>
+                                android:src="@drawable/ic_person_add_black_24dp"
+                                android:layout_marginTop="-2dp"/>
 
                         <ImageView
                                 android:layout_marginTop="8dp"

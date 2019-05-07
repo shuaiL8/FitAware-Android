@@ -32,11 +32,20 @@
             android:textAppearance="?android:attr/textAppearanceMedium"/>
 
     <TextView
+        android:textSize="15dp"
+        android:id="@+id/userID"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/rankOfTeammates"
+        android:layout_centerHorizontal="true"
+        android:textAppearance="?android:attr/textAppearanceMedium"/>
+
+    <TextView
             android:textSize="15dp"
             android:id="@+id/stepsOfGoal"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/rankOfTeammates"
+            android:layout_below="@+id/userID"
             android:layout_centerHorizontal="true"
             android:textAppearance="?android:attr/textAppearanceMedium"/>
 </RelativeLayout>

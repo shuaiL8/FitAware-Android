@@ -50,6 +50,7 @@ public class TeammatesAdapter extends ArrayAdapter<Teammates>{
             row = inflater.inflate(layoutResourceId, parent, false);
             holder = new TeammatesAdapter.ViewHolder();
             holder.rankOfTeammates = (TextView) row.findViewById(R.id.rankOfTeammates);
+            holder.userID = (TextView) row.findViewById(R.id.userID);
             stepsOfGoal = (TextView) row.findViewById(R.id.stepsOfGoal);
             mDecoView = row.findViewById(R.id.dynamicArcViews);
 
@@ -70,6 +71,8 @@ public class TeammatesAdapter extends ArrayAdapter<Teammates>{
 
 
         holder.rankOfTeammates.setText("No. "+item.getRank());
+        holder.userID.setText(item.getName());
+
         stepsOfGoal.setText(String.format("%.0f / %.0f", memberSteps, goal));
 
         holder.image.setImageBitmap(item.getImage());
@@ -84,6 +87,8 @@ public class TeammatesAdapter extends ArrayAdapter<Teammates>{
 
     class ViewHolder {
         TextView rankOfTeammates;
+        TextView userID;
+
         ImageView image;
     }
 

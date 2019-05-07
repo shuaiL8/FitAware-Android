@@ -249,14 +249,11 @@ class MeFragment : Fragment() {
                 .setDelay(300)
                 .build()
         )
+    }
 
-        mDecoView!!.addEvent(
-            DecoEvent.Builder(my_steps.toFloat())
-                .setIndex(mSeries1Index)
-                .setDuration(1000)
-                .setDelay(100)
-                .build()
-        )
+    override fun onStop() {
+        super.onStop()
+        mTimer!!.cancel()
     }
 
 }

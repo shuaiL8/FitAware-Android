@@ -162,19 +162,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             Navigation.findNavController(this, R.id.my_nav_host_fragment).navigate(R.id.loginFragment)
         }
 
-        //sendData
-        mTimer = Timer()
-        val delay = 1000 // delay for 0 sec.
-        val period = 5000 // repeat 5 sec.
 
-        mTimer!!.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                val stepsDataTask = StepsDataTask()
-                stepsDataTask.execute()
-
-                sendData()
-            }
-        }, delay.toLong(), period.toLong())
 
         database = FirebaseDatabase.getInstance().reference
 
@@ -248,10 +236,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             myRef.addValueEventListener(myPostListener)
 
             Log.w(TAG, "selected_idOnCreate"+selected_id)
-
-            if(selected_id != ""){
-
-            }
         }
 
 
@@ -279,6 +263,22 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             model!!.setMsgCommunicator(allSteps.toString())
             Log.w(TAG, "allSteps$allSteps")
         }
+
+        //sendData
+        mTimer = Timer()
+        val delay = 1000 // delay for 0 sec.
+        val period = 5000 // repeat 5 sec.
+
+        mTimer!!.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                Log.w(TAG, "sendData"+user_id)
+
+                val stepsDataTask = StepsDataTask()
+                stepsDataTask.execute()
+
+                sendData()
+            }
+        }, delay.toLong(), period.toLong())
 
     }
 
@@ -457,13 +457,17 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     override fun onStop() {
         super.onStop()
         mClient!!.disconnect()
-        mTimer!!.cancel()
     }
 
     override fun onPause() {
         super.onPause()
         mClient!!.stopAutoManage(this)
         mClient!!.disconnect()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        mClient!!.connect()
     }
 
 }
