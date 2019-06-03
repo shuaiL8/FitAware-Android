@@ -1,4 +1,4 @@
-package com.example.fitaware.Team;
+package com.example.fitaware.History;
 
 import android.app.Activity;
 import android.content.Context;
@@ -21,23 +21,22 @@ import java.util.ArrayList;
  * Created by fredliu on 12/3/17.
  */
 
-public class MemberAdapter extends ArrayAdapter<Member> {
-    private static final String TAG = "MemberAdapter";
+public class HistoryAdapter extends ArrayAdapter<Histories> {
+    private static final String TAG = "HistoryAdapter";
 
     private DecoView mDecoView;
     private int mBackIndex = 0;
     private int mSeries1Index = 0;
 
-    private float memberSteps = 0;
-    private float goal = 0;
+    private float his_steps = 0;
+    private float his_goal = 0;
 
-    private String mColor;
 
     private Context context;
     private int layoutResourceId;
-    private ArrayList<Member> data = new ArrayList<Member>();
+    private ArrayList<Histories> data = new ArrayList<Histories>();
 
-    public MemberAdapter(Context context, int layoutResourceId, ArrayList<Member> data) {
+    public HistoryAdapter(Context context, int layoutResourceId, ArrayList<Histories> data) {
         super(context, layoutResourceId, data);
         this.layoutResourceId = layoutResourceId;
         this.context = context;
@@ -53,9 +52,14 @@ public class MemberAdapter extends ArrayAdapter<Member> {
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
             holder = new ViewHolder();
+            holder.mDate = row.findViewById(R.id.textDate);
             holder.mRank = row.findViewById(R.id.textRank);
-            holder.mName = row.findViewById(R.id.memberName);
-            holder.mSteps = row.findViewById(R.id.memberSteps);
+            holder.mSteps = row.findViewById(R.id.his_Steps);
+            holder.mDuration = row.findViewById(R.id.his_duration);
+            holder.mHeatPoints = row.findViewById(R.id.his_heartPoints);
+            holder.mDistance = row.findViewById(R.id.his_distance);
+            holder.mCalories = row.findViewById(R.id.his_calories);
+
             mDecoView = row.findViewById(R.id.dynamicArcViewRank);
 
             row.setTag(holder);
@@ -64,23 +68,21 @@ public class MemberAdapter extends ArrayAdapter<Member> {
         }
 
 
-        Member item = data.get(position);
+        Histories item = data.get(position);
 
         Log.i(TAG, "memberSteps: "+ item.getmSteps());
-        Log.i(TAG, "goal: "+ item.getmGoal());
 
-        mColor = item.getmColor();
-        memberSteps = Float.valueOf(item.getmSteps());
-        goal = Float.valueOf(item.getmGoal());
+        his_steps = Float.valueOf(item.getmSteps());
+        his_goal = Float.valueOf(item.getmGoal());
 
 
+        holder.mDate.setText(item.getmDate());
         holder.mRank.setText(item.getmRank());
-        holder.mName.setText(item.getmName());
-        holder.mSteps.setText(Integer.toString(item.getmSteps()));
-
-        holder.mRank.setTextColor(Color.parseColor(mColor));
-        holder.mName.setTextColor(Color.parseColor(mColor));
-        holder.mSteps.setTextColor(Color.parseColor(mColor));
+        holder.mSteps.setText(item.getmSteps());
+        holder.mDuration.setText(item.getmDuration());
+        holder.mHeatPoints.setText(item.getmHeartPoints());
+        holder.mDistance.setText(item.getmDistance());
+        holder.mCalories.setText(item.getmCalories());
 
         createBackSeries();
         createDataSeries();
@@ -90,9 +92,14 @@ public class MemberAdapter extends ArrayAdapter<Member> {
     }
 
     class ViewHolder {
+        TextView mDate;
         TextView mRank;
-        TextView mName;
         TextView mSteps;
+        TextView mDuration;
+        TextView mHeatPoints;
+        TextView mDistance;
+        TextView mCalories;
+
     }
 
     private void createBackSeries() {
@@ -106,8 +113,8 @@ public class MemberAdapter extends ArrayAdapter<Member> {
     }
 
     private void createDataSeries() {
-        SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor(mColor))
-                .setRange(-1, goal, 0)
+        SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor("#3ebfab"))
+                .setRange(-1, his_goal, 0)
                 .setInitialVisibility(false)
                 .build();
 
@@ -136,7 +143,7 @@ public class MemberAdapter extends ArrayAdapter<Member> {
         );
 
         mDecoView.addEvent(
-                new DecoEvent.Builder(memberSteps)
+                new DecoEvent.Builder(his_steps)
                         .setIndex(mSeries1Index)
                         .setDuration(1000)
                         .setDelay(100)

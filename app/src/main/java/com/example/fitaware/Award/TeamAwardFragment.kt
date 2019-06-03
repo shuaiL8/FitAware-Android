@@ -1,14 +1,17 @@
 package com.example.fitaware.Award
 
 
+import android.app.Activity
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v4.widget.SwipeRefreshLayout
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.GridView
+import androidx.navigation.Navigation
 import com.example.fitaware.R
 import kotlinx.android.synthetic.main.fragment_team_award.*
 import java.util.ArrayList
@@ -31,7 +34,10 @@ class TeamAwardFragment : Fragment() {
 
 
         val gridViewTeamAwards = view.findViewById<GridView>(R.id.gridViewTeamAwards)
-
+        val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+        swipeRefresh.setOnRefreshListener {
+            Navigation.findNavController(context as Activity, R.id.my_nav_awards_fragment).navigate(R.id.teamAwardFragment)
+        }
         val bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_trophy)
         awards.add(Award(bitmap, "Best of Year", "12/31/2018"))
 

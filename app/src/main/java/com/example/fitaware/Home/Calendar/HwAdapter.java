@@ -194,9 +194,9 @@ class HwAdapter extends BaseAdapter {
 
     public void setEventView(View v, int pos, TextView txt){
 
-        int len=HomeCollection.date_collection_arr.size();
+        int len=date_collection_arr.size();
         for (int i = 0; i < len; i++) {
-            HomeCollection cal_obj=HomeCollection.date_collection_arr.get(i);
+            HomeCollection cal_obj=date_collection_arr.get(i);
             String date=cal_obj.date;
             int len1=day_string.size();
             if (len1>pos) {
@@ -208,25 +208,28 @@ class HwAdapter extends BaseAdapter {
 
                     } else {
                         v.setBackgroundColor(Color.parseColor("#343434"));
-                        Calendar calendar = Calendar.getInstance();
-                        SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd");
-                        String strDate = mdformat.format(calendar.getTime());
 
-                        if(date.compareTo(strDate) <= 0){
-                            if(date.compareTo("2018-11-30") == 0){
-                                v.setBackgroundResource(R.drawable.rounded_calender);
-                            }
-                            else if(date.compareTo("2018-11-21") == 0){
-                                v.setBackgroundResource(R.drawable.rounded_calender);
-                            }
-                            else {
-                                v.setBackgroundResource(R.drawable.rounded_calender_green);
+                        for (int j=0; j<len; j++){
+                            if (date_collection_arr.get(j).date.equals(date)){
+
+                                float strSteps = Integer.valueOf(date_collection_arr.get(j).steps);
+                                float  strGoal = Integer.valueOf(date_collection_arr.get(j).goal);
+
+                                float strPercentage = strSteps/strGoal;
+
+
+                                if(strPercentage < 0.5) {
+                                    v.setBackgroundResource(R.drawable.rounded_calender);
+                                }
+                                else if(strPercentage > 0.5){
+                                    v.setBackgroundResource(R.drawable.rounded_calender_green);
+                                }
+                                else {
+                                    v.setBackgroundResource(R.drawable.rounded_calender_orange);
+                                }
                             }
                         }
-                        else {
-                            v.setBackgroundResource(R.drawable.rounded_calender_orange);
-                        }
-                        Log.i(TAG,  "strDate" + date + strDate );
+
                         if(Integer.parseInt(gridvalue) == cDay && vMonth == cMonth) {
                             txt.setTextColor(Color.parseColor("#ff1a1a"));
                         }
@@ -241,14 +244,18 @@ class HwAdapter extends BaseAdapter {
 
     public void getPositionList(final String date, final Activity act){
 
-        final int len= HomeCollection.date_collection_arr.size();
+        final int len= date_collection_arr.size();
         JSONArray jbarrays=new JSONArray();
         for (int j=0; j<len; j++){
-            if (HomeCollection.date_collection_arr.get(j).date.equals(date)){
+            if (date_collection_arr.get(j).date.equals(date)){
                 HashMap<String, String> maplist = new HashMap<String, String>();
-                maplist.put("hnames",HomeCollection.date_collection_arr.get(j).dur);
-                maplist.put("hsubject",HomeCollection.date_collection_arr.get(j).dist);
-                maplist.put("descript",HomeCollection.date_collection_arr.get(j).cal);
+                maplist.put("duration",date_collection_arr.get(j).duration);
+                maplist.put("steps",date_collection_arr.get(j).steps);
+                maplist.put("heartPoints",date_collection_arr.get(j).heartPoints);
+                maplist.put("distance",date_collection_arr.get(j).distance);
+                maplist.put("cals",date_collection_arr.get(j).cals);
+                maplist.put("goal",date_collection_arr.get(j).goal);
+
                 JSONObject json1 = new JSONObject(maplist);
                 jbarrays.put(json1);
             }
@@ -273,16 +280,20 @@ class HwAdapter extends BaseAdapter {
                         Bundle args = new Bundle();
                         args.putString("date", date);
                         for (int j=0; j<len; j++){
-                            if (HomeCollection.date_collection_arr.get(j).date.equals(date)){
-                                args.putString("time", HomeCollection.date_collection_arr.get(j).dur);
-                                args.putString("distance", HomeCollection.date_collection_arr.get(j).dist);
-                                args.putString("cal", HomeCollection.date_collection_arr.get(j).cal);
+                            if (date_collection_arr.get(j).date.equals(date)){
+                                args.putString("duration", date_collection_arr.get(j).duration);
+                                args.putString("steps", date_collection_arr.get(j).steps);
+                                args.putString("heartPoints", date_collection_arr.get(j).heartPoints);
+                                args.putString("distance", date_collection_arr.get(j).distance);
+                                args.putString("cals", date_collection_arr.get(j).cals);
+                                args.putString("goal", date_collection_arr.get(j).goal);
+
                             }
                         }
 
-                        DecoviewDialogFragment decoviewDialogFragment = new DecoviewDialogFragment();
-                        decoviewDialogFragment.setArguments(args);
-                        decoviewDialogFragment.show(((AppCompatActivity)context).getSupportFragmentManager(), DecoviewDialogFragment.TAG);
+//                        DecoviewDialogFragment decoviewDialogFragment = new DecoviewDialogFragment();
+//                        decoviewDialogFragment.setArguments(args);
+//                        decoviewDialogFragment.show(((AppCompatActivity)context).getSupportFragmentManager(), DecoviewDialogFragment.TAG);
                     }
                 }
             });
@@ -308,9 +319,12 @@ class HwAdapter extends BaseAdapter {
 
                 Dialogpojo pojo = new Dialogpojo();
 
-                pojo.setTitles(jsonObject.optString("hnames"));
-                pojo.setSubjects(jsonObject.optString("hsubject"));
-                pojo.setDescripts(jsonObject.optString("descript"));
+                pojo.setDuration(jsonObject.optString("duration"));
+                pojo.setSteps(jsonObject.optString("steps"));
+                pojo.setHeartPoints(jsonObject.optString("heartPoints"));
+                pojo.setDisatnce(jsonObject.optString("distance"));
+                pojo.setCals(jsonObject.optString("cals"));
+                pojo.setGoal(jsonObject.optString("goal"));
 
                 alCustom.add(pojo);
 

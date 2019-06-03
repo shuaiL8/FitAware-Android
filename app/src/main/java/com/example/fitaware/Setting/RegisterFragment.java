@@ -1,7 +1,16 @@
 package com.example.fitaware.Setting;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Canvas;
+import android.graphics.Paint;
+import android.graphics.PorterDuff;
+import android.graphics.PorterDuffXfermode;
+import android.graphics.Rect;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
@@ -51,10 +60,12 @@ public class RegisterFragment extends Fragment {
     private Spinner mEtSpinner;
 
     private ProgressBar mProgressbar;
+    private ImageView icon;
+    private TextView setIcon;
+
+    private SharedPreferences mSharedPreferences;
 
     private DatabaseReference database;
-    public int loginStatus = 0;
-    public String user_id = "";
 
 
 //    private CompositeSubscription mSubscriptions;
@@ -66,6 +77,7 @@ public class RegisterFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_register,container,false);
 //        mSubscriptions = new CompositeSubscription();
         initViews(view);
+        initSharedPreferences();
 
         database = FirebaseDatabase.getInstance().getReference();
 
@@ -86,7 +98,14 @@ public class RegisterFragment extends Fragment {
         mTiPassword = (TextInputLayout) v.findViewById(R.id.ti_password);
         mTiStepsGoal = (TextInputLayout) v.findViewById(R.id.ti_stepsGoal);
         mProgressbar = (ProgressBar) v.findViewById(R.id.progress);
+        icon = (ImageView) v.findViewById(R.id.icon);
+        setIcon = (TextView) v.findViewById(R.id.tv_setIcon);
 
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.shuail8);
+        bitmap = getCroppedBitmap(bitmap);
+
+        icon.setImageBitmap(bitmap);
         mEtSpinner = (Spinner) v.findViewById(R.id.mEtSpinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.Daily_Weekly_Monthly, android.R.layout.simple_spinner_item);
@@ -99,7 +118,7 @@ public class RegisterFragment extends Fragment {
         mTvLogin.setOnClickListener(view -> goToLogin());
     }
 
-    private void writeNewPost(String name, String email, String password, String stepsGoal, String captain, String team, String currentSteps, String periodical) {
+    private void writeNewPost(String name, String email, String password, String stepsGoal, String captain, String team, String currentSteps, String periodical, String heartPoints, String duration, String distance, String calories, String teamGoal, String teamSteps) {
 
         User user = new User();
 
@@ -110,24 +129,32 @@ public class RegisterFragment extends Fragment {
         user.setCaptain(captain);
         user.setTeam(team);
         user.setCurrentSteps(currentSteps);
+        user.setHeartPoints(heartPoints);
+        user.setDuration(duration);
+        user.setDistance(distance);
+        user.setCalories(calories);
+        user.setTeamGoal(teamGoal);
+        user.setTeamSteps(teamSteps);
         user.setPeriodical(periodical);
 
-        database.child("User/"+name).setValue(user);
+        database.child("User/"+name.toLowerCase()).setValue(user);
+    }
 
-        loginStatus = 1;
-        sendData();
+    private void initSharedPreferences() {
 
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
     }
 
     private void register() {
 
         setError();
 
-        String inputName = mEtName.getText().toString();
-        String inputEmail = mEtEmail.getText().toString();
+        String inputName = mEtName.getText().toString().toLowerCase();
+        String inputEmail = mEtEmail.getText().toString().toLowerCase();
         String inputPassword = mEtPassword.getText().toString();
         String inputGoal = mEtStepsGoal.getText().toString();
         String inputPeriodical = mEtSpinner.getSelectedItem().toString();
+
 
 
         int err = 0;
@@ -159,14 +186,19 @@ public class RegisterFragment extends Fragment {
 
         if (err == 0) {
 
-//            User user = new User();
-//            user.setName(name);
-//            user.setEmail(email);
-//            user.setPassword(password);
 
             mProgressbar.setVisibility(View.VISIBLE);
-            user_id = inputName;
-            writeNewPost(inputName, inputEmail, inputPassword, inputGoal, "none", "none", "0", inputPeriodical);
+
+            SharedPreferences.Editor editor = mSharedPreferences.edit();
+            editor.putString("user_id", inputName);
+            editor.putString("team", "none");
+            editor.putString("my_goal", inputGoal);
+
+            editor.putInt("loginStatus", 1);
+
+            editor.commit();
+            writeNewPost(inputName, inputEmail, inputPassword, inputGoal, "none", "none", "0", inputPeriodical, "0", "0", "0", "0", "0", "0");
+            startActivity();
 
         } else {
 
@@ -177,20 +209,6 @@ public class RegisterFragment extends Fragment {
         Log.i(TAG, "inputPassword: " + inputPassword);
     }
 
-    private void sendData()
-    {
-        //INTENT OBJ
-        Intent i = new Intent(getActivity().getBaseContext(),
-                MainActivity.class);
-
-        //PACK DATA
-        i.putExtra("Login_Status", loginStatus);
-        i.putExtra("user_id", user_id);
-        Log.i(TAG, "putExtra user_id: " + user_id);
-
-        //START ACTIVITY
-        getActivity().startActivity(i);
-    }
 
     private void setError() {
 
@@ -199,41 +217,11 @@ public class RegisterFragment extends Fragment {
         mTiPassword.setError(null);
     }
 
-    private void registerProcess(User user) {
+    private void startActivity() {
+        Intent i = new Intent(getActivity().getBaseContext(),
+                MainActivity.class);
 
-//        mSubscriptions.add(NetworkUtil.getRetrofit().register(user)
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeOn(Schedulers.io())
-//                .subscribe(this::handleResponse,this::handleError));
-    }
-
-    private void handleResponse(Response response) {
-
-        mProgressbar.setVisibility(View.GONE);
-        showSnackBarMessage(response.getMessage());
-    }
-
-    private void handleError(Throwable error) {
-
-        mProgressbar.setVisibility(View.GONE);
-
-//        if (error instanceof HttpException) {
-//
-//            Gson gson = new GsonBuilder().create();
-//
-//            try {
-//
-//                String errorBody = ((HttpException) error).response().errorBody().string();
-//                Response response = gson.fromJson(errorBody,Response.class);
-//                showSnackBarMessage(response.getMessage());
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        } else {
-//
-//            showSnackBarMessage("Network Error !");
-//        }
+        getActivity().startActivity(i);
     }
 
     private void showSnackBarMessage(String message) {
@@ -254,5 +242,24 @@ public class RegisterFragment extends Fragment {
     public void onDestroy() {
         super.onDestroy();
 //        mSubscriptions.unsubscribe();
+    }
+
+    public Bitmap getCroppedBitmap(Bitmap bitmap) {
+        Bitmap output  = Bitmap.createBitmap(bitmap.getWidth(),
+                bitmap.getHeight(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(output);
+
+        int color = 0xff424242;
+        final Paint paint = new Paint(Paint.ANTI_ALIAS_FLAG);
+        Rect rect  = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.setColor(color);
+        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        canvas.drawCircle((bitmap.getWidth() / 2), (bitmap.getHeight() / 2),
+                (bitmap.getWidth() / 2), paint);
+        paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
+        canvas.drawBitmap(bitmap, rect, rect, paint);
+        return output;
     }
 }

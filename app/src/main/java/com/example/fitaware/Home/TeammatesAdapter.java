@@ -29,8 +29,13 @@ public class TeammatesAdapter extends ArrayAdapter<Teammates>{
     private int mBackIndex = 0;
     private int mSeries1Index = 0;
 
+    private int tab = -1;
+
     private float memberSteps = 0;
     private float goal = 0;
+    private float memberDuration = 0;
+    private float memberHeartPoints = 0;
+
     private String mColor ="#000000";
 
     public TeammatesAdapter(Context context, int layoutResourceId, ArrayList<Teammates> data) {
@@ -66,21 +71,40 @@ public class TeammatesAdapter extends ArrayAdapter<Teammates>{
         if(item.getColor() != "") {
             mColor = item.getColor();
         }
+        tab = Integer.valueOf(item.getTab());
         memberSteps = Float.valueOf(item.getSteps());
         goal = Float.valueOf(item.getGoal());
-
+        memberDuration = Float.valueOf(item.getDuration());
+        memberHeartPoints = Float.valueOf(item.getHeartPoints());
 
         holder.rankOfTeammates.setText("No. "+item.getRank());
         holder.userID.setText(item.getName());
-
-        stepsOfGoal.setText(String.format("%.0f / %.0f", memberSteps, goal));
-
         holder.image.setImageBitmap(item.getImage());
 
 
-        createBackSeries();
-        createDataSeries();
-        createEvents();
+        if(tab == 0) {
+            stepsOfGoal.setText(String.format("%.0f / %.0f", memberDuration, 60F));
+            createBackSeries(60F);
+            createDataSeries(60F);
+            createEvents(60F, memberDuration);
+
+        }
+
+        else if (tab == 2) {
+            stepsOfGoal.setText(String.format("%.0f / %.0f", memberHeartPoints, 10F));
+            createBackSeries(10F);
+            createDataSeries(10F);
+            createEvents(10F, memberHeartPoints);
+
+        }
+        else{
+            stepsOfGoal.setText(String.format("%.0f / %.0f", memberSteps, goal));
+            createBackSeries(goal);
+            createDataSeries(goal);
+            createEvents(goal, memberSteps);
+
+        }
+
 
         return row;
     }
@@ -92,9 +116,9 @@ public class TeammatesAdapter extends ArrayAdapter<Teammates>{
         ImageView image;
     }
 
-    private void createBackSeries() {
+    private void createBackSeries(Float mGoal) {
         SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor("#FFE2E2E2"))
-                .setRange(0, 2000f, 0)
+                .setRange(-1f, mGoal, 0f)
                 .setInitialVisibility(true)
                 .build();
 
@@ -102,35 +126,23 @@ public class TeammatesAdapter extends ArrayAdapter<Teammates>{
 
     }
 
-    private void createDataSeries() {
+    private void createDataSeries(Float mGoal) {
         SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor(mColor))
-                .setRange(-1, goal, 0)
+                .setRange(-1f, mGoal, 0f)
                 .setInitialVisibility(false)
                 .build();
 
-        seriesItem.addArcSeriesItemListener(new SeriesItem.SeriesItemListener() {
-            @Override
-            public void onSeriesItemAnimationProgress(float percentComplete, float currentPosition) {
-
-                stepsOfGoal.setText(String.format("%.0f / %.0f", memberSteps, goal));
-            }
-
-            @Override
-            public void onSeriesItemDisplayProgress(float percentComplete) {
-
-            }
-        });
 
         mSeries1Index = mDecoView.addSeries(seriesItem);
 
 
     }
 
-    private void createEvents() {
+    private void createEvents(Float mGoal, Float mValue) {
         mDecoView.executeReset();
 
         mDecoView.addEvent(
-                new DecoEvent.Builder(2000f)
+                new DecoEvent.Builder(mGoal)
                         .setIndex(mBackIndex)
                         .setDuration(1000)
                         .setDelay(100)
@@ -146,7 +158,7 @@ public class TeammatesAdapter extends ArrayAdapter<Teammates>{
         );
 
         mDecoView.addEvent(
-                new DecoEvent.Builder(memberSteps)
+                new DecoEvent.Builder(mValue)
                         .setIndex(mSeries1Index)
                         .setDuration(1000)
                         .setDelay(100)
@@ -155,14 +167,4 @@ public class TeammatesAdapter extends ArrayAdapter<Teammates>{
 
     }
 
-    private void refreshEvents() {
-
-        mDecoView.addEvent(
-                new DecoEvent.Builder(memberSteps)
-                        .setIndex(mSeries1Index)
-                        .setDuration(1000)
-                        .setDelay(100)
-                        .build()
-        );
-    }
 }

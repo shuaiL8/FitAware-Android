@@ -12,6 +12,13 @@ public class User {
     private String currentSteps;
     private String goal;
     private String periodical;
+    private String heartPoints;
+    private String duration;
+    private String distance;
+    private String calories;
+    private String teamGoal;
+    private String teamSteps;
+
 
     public void setId(String id) {
         this.id = id;
@@ -40,6 +47,29 @@ public class User {
     public void setCurrentSteps(String currentSteps) {
         this.currentSteps = currentSteps;
     }
+
+    public void setHeartPoints(String heartPoints) {
+        this.heartPoints = heartPoints;
+    }
+
+    public void setDuration(String duration) {
+        this.duration = duration;
+    }
+    public void setDistance(String distance) {
+        this.distance = distance;
+    }
+    public void setCalories(String calories) {
+        this.calories = calories;
+    }
+
+    public void setTeamGoal(String teamGoal) {
+        this.teamGoal = teamGoal;
+    }
+
+    public void setTeamSteps(String teamSteps) {
+        this.teamSteps = teamSteps;
+    }
+
 
     public void setGoal(String goal) {
         this.goal = goal;
@@ -70,6 +100,25 @@ public class User {
         return currentSteps;
     }
 
+    public String getHeartPoints() {
+        return heartPoints;
+    }
+
+    public String getDuration() {
+        return duration;
+    }
+
+    public String getDistance() {
+        return distance;
+    }
+    public String getCalories() {
+        return calories;
+    }
+
+    public String getTeamSteps() {
+        return teamSteps;
+    }
+
     public String getCaptain() {
         return captain;
     }
@@ -81,6 +130,11 @@ public class User {
     public String getGoal() {
         return goal;
     }
+
+    public String getTeamGoal() {
+        return teamGoal;
+    }
+
 
     public String getPeriodical() {
         return periodical;

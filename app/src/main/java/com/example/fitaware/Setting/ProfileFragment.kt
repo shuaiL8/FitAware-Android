@@ -18,6 +18,8 @@ import android.support.design.widget.TextInputLayout
 import androidx.navigation.Navigation
 import com.example.fitaware.Communicator
 import android.arch.lifecycle.Observer
+import android.content.SharedPreferences
+import android.preference.PreferenceManager
 import android.widget.*
 
 
@@ -30,6 +32,8 @@ class ProfileFragment : Fragment() {
     private var currentStepsGoal: String = ""
     private var user_id: String = ""
     private var periodical: String = ""
+    private var sharedPreferences: SharedPreferences? = null
+    private var ti_stepsGoal : TextInputLayout? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -41,6 +45,7 @@ class ProfileFragment : Fragment() {
             false
         )
         setHasOptionsMenu(true)
+        initSharedPreferences()
 
         val toolbarTiltle = activity!!.findViewById<TextView>(R.id.toolbar_title)
         toolbarTiltle.text = "Profile"
@@ -71,7 +76,7 @@ class ProfileFragment : Fragment() {
 
         database = FirebaseDatabase.getInstance().reference
         val arrayPeriodical = resources.getStringArray(R.array.Daily_Weekly_Monthly)
-        val ti_stepsGoal = view.findViewById<TextInputLayout>(R.id.ti_stepsGoal)
+        ti_stepsGoal = view.findViewById<TextInputLayout>(R.id.ti_stepsGoal)
         val et_stepsGoal = view.findViewById<EditText>(R.id.et_stepsGoal)
         val btn_update = view.findViewById<Button>(R.id.btn_update)
 
@@ -88,7 +93,7 @@ class ProfileFragment : Fragment() {
             mEtSpinner.adapter = adapter
         }
 
-        for(x in 0..2 ){
+        for(x in 0..3 ){
             if(periodical == arrayPeriodical[x]) {
                 mEtSpinner.setSelection(x)
                 Log.w(TAG, "arrayPeriodical"+x+arrayPeriodical[x])
@@ -101,20 +106,33 @@ class ProfileFragment : Fragment() {
 
 
         btn_update.setOnClickListener {
+
+            setError()
+
             newStepsGoal = et_stepsGoal.text.toString()
             newPeriodical = mEtSpinner.selectedItem.toString()
 
 
+            var err = 0
+
             if (!validateFields(newStepsGoal)) {
 
-                ti_stepsGoal.error = "Goal should not be empty !"
-                showSnackBarMessage("Enter Valid Details !")
+                ti_stepsGoal!!.error = "Goal should not be empty !"
+                err++
 
             }
-            else {
+            if(err == 0) {
+                val editor = sharedPreferences?.edit()
+                editor!!.putString("my_goal", newStepsGoal)
+                editor.commit()
+
                 writeNewPost(user_id, newPeriodical, newStepsGoal)
                 Navigation.findNavController(activity!!, R.id.my_nav_host_fragment).navigate(R.id.settingFragment)
                 showSnackBarMessage("Goal Update Success !")
+
+            }
+            else {
+                showSnackBarMessage("Enter Valid Details !")
             }
 
         }
@@ -122,7 +140,15 @@ class ProfileFragment : Fragment() {
         return view
     }
 
+    private fun setError() {
 
+        ti_stepsGoal!!.error = null
+    }
+
+    private fun initSharedPreferences() {
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+    }
 
     private fun writeNewPost(id: String, periodical: String, goal: String) {
         val childUpdates = HashMap<String, Any>()

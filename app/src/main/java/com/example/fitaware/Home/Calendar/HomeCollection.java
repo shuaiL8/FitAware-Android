@@ -1,21 +1,24 @@
 package com.example.fitaware.Home.Calendar;
 
-import java.util.ArrayList;
 
 class HomeCollection {
     public String date="";
-    public String dur="";
-    public String dist="";
-    public String cal="";
+    public String duration="";
+    public String steps="";
+    public String heartPoints="";
+    public String distance="";
+    public String cals="";
+    public String goal="";
 
-
-    public static ArrayList<HomeCollection> date_collection_arr;
-    public HomeCollection(String date, String dur, String dist, String cal){
+    public HomeCollection(String date, String duration, String steps, String heartPoints, String distance, String cals, String goal){
 
         this.date = date;
-        this.dur = dur;
-        this.dist = dist;
-        this.cal = cal;
+        this.duration = duration;
+        this.steps = steps;
+        this.heartPoints = heartPoints;
+        this.distance = distance;
+        this.cals = cals;
+        this.goal = goal;
 
     }
 }

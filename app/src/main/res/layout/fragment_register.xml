@@ -16,11 +16,29 @@
             android:layout_height="match_parent"
             android:layout_margin="@dimen/activity_vertical_margin">
 
+            <ImageView
+                android:layout_centerHorizontal="true"
+                android:layout_width="120dp"
+                android:layout_height="120dp"
+                android:id="@+id/icon"
+                android:background="@drawable/ic_person_black_24dp"/>
+
+            <TextView
+                android:id="@+id/tv_setIcon"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/icon"
+                android:layout_marginTop="20dp"
+                android:textColor="@color/colorPrimary"
+                android:text="Set an Icon"
+                android:textAlignment="center" />
+
 
             <android.support.design.widget.TextInputLayout
                 android:id="@+id/ti_name"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                android:layout_below="@+id/tv_setIcon">
 
                 <EditText
                     android:id="@+id/et_name"
@@ -86,7 +104,7 @@
                         android:id="@+id/et_stepsGoal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:drawableRight="@drawable/ic_directions_walk_black_24dp"
+                        android:drawableRight="@drawable/ic_steps"
                         android:layout_marginTop="20dp"
                         android:hint="Daily Steps Goal"
                         android:inputType="number" />

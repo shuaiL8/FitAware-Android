@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+            android:padding="10dp">
+
+    <ImageView
+            android:layout_weight="1"
+            android:id="@+id/imageView_teams"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:src="@drawable/teamwork"/>
+
+
+    <TextView
+            android:layout_weight="1"
+            android:id="@+id/team_name"
+            android:layout_width="65dp"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="@color/colorCals"
+            android:text="CS5714"
+            android:layout_gravity="center"
+            />
+
+    <TextView
+            android:layout_weight="1"
+            android:layout_width="50dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/team_captain"
+            android:textSize="15sp"
+            android:textColor="@color/colorCals"
+            android:text="shuail8"
+            android:layout_gravity="center"/>
+
+
+    <TextView
+            android:layout_weight="1"
+            android:id="@+id/team_rank"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            android:textColor="@color/colorCals"
+            android:text="1st"
+            android:layout_gravity="center"/>
+    <LinearLayout
+            android:layout_weight="1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:layout_gravity="center">
+
+        <TextView
+                android:layout_weight="1"
+                android:id="@+id/team_steps"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textColor="@color/colorCals"
+                android:text="2000"
+                android:layout_gravity="center"/>
+
+        <TextView
+                android:layout_weight="1"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textSize="15sp"
+                android:textColor="@color/colorCals"
+                android:text="steps"
+                android:layout_gravity="center"/>
+
+    </LinearLayout>
+
+
+
+
+
+</LinearLayout>

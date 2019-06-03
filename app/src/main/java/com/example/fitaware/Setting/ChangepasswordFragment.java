@@ -1,10 +1,13 @@
 package com.example.fitaware.Setting;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.DialogFragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,6 +21,7 @@ import com.example.fitaware.model.Response;
 import com.example.fitaware.model.User;
 //import com.example.fitaware.network.NetworkUtil;
 import com.example.fitaware.utils.Constants;
+import com.google.firebase.database.*;
 //import com.google.gson.Gson;
 //import com.google.gson.GsonBuilder;
 //import retrofit2.adapter.rxjava.HttpException;
@@ -26,11 +30,23 @@ import com.example.fitaware.utils.Constants;
 //import rx.subscriptions.CompositeSubscription;
 
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
+import static com.example.fitaware.utils.Validation.validateEmail;
 import static com.example.fitaware.utils.Validation.validateFields;
 
 
 public class ChangepasswordFragment extends DialogFragment {
+    private DatabaseReference myRef;
+
+    private Map<String,String> myData;
+    public String user_id = "none";
+    private String password = "none";
+
+    private SharedPreferences mSharedPreferences;
+    private DatabaseReference database;
+
     public interface Listener {
 
         void onPasswordChanged();
@@ -59,7 +75,11 @@ public class ChangepasswordFragment extends DialogFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_changepassword,container,false);
-//        mSubscriptions = new CompositeSubscription();
+        initSharedPreferences();
+
+        database = FirebaseDatabase.getInstance().getReference();
+
+
         getData();
         initViews(view);
         return view;
@@ -101,6 +121,7 @@ public class ChangepasswordFragment extends DialogFragment {
         String oldPassword = mEtOldPassword.getText().toString();
         String newPassword = mEtNewPassword.getText().toString();
 
+
         int err = 0;
 
         if (!validateFields(oldPassword)) {
@@ -117,13 +138,32 @@ public class ChangepasswordFragment extends DialogFragment {
 
         if (err == 0) {
 
-            User user = new User();
-            user.setPassword(oldPassword);
-            user.setNewPassword(newPassword);
-            changePasswordProgress(user);
+
+
             mProgressBar.setVisibility(View.VISIBLE);
+            changePasswordProgress(newPassword,  oldPassword);
 
         }
+
+        Log.i(TAG, "password: " + password);
+
+        Log.i(TAG, "oldPassword: " + oldPassword);
+        Log.i(TAG, "newPassword: " + newPassword);
+        Log.i(TAG, "err: " + err);
+
+    }
+
+    private void writeNewPassowrdPost(String id, String newP) {
+        HashMap<String, Object> childUpdates = new HashMap<>();
+
+        String update = "/User/" + id + "/password";
+        Log.w(TAG, "update newpassword: "+update);
+
+        childUpdates.put(update, newP);
+
+        Log.w(TAG, "childUpdates newpassword: "+childUpdates);
+
+        database.updateChildren(childUpdates);
     }
 
     private void setError() {
@@ -132,49 +172,95 @@ public class ChangepasswordFragment extends DialogFragment {
         mTiNewPassword.setError(null);
     }
 
-    private void changePasswordProgress(User user) {
+    private void changePasswordProgress(String newP, String oldP) {
 
-//        mSubscriptions.add(NetworkUtil.getRetrofit(mToken).changePassword(mEmail,user)
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeOn(Schedulers.io())
-//                .subscribe(this::handleResponse,this::handleError));
+
+        if(oldP.equals(password)) {
+            Log.i(TAG, "test user_id: " + user_id);
+
+            writeNewPassowrdPost(user_id, newP);
+
+            mProgressBar.setVisibility(View.GONE);
+            mListener.onPasswordChanged();
+            dismiss();
+        }
+        else{
+            mProgressBar.setVisibility(View.GONE);
+
+            showMessage("Wrong Password!");
+        }
+
+
     }
 
-    private void handleResponse(Response response) {
-
-        mProgressBar.setVisibility(View.GONE);
-        mListener.onPasswordChanged();
-        dismiss();
-    }
-
-    private void handleError(Throwable error) {
-
-        mProgressBar.setVisibility(View.GONE);
-
-//        if (error instanceof HttpException) {
-//
-//        Gson gson = new GsonBuilder().create();
-//
-//        try {
-//
-//            String errorBody = ((HttpException) error).response().errorBody().string();
-//            Response response = gson.fromJson(errorBody,Response.class);
-//            showMessage(response.getMessage());
-//
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    } else {
-//
-//        showMessage("Network Error !");
-//    }
-}
 
     private void showMessage(String message) {
 
         mTvMessage.setVisibility(View.VISIBLE);
         mTvMessage.setText(message);
 
+    }
+
+    public interface MyCallback {
+        void onCallback(String value);
+    }
+
+    private void initSharedPreferences() {
+
+        mSharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+    }
+
+    public void readData(LoginFragment.MyCallback myCallback) {
+        myRef = FirebaseDatabase.getInstance().getReference().child("User/"+user_id);
+        Log.w(TAG, "myRef" + myRef);
+
+        ValueEventListener postListener = new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // Get Post object and use the values to update the UI
+                Log.w(TAG, "dataSnapshot" + dataSnapshot);
+
+                if(dataSnapshot.getValue() != null) {
+                    String my = dataSnapshot.getValue().toString();
+                    myCallback.onCallback(my);
+
+                }
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException());
+                // ...
+            }
+        };
+        myRef.addValueEventListener(postListener);
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        user_id = mSharedPreferences.getString("user_id", "none");
+
+        readData(new LoginFragment.MyCallback() {
+            @Override
+            public void onCallback(String value) {
+
+                value = value.substring(1, value.length()-1);
+                String[] keyValuePairs = value.split(",");
+                myData = new HashMap<>();
+
+                for(String pair : keyValuePairs) {
+                    String[] entry = pair.split("=");
+                    myData.put(entry[0].trim(), entry[1].trim());
+                }
+
+                password = myData.get("password");
+
+                Log.d("testCallback", value);
+
+            }
+        });
     }
 
     @Override

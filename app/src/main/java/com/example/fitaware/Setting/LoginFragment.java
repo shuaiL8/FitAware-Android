@@ -30,6 +30,7 @@ import com.google.firebase.database.*;
 //import rx.android.schedulers.AndroidSchedulers;
 //import rx.schedulers.Schedulers;
 //import rx.subscriptions.CompositeSubscription;
+import android.os.Handler;
 
 import java.io.IOException;
 import java.util.Currency;
@@ -53,13 +54,18 @@ public class LoginFragment extends Fragment {
     private TextInputLayout mTiPassword;
     private ProgressBar mProgressBar;
 
-    private String email;
-    private String password;
+    private String email = "none";
+    private String password = "none";
     private Map<String,String> myData;
 //    private CompositeSubscription mSubscriptions;
     private SharedPreferences mSharedPreferences;
-    public int loginStatus = 0;
-    public String user_id = "";
+//    public int loginStatus = 0;
+    public String user_id = "none";
+    public String team = "none";
+    public String my_goal = "none";
+    public String teamGoal = "none";
+    public String captain = "none";
+
 
     @Nullable
     @Override
@@ -68,6 +74,7 @@ public class LoginFragment extends Fragment {
 //        mSubscriptions = new CompositeSubscription();
         initViews(view);
         initSharedPreferences();
+
 
         return view;
     }
@@ -105,6 +112,8 @@ public class LoginFragment extends Fragment {
         String[] inputId = inputEmail.split("@");
         user_id = inputId[0];
 
+
+
         Log.i(TAG, "inputEmail: " + inputEmail);
 
         Log.i(TAG, "inputId: " + inputId[0]);
@@ -125,43 +134,54 @@ public class LoginFragment extends Fragment {
 
                 email = myData.get("email");
                 password = myData.get("password");
+                team = myData.get("team");
+                my_goal = myData.get("goal");
+                teamGoal = myData.get("teamGoal");
+                captain = myData.get("captain");
 
                 Log.d("testCallback", value);
 
-
-                int err = 0;
-
-                if (!validateEmail(email)) {
-
-                    err++;
-                    mTiEmail.setError("Email should be valid !");
-                }
-
-                if (!validateFields(password)) {
-
-                    err++;
-                    mTiPassword.setError("Password should not be empty !");
-                }
-
-                if (err == 0) {
-
-                    loginProcess(inputEmail,inputPassword);
-                    mProgressBar.setVisibility(View.VISIBLE);
-
-                } else {
-
-                    showSnackBarMessage("Enter Valid Details !");
-                }
-
-                Log.i(TAG, "inputEmail: " + inputEmail);
-                Log.i(TAG, "inputPassword: " + inputPassword);
-                Log.i(TAG, "email: " + email);
-                Log.i(TAG, "password: " + password);
-
-                Log.i(TAG, "err: " + err);
             }
         });
 
+        int err = 0;
+
+        if (!validateEmail(inputEmail)) {
+
+            err++;
+            mTiEmail.setError("Email should be valid !");
+        }
+
+        if (!validateFields(inputPassword)) {
+
+            err++;
+            mTiPassword.setError("Password should not be empty !");
+        }
+
+        if (err == 0) {
+            Handler handler = new Handler();
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    loginProcess(inputEmail,inputPassword);
+
+                }
+            }, 1000);
+
+            mProgressBar.setVisibility(View.VISIBLE);
+
+        } else {
+
+            showSnackBarMessage("Enter Valid Details !");
+        }
+
+        Log.i(TAG, "inputEmail: " + inputEmail);
+        Log.i(TAG, "inputPassword: " + inputPassword);
+        Log.i(TAG, "email: " + email);
+        Log.i(TAG, "password: " + password);
+
+        Log.i(TAG, "err: " + err);
     }
 
     private void setError() {
@@ -171,15 +191,17 @@ public class LoginFragment extends Fragment {
     }
 
     private void loginProcess(String e, String p) {
-
-//        mSubscriptions.add(NetworkUtil.getRetrofit(email, password).login()
-//                .observeOn(AndroidSchedulers.mainThread())
-//                .subscribeOn(Schedulers.io())
-//                .subscribe(this::handleResponse,this::handleError));
-
         if(e .equals(email)  && p.equals(password) ) {
-            loginStatus = 1;
-            sendData();
+            SharedPreferences.Editor editor = mSharedPreferences.edit();
+            editor.putString("user_id", user_id);
+            editor.putString("team", team);
+            editor.putString("my_goal", my_goal);
+            editor.putString("team_goal", teamGoal);
+            editor.putString("captain", captain);
+
+            editor.putInt("loginStatus", 1);
+            editor.commit();
+            startActivity();
         }
         else {
             showSnackBarMessage("Wrong Email or Password !");
@@ -188,43 +210,12 @@ public class LoginFragment extends Fragment {
 
     }
 
-    private void handleResponse(Response response) {
 
-        mProgressBar.setVisibility(View.GONE);
+    private void startActivity() {
+        Intent i = new Intent(getActivity().getBaseContext(),
+                MainActivity.class);
 
-        SharedPreferences.Editor editor = mSharedPreferences.edit();
-        editor.putString(Constants.TOKEN,response.getToken());
-        editor.putString(Constants.EMAIL,response.getMessage());
-        editor.apply();
-
-        mEtEmail.setText(null);
-        mEtPassword.setText(null);
-
-        loginStatus = 1;
-        sendData();
-    }
-
-    private void handleError(Throwable error) {
-
-        mProgressBar.setVisibility(View.GONE);
-
-//        if (error instanceof HttpException) {
-//
-//            Gson gson = new GsonBuilder().create();
-//
-//            try {
-//
-//                String errorBody = ((HttpException) error).response().errorBody().string();
-//                Response response = gson.fromJson(errorBody,Response.class);
-//                showSnackBarMessage(response.getMessage());
-//
-//            } catch (IOException e) {
-//                e.printStackTrace();
-//            }
-//        } else {
-//
-//            showSnackBarMessage("Network Error !");
-//        }
+        getActivity().startActivity(i);
     }
 
     private void showSnackBarMessage(String message) {
@@ -239,11 +230,6 @@ public class LoginFragment extends Fragment {
 
         Navigation.findNavController(getActivity(), R.id.my_nav_host_fragment).navigate(R.id.registerFragment);
 
-
-//        FragmentTransaction fragmentTransaction = getFragmentManager().beginTransaction();
-//        RegisterFragment fragment = new RegisterFragment();
-//        fragmentTransaction.replace(R.id.content,fragment,RegisterFragment.TAG);
-//        fragmentTransaction.commit();
     }
 
     private void showeRsetpasswordDialog(){
@@ -253,25 +239,8 @@ public class LoginFragment extends Fragment {
         resetpasswordFragment.show(getFragmentManager(), ResetpasswordFragment.TAG);
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-//        mSubscriptions.unsubscribe();
-    }
 
-    private void sendData()
-    {
-        //INTENT OBJ
-        Intent i = new Intent(getActivity().getBaseContext(),
-                MainActivity.class);
 
-        //PACK DATA
-        i.putExtra("Login_Status", loginStatus);
-        i.putExtra("user_id", user_id);
-
-        //START ACTIVITY
-        getActivity().startActivity(i);
-    }
 
     public interface MyCallback {
         void onCallback(String value);
@@ -302,5 +271,11 @@ public class LoginFragment extends Fragment {
             }
         };
         myRef.addValueEventListener(postListener);
+    }
+
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
     }
 }

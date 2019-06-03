@@ -32,7 +32,7 @@
                         android:id="@+id/et_stepsGoal"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:drawableRight="@drawable/ic_directions_walk_black_24dp"
+                        android:drawableRight="@drawable/ic_steps"
                         android:layout_marginTop="20dp"
                         android:inputType="number"/>
 

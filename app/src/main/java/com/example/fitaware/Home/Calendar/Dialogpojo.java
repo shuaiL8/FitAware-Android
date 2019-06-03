@@ -1,76 +1,69 @@
 package com.example.fitaware.Home.Calendar;
 
 public class Dialogpojo {
-    private String titles;
-    private String subjects;
-    private String types;
-    private String duedates;
-    private String descripts;
-    private String attatchmentd;
-    private String sections;
-    private String classe;
+    private String date;
+    private String duration;
+    private String steps;
+    private String heartPoints;
+    private String distance;
+    private String cals;
+    private String goal;
 
-    public void setTitles(String titles) {
-        this.titles = titles;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public void setSubjects(String subjects) {
-        this.subjects = subjects;
+    public void setDuration(String duration) {
+        this.duration = duration;
     }
 
-    public void setTypes(String types) {
-        this.types = types;
+    public void setSteps(String steps) {
+        this.steps = steps;
     }
 
-    public void setDuedates(String duedates) {
-        this.duedates = duedates;
+    public void setHeartPoints(String heartPoints) {
+        this.heartPoints = heartPoints;
     }
 
-    public void setDescripts(String descripts) {
-        this.descripts = descripts;
+    public void setDisatnce(String distance) {
+        this.distance = distance;
     }
 
-    public void setAttatchmentd(String attatchmentd) {
-        this.attatchmentd = attatchmentd;
+    public void setCals(String cals) {
+        this.cals = cals;
     }
 
-    public String getTitles() {
-        return titles;
+    public void setGoal(String goal) {
+        this.goal = goal;
     }
 
-    public String getSubjects() {
-        return subjects;
+
+    public String getDate() {
+        return date;
     }
 
-    public String getTypes() {
-        return types;
+    public String getDuration() {
+        return duration;
     }
 
-    public String getDuedates() {
-        return duedates;
+    public String getSteps() {
+        return steps;
     }
 
-    public String getDescripts() {
-        return descripts;
+    public String getHeartPoints() {
+        return heartPoints;
     }
 
-    public String getAttatchmentd() {
-        return attatchmentd;
+    public String getDisatnce() {
+        return distance;
     }
 
-    public void setSections(String sections) {
-        this.sections = sections;
+    public String getCals() {
+        return cals;
     }
 
-    public void setClasse(String classe) {
-        this.classe = classe;
+    public String getGoal() {
+        return goal;
     }
 
-    public String getClasse() {
-        return classe;
-    }
-
-    public String getSections() {
-        return sections;
-    }
 }

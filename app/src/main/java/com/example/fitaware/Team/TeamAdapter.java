@@ -37,6 +37,7 @@ public class TeamAdapter extends ArrayAdapter<Team> {
             holder.captain = (TextView) row.findViewById(R.id.team_captain);
             holder.image = (ImageView) row.findViewById(R.id.imageView_teams);
             holder.rank = (TextView) row.findViewById(R.id.team_rank);
+            holder.team_steps = (TextView) row.findViewById(R.id.team_steps);
 
             row.setTag(holder);
         } else {
@@ -47,7 +48,8 @@ public class TeamAdapter extends ArrayAdapter<Team> {
         Team item = data.get(position);
         holder.name.setText(item.getName());
         holder.captain.setText(item.getCaptain());
-        holder.rank.setText(item.getRank());
+        holder.rank.setText("No. "+item.getRank());
+        holder.team_steps.setText(String.valueOf(item.getTeamSteps()));
 
         holder.image.setImageBitmap(item.getImage());
         return row;
@@ -57,6 +59,7 @@ public class TeamAdapter extends ArrayAdapter<Team> {
         TextView name;
         TextView captain;
         TextView rank;
+        TextView team_steps;
 
         ImageView image;
     }

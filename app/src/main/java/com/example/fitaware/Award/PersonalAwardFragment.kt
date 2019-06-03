@@ -1,7 +1,7 @@
 package com.example.fitaware.Award
 
 
-import android.graphics.Bitmap
+import android.app.Activity
 import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -12,9 +12,7 @@ import android.view.ViewGroup
 import com.example.fitaware.R
 import android.widget.AdapterView
 import android.widget.GridView
-import android.widget.ListView
-import com.example.fitaware.Team.Member
-import com.example.fitaware.Team.MemberAdapter
+import androidx.navigation.Navigation
 import java.util.ArrayList
 
 
@@ -34,6 +32,10 @@ class PersonalAwardFragment : Fragment() {
         setHasOptionsMenu(true)
 
         val gridViewPersonalAwards = view.findViewById<GridView>(R.id.gridViewPersonalAwards)
+        val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+        swipeRefresh.setOnRefreshListener {
+            Navigation.findNavController(context as Activity, R.id.my_nav_awards_fragment).navigate(R.id.personalAwardFragment)
+        }
 
         val bitmap = BitmapFactory.decodeResource(resources, R.drawable.ic_first)
         awards.add(Award(bitmap, "Best of Day", "4/10/2019"))

@@ -4,8 +4,8 @@
             xmlns:tools="http://schemas.android.com/tools" android:id="@+id/navigation_team"
             app:startDestination="@id/allTeamsFragment">
 
-    <fragment android:id="@+id/myTeamFragment" android:name="com.example.fitaware.Team.MyTeamFragment"
-              android:label="fragment_my_team" tools:layout="@layout/fragment_my_team"/>
     <fragment android:id="@+id/allTeamsFragment" android:name="com.example.fitaware.Team.AllTeamsFragment"
               android:label="fragment_all_teams" tools:layout="@layout/fragment_all_teams"/>
+    <fragment android:id="@+id/allTeamsFragment_list" android:name="com.example.fitaware.Team.AllTeamsListFragment"
+              android:label="fragment_all_teams_list" tools:layout="@layout/fragment_all_teams_list"/>
 </navigation>

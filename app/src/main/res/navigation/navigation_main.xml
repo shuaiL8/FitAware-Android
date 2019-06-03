@@ -2,19 +2,17 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
             xmlns:app="http://schemas.android.com/apk/res-auto"
             xmlns:tools="http://schemas.android.com/tools" android:id="@+id/navigation_graph"
-            app:startDestination="@id/homeFragment">
+            app:startDestination="@id/loginFragment">
 
     <fragment android:id="@+id/homeFragment" android:name="com.example.fitaware.Home.HomeFragment"
               android:label="fragment_home" tools:layout="@layout/fragment_home">
-        <action android:id="@+id/action_homeFragment_to_meFragment" app:destination="@id/meFragment"/>
-    </fragment>
-    <fragment android:id="@+id/meFragment" android:name="com.example.fitaware.MeFragment" android:label="fragment_me"
-              tools:layout="@layout/fragment_me">
-        <action android:id="@+id/action_meFragment_to_teamFragment" app:destination="@id/teamFragment"/>
+        <action android:id="@+id/action_homeFragment_to_historyFragment" app:destination="@id/historyFragment"/>
     </fragment>
     <fragment android:id="@+id/teamFragment" android:name="com.example.fitaware.Team.TeamFragment"
               android:label="fragment_team" tools:layout="@layout/fragment_team">
         <action android:id="@+id/action_teamFragment_to_awardsFragment" app:destination="@id/awardsFragment"/>
+        <action android:id="@+id/action_teamFragment_to_createNewTeamFragment2"
+                app:destination="@id/createNewTeamFragment"/>
     </fragment>
     <fragment android:id="@+id/awardsFragment" android:name="com.example.fitaware.Award.AwardsFragment"
               android:label="fragment_awards" tools:layout="@layout/fragment_awards">
@@ -28,9 +26,16 @@
     <fragment android:id="@+id/loginFragment" android:name="com.example.fitaware.Setting.LoginFragment"
               android:label="fragment_login" tools:layout="@layout/fragment_login">
         <action android:id="@+id/action_loginFragment_to_registerFragment" app:destination="@id/registerFragment"/>
+        <action android:id="@+id/action_loginFragment_to_homeFragment" app:destination="@id/homeFragment"/>
     </fragment>
     <fragment android:id="@+id/registerFragment" android:name="com.example.fitaware.Setting.RegisterFragment"
               android:label="fragment_register" tools:layout="@layout/fragment_register"/>
     <fragment android:id="@+id/profileFragment" android:name="com.example.fitaware.Setting.ProfileFragment"
               android:label="profileFragment"/>
+    <fragment android:id="@+id/createNewTeamFragment" android:name="com.example.fitaware.Team.CreateNewTeamFragment"
+              android:label="fragment_create_new_team" tools:layout="@layout/fragment_create_new_team"/>
+    <fragment android:id="@+id/historyFragment" android:name="com.example.fitaware.History.HistoryFragment"
+              android:label="fragment_history" tools:layout="@layout/fragment_history">
+        <action android:id="@+id/action_historyFragment_to_teamFragment" app:destination="@id/teamFragment"/>
+    </fragment>
 </navigation>

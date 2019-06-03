@@ -52,12 +52,16 @@ class DialogAdaptorStudent extends BaseAdapter {
         TextView tvSubject=(TextView)listViewItem.findViewById(R.id.tv_type);
         TextView tvDuedate=(TextView)listViewItem.findViewById(R.id.tv_desc);
         TextView tvDescription=(TextView)listViewItem.findViewById(R.id.tv_class);
+        TextView tv_section=(TextView)listViewItem.findViewById(R.id.tv_section);
 
-        tvTitle.setText("Duration : "+alCustom.get(position).getTitles());
-        tvSubject.setText("Distance : "+alCustom.get(position).getSubjects());
-        tvDescription.setText("Calorie Estimate : "+alCustom.get(position).getDescripts());
-
-//        tvDuedate.setText("Calories : "+alCustom.get(position).getDuedates());
+        tvTitle.setText("Duration : "+alCustom.get(position).getDuration());
+        float s = Integer.valueOf(alCustom.get(position).getSteps());
+        float g = Integer.valueOf(alCustom.get(position).getGoal());
+        float percent = (s/g)*100;
+        tvSubject.setText(String.format("Steps: %.0f / %.0f (%.0f%%)", s, g, percent));
+        tvDuedate.setText("HeartPoints : "+alCustom.get(position).getHeartPoints());
+        tvDescription.setText("Distance : "+alCustom.get(position).getDisatnce());
+        tv_section.setText("Calorie : "+alCustom.get(position).getCals());
 
         return  listViewItem;
     }

@@ -15,6 +15,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "122641114766-n6hubf1kcnhbhreiufb0s81hj1nvhq2u.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.fitaware",
+            "certificate_hash": "3f6469a2c163db092afaed8b979f3673708a76b5"
+          }
+        },
+        {
           "client_id": "122641114766-ht5fom86af6mdfs0bfji0r99trpe2m6i.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

@@ -5,16 +5,24 @@
              android:layout_height="match_parent"
              tools:context=".Award.TeamAwardFragment">
 
-    <GridView
-            android:id="@+id/gridViewTeamAwards"
+    <android.support.v4.widget.SwipeRefreshLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/swipeRefresh"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:gravity="center"
-            android:columnWidth="150dp"
-            android:numColumns="auto_fit"
-            android:verticalSpacing="24dp"
-            android:horizontalSpacing="10dp"
-            android:stretchMode="spacingWidthUniform"
-            android:padding="5dp"/>
+            android:layout_height="match_parent">
+
+            <GridView
+                    android:id="@+id/gridViewTeamAwards"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:columnWidth="150dp"
+                    android:numColumns="auto_fit"
+                    android:verticalSpacing="24dp"
+                    android:horizontalSpacing="10dp"
+                    android:stretchMode="spacingWidthUniform"
+                    android:padding="5dp"/>
+    </android.support.v4.widget.SwipeRefreshLayout>
+
 
 </FrameLayout>

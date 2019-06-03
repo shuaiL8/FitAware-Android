@@ -15,6 +15,17 @@ import com.example.fitaware.Communicator
 import com.example.fitaware.MainActivity
 import com.google.firebase.database.*
 import android.arch.lifecycle.Observer
+import java.util.HashMap
+import android.R.id.edit
+import android.app.Activity
+import android.app.AlertDialog
+import android.content.Context
+import android.content.DialogInterface
+import android.content.SharedPreferences
+import android.graphics.*
+import android.preference.PreferenceManager
+import android.support.v4.widget.SwipeRefreshLayout
+import android.widget.Toast
 
 
 /**
@@ -27,8 +38,9 @@ class SettingFragment : Fragment() {
 
     private var user_id: String = ""
 
+    private lateinit var database: DatabaseReference
+    private var sharedPreferences: SharedPreferences? = null
 
-    var loginStatus = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,6 +51,18 @@ class SettingFragment : Fragment() {
             R.layout.fragment_setting, container,
             false)
         setHasOptionsMenu(true)
+        initSharedPreferences()
+
+        database = FirebaseDatabase.getInstance().reference
+
+        val toolbarTiltle = activity!!.findViewById<TextView>(R.id.toolbar_title)
+        toolbarTiltle.text = ""
+
+        val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+
+        swipeRefresh.setOnRefreshListener {
+            Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.settingFragment)
+        }
 
         val userListView = view.findViewById<ListView>(R.id.userListView)
         val icon = view.findViewById<ImageView>(R.id.icon)
@@ -59,7 +83,10 @@ class SettingFragment : Fragment() {
 
         userListView.adapter = adapter
 
-        icon.setBackgroundResource(R.drawable.ic_person_black_24dp)
+        var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
+        bitmap = getCroppedBitmap(bitmap)
+
+        icon.setImageBitmap(bitmap)
 
         userListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, position, id ->
             if (position == 0) {
@@ -71,33 +98,44 @@ class SettingFragment : Fragment() {
                 showChangepasswordDialog()
             }
             if (position == 3) {
-                loginStatus = 0
-                sendData()
+
+                // build alert dialog
+                val dialogBuilder = AlertDialog.Builder(context)
+
+                // set message of alert dialog
+                dialogBuilder.setMessage("Do you want to logout ?")
+                    // if the dialog is cancelable
+                    // positive button text and action
+                    .setPositiveButton("Logout", DialogInterface.OnClickListener {
+                            dialog, id ->
+                        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
+                        val editor = sharedPreferences!!.edit()
+                        editor.remove("loginStatus")
+                        editor.remove("user_id")
+
+                        editor.commit()
+                        sendData()
+                    })
+                    // negative button text and action
+                    .setNegativeButton("Cancel", DialogInterface.OnClickListener {
+                            dialog, id -> dialog.cancel()
+                    })
+
+                // create dialog box
+                val alert = dialogBuilder.create()
+                // set title for alert dialog box
+//                alert.setTitle("AlertDialogExample")
+                // show alert dialog
+                alert.show()
+
             }
             if (position == 4) {
 
             }
         }
 
-        val model = ViewModelProviders.of(activity!!).get(Communicator::class.java)
-        val `object` = Observer<Any> { o ->
-            // Update the UI
+        user_id = sharedPreferences!!.getString("user_id", "")
 
-            Log.w(TAG, "allSteps" + o!!.toString())
-
-            val value = o.toString().substring(1, o.toString().length - 1)
-            val keyValuePairs = value.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val allSteps = java.util.HashMap<String, String>()
-
-            for (pair in keyValuePairs) {
-                val entry = pair.split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                allSteps[entry[0].trim { it <= ' ' }] = entry[1].trim { it <= ' ' }
-            }
-
-            user_id = allSteps["user_id"]!!.toString()
-        }
-
-        model.message.observe(activity!!, `object`)
 
         val myRef = FirebaseDatabase.getInstance().reference.child("User/$user_id")
 
@@ -112,9 +150,15 @@ class SettingFragment : Fragment() {
                     Log.i(TAG, "$key: $value")
                     Log.i(TAG, "email: ${my["email"]}")
                 }
-                tv_name.text = my["id"] as CharSequence?
-                tv_email.text = my["email"] as CharSequence?
-                tv_group.text = my["team"] as CharSequence?
+                tv_name.text = my["id"].toString()
+                tv_email.text = my["email"].toString()
+
+                if(my["captain"].toString() == my["id"].toString()) {
+                    tv_group.text = "Captain of " + my["team"].toString()
+                }
+                else {
+                    tv_group.text = "In team: " + my["team"].toString()
+                }
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -127,6 +171,7 @@ class SettingFragment : Fragment() {
 
         return view
     }
+
 
     private fun showChangepasswordDialog() {
 
@@ -141,34 +186,42 @@ class SettingFragment : Fragment() {
     }
 
 
-    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
-        inflater.inflate(R.menu.tool_bar2, menu)
-    }
 
-
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.add -> {
-            // User chose the "Settings" item, show the app settings UI...
-            true
-        }
-
-        else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            super.onOptionsItemSelected(item)
-        }
-    }
 
     private fun sendData() {
         //INTENT OBJ
         val intent = Intent(activity!!.baseContext, MainActivity::class.java)
 
         //PACK DATA
-        intent.putExtra("Login_Status", loginStatus)
+//        intent.putExtra("Login_Status", loginStatus)
 
         //START ACTIVITY
         activity!!.startActivity(intent)
-
     }
 
+    private fun initSharedPreferences() {
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context)
+    }
+
+
+    fun getCroppedBitmap(bitmap: Bitmap): Bitmap {
+        var output  = Bitmap.createBitmap(bitmap.width,
+                bitmap.height, Bitmap.Config.ARGB_8888);
+        var  canvas: Canvas = Canvas(output)
+
+        var color:Int = 0xff424242.toInt()
+        var paint: Paint = Paint()
+        var rect: Rect = Rect(0, 0, bitmap.width, bitmap.height)
+
+        paint.isAntiAlias = true;
+        canvas.drawARGB(0, 0, 0, 0);
+        paint.color = color
+        // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
+        canvas.drawCircle((bitmap.width / 2).toFloat(), (bitmap.height / 2).toFloat(),
+                (bitmap.width / 2).toFloat(), paint);
+        paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
+        canvas.drawBitmap(bitmap, rect, rect, paint)
+        return output
+    }
 }
