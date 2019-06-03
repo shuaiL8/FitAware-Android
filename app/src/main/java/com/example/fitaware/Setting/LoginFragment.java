@@ -57,9 +57,9 @@ public class LoginFragment extends Fragment {
     private String email = "none";
     private String password = "none";
     private Map<String,String> myData;
-//    private CompositeSubscription mSubscriptions;
+    //    private CompositeSubscription mSubscriptions;
     private SharedPreferences mSharedPreferences;
-//    public int loginStatus = 0;
+    //    public int loginStatus = 0;
     public String user_id = "none";
     public String team = "none";
     public String my_goal = "none";

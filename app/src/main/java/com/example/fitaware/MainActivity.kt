@@ -54,7 +54,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     private var daily_calories: Long = 0
     private var daily_distance: Long = 0
 
-    private var user_id: String = ""
+    private var user_id: String = "none"
 
     private var periodical: String = "none"
     private var team: String = "none"
@@ -234,7 +234,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 //        receiveData()
 
 
-        if(loginStatus == 1 && user_id != "") {
+        if(loginStatus == 1 && user_id != "none") {
 
             val myRef = FirebaseDatabase.getInstance().reference.child("User")
             val myPostListener = object : ValueEventListener {
@@ -424,7 +424,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
         this?.runOnUiThread {
 
-            if(user_id != "") {
+            if(user_id != "none") {
                 writeNewPost(user_id, daily_steps.toString(), daily_duration.toString(), daily_heartPoints.toString(), daily_distance.toString(), daily_calories.toString())
 
             }
@@ -657,7 +657,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     private fun registerMyReceiver() {
 
         val filter = IntentFilter()
-        filter.addAction("com.example.BroadcastReceiver")
+        filter.addAction("BroadcastReceiver")
         registerReceiver(receiver, filter)
 
     }

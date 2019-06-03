@@ -153,11 +153,17 @@ class SettingFragment : Fragment() {
                 tv_name.text = my["id"].toString()
                 tv_email.text = my["email"].toString()
 
-                if(my["captain"].toString() == my["id"].toString()) {
-                    tv_group.text = "Captain of " + my["team"].toString()
+                if(my["team"].toString() != "none") {
+                    if(my["captain"].toString() == my["id"].toString()) {
+                        tv_group.text = "Captain of " + my["team"].toString()
+                    }
+                    else {
+                        tv_group.text = "In team: " + my["team"].toString()
+                    }
                 }
                 else {
-                    tv_group.text = "In team: " + my["team"].toString()
+                    tv_group.text = "Currently not in any team"
+
                 }
             }
 
@@ -207,7 +213,7 @@ class SettingFragment : Fragment() {
 
     fun getCroppedBitmap(bitmap: Bitmap): Bitmap {
         var output  = Bitmap.createBitmap(bitmap.width,
-                bitmap.height, Bitmap.Config.ARGB_8888);
+            bitmap.height, Bitmap.Config.ARGB_8888);
         var  canvas: Canvas = Canvas(output)
 
         var color:Int = 0xff424242.toInt()
@@ -219,7 +225,7 @@ class SettingFragment : Fragment() {
         paint.color = color
         // canvas.drawRoundRect(rectF, roundPx, roundPx, paint);
         canvas.drawCircle((bitmap.width / 2).toFloat(), (bitmap.height / 2).toFloat(),
-                (bitmap.width / 2).toFloat(), paint);
+            (bitmap.width / 2).toFloat(), paint);
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
         canvas.drawBitmap(bitmap, rect, rect, paint)
         return output

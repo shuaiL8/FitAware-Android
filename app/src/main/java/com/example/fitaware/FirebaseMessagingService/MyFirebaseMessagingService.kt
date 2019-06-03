@@ -72,7 +72,7 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
             }
 
             val intent = Intent()
-            intent.action = "com.example.BroadcastReceiver"
+            intent.action = "BroadcastReceiver"
             intent.putExtra("message", remoteMessage.notification!!.body!!)
             intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
 

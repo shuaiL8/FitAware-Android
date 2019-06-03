@@ -63,8 +63,6 @@ public class ChangepasswordFragment extends DialogFragment {
     private TextInputLayout mTiNewPassword;
     private ProgressBar mProgressBar;
 
-//    private CompositeSubscription mSubscriptions;
-
     private String mToken;
     private String mEmail;
 
@@ -266,6 +264,5 @@ public class ChangepasswordFragment extends DialogFragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-//        mSubscriptions.unsubscribe();
     }
 }

@@ -48,27 +48,32 @@ class CalendarFragment : Fragment() {
         val postListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 // Get Post object and use the values to update the UI
-                val my = dataSnapshot.value as Map<String, Any>
 
-                Log.i(TAG, "myTeamMember: $my")
+                if(dataSnapshot.value != null) {
+                    val my = dataSnapshot.value as Map<String, Any>
 
-
-                for((key, value) in my){
-                    val details = value as Map<String, String>
+                    Log.i(TAG, "myTeamMember: $my")
 
 
-                    date_collection_arr.add(
-                        HomeCollection(
-                            key,
-                            details["Minis"], details["Steps"], details["HPs"], details["Ms"], details["Cals"], details["Goal"]
+                    for((key, value) in my){
+                        val details = value as Map<String, String>
+
+
+                        date_collection_arr.add(
+                            HomeCollection(
+                                key,
+                                details["Minis"], details["Steps"], details["HPs"], details["Ms"], details["Cals"], details["Goal"]
+                            )
                         )
-                    )
 
 
-                    Log.i(TAG, "$key: $value")
-                    Log.i(TAG, "details: $details")
+                        Log.i(TAG, "$key: $value")
+                        Log.i(TAG, "details: $details")
+
+                    }
 
                 }
+
 
 
             }
@@ -80,6 +85,8 @@ class CalendarFragment : Fragment() {
             }
         }
         myRef.addValueEventListener(postListener)
+
+
 
 
         cal_month = GregorianCalendar.getInstance() as GregorianCalendar
