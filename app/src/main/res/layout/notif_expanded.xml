@@ -1,6 +1,139 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                                             android:layout_width="match_parent"
-                                             android:layout_height="match_parent">
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-</android.support.constraint.ConstraintLayout>
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:padding="10dp">
+
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
+            <ImageView
+                    android:id="@+id/imageMySteps"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/ic_steps"
+                    android:gravity="center"/>
+
+            <TextView
+                    android:id="@+id/textMySteps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="7318"
+                    android:textSize="15dp"
+                    android:gravity="center"
+                    android:padding="8dp"/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Steps"
+                    android:textSize="15dp"
+                    android:gravity="center"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
+            <ImageView
+                    android:id="@+id/imageMyRank"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/ic_rank"
+                    android:gravity="center"/>
+
+            <TextView
+                    android:id="@+id/textMyRank"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1/6"
+                    android:textSize="15dp"
+                    android:gravity="center"
+                    android:padding="8dp"/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Rank"
+                    android:textSize="15dp"
+                    android:gravity="center"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
+            <ImageView
+                    android:id="@+id/imageTeamSteps"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/ic_team_steps"
+                    android:gravity="center"/>
+
+            <TextView
+                    android:id="@+id/textTeamSteps"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="42831"
+                    android:textSize="15dp"
+                    android:gravity="center"
+                    android:padding="8dp"/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Team Steps"
+                    android:textSize="15dp"
+                    android:gravity="center"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:gravity="center"
+                android:layout_weight="1">
+            <ImageView
+                    android:id="@+id/imageTeamRank"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:src="@drawable/ic_team_rank"
+                    android:gravity="center"/>
+
+            <TextView
+                    android:id="@+id/textTeamRank"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="1/47"
+                    android:textSize="15dp"
+                    android:gravity="center"
+                    android:padding="8dp"/>
+
+            <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Team Rank"
+                    android:textSize="15dp"
+                    android:gravity="center"/>
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+
+</FrameLayout>

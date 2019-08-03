@@ -1,16 +1,17 @@
-package com.example.fitaware.Home.Calendar;
+package com.vt.fitaware.Home.Calendar;
 
 import android.app.Activity;
 import android.app.Dialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.*;
 import android.widget.*;
-import com.example.fitaware.Home.DecoviewDialogFragment;
-import com.example.fitaware.R;
+import androidx.navigation.Navigation;
+import com.vt.fitaware.R;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -45,6 +46,7 @@ class HwAdapter extends BaseAdapter {
     public static List<String> day_string;
     public ArrayList<HomeCollection> date_collection_arr;
     private String gridvalue;
+    private TextView tv_date;
     private ListView listTeachers;
     private ArrayList<Dialogpojo> alCustom=new ArrayList<Dialogpojo>();
 
@@ -212,21 +214,23 @@ class HwAdapter extends BaseAdapter {
                         for (int j=0; j<len; j++){
                             if (date_collection_arr.get(j).date.equals(date)){
 
-                                float strSteps = Integer.valueOf(date_collection_arr.get(j).steps);
-                                float  strGoal = Integer.valueOf(date_collection_arr.get(j).goal);
+                                if(date_collection_arr.get(j).steps != null && date_collection_arr.get(j).goal != null) {
+                                    float strSteps = Integer.valueOf(date_collection_arr.get(j).steps);
+                                    float  strGoal = Integer.valueOf(date_collection_arr.get(j).goal);
 
-                                float strPercentage = strSteps/strGoal;
+                                    float strPercentage = strSteps/strGoal;
 
+                                    if(strPercentage < 0.5) {
+                                        v.setBackgroundResource(R.drawable.rounded_calender);
+                                    }
+                                    else if(strPercentage > 0.5){
+                                        v.setBackgroundResource(R.drawable.rounded_calender_green);
+                                    }
+                                    else {
+                                        v.setBackgroundResource(R.drawable.rounded_calender_orange);
+                                    }
+                                }
 
-                                if(strPercentage < 0.5) {
-                                    v.setBackgroundResource(R.drawable.rounded_calender);
-                                }
-                                else if(strPercentage > 0.5){
-                                    v.setBackgroundResource(R.drawable.rounded_calender_green);
-                                }
-                                else {
-                                    v.setBackgroundResource(R.drawable.rounded_calender_orange);
-                                }
                             }
                         }
 
@@ -269,6 +273,8 @@ class HwAdapter extends BaseAdapter {
             wmlp.x = 75;   //x position
             wmlp.y = 1100;   //y position
 
+            tv_date = (TextView) dialogs.findViewById(R.id.tv_date);
+            tv_date.setText(date);
             listTeachers = (ListView) dialogs.findViewById(R.id.list_teachers);
             ImageView imgCross = (ImageView) dialogs.findViewById(R.id.img_cross);
             listTeachers.setAdapter(new DialogAdaptorStudent(context, getMatchList(jbarrays + "")));
@@ -291,9 +297,14 @@ class HwAdapter extends BaseAdapter {
                             }
                         }
 
-//                        DecoviewDialogFragment decoviewDialogFragment = new DecoviewDialogFragment();
-//                        decoviewDialogFragment.setArguments(args);
-//                        decoviewDialogFragment.show(((AppCompatActivity)context).getSupportFragmentManager(), DecoviewDialogFragment.TAG);
+                        Navigation.findNavController(context, R.id.my_nav_host_fragment).navigate(R.id.userFragment);
+
+                        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString("newSelectedDate", date);
+
+                        editor.commit();
                     }
                 }
             });

@@ -1,4 +1,4 @@
-package com.example.fitaware.FirebaseMessagingService
+package com.vt.fitaware.FirebaseMessagingService
 
 import android.content.Context
 import android.util.Log

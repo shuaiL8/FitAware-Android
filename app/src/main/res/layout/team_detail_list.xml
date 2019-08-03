@@ -1,79 +1,144 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-              android:layout_width="match_parent"
-              android:layout_height="wrap_content"
-              android:orientation="horizontal"
-            android:padding="10dp">
-
-    <ImageView
-            android:layout_weight="1"
-            android:id="@+id/imageView_teams"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
-            android:src="@drawable/teamwork"/>
 
 
-    <TextView
-            android:layout_weight="1"
-            android:id="@+id/team_name"
-            android:layout_width="65dp"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:textColor="@color/colorCals"
-            android:text="CS5714"
-            android:layout_gravity="center"
-            />
-
-    <TextView
-            android:layout_weight="1"
-            android:layout_width="50dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/team_captain"
-            android:textSize="15sp"
-            android:textColor="@color/colorCals"
-            android:text="shuail8"
-            android:layout_gravity="center"/>
+<FrameLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp">
 
 
-    <TextView
-            android:layout_weight="1"
-            android:id="@+id/team_rank"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textSize="15sp"
-            android:textColor="@color/colorCals"
-            android:text="1st"
-            android:layout_gravity="center"/>
-    <LinearLayout
-            android:layout_weight="1"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-    android:orientation="vertical"
-    android:layout_gravity="center">
+    <android.support.v7.widget.CardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-                android:layout_weight="1"
-                android:id="@+id/team_steps"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textColor="@color/colorCals"
-                android:text="2000"
-                android:layout_gravity="center"/>
+        <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+                      android:layout_width="match_parent"
+                      android:layout_height="wrap_content"
+                      android:orientation="horizontal"
+                      android:padding="10dp">
 
-        <TextView
-                android:layout_weight="1"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textSize="15sp"
-                android:textColor="@color/colorCals"
-                android:text="steps"
-                android:layout_gravity="center"/>
 
-    </LinearLayout>
+            <TextView
+                    android:layout_weight="1"
+                    android:id="@+id/team_rank"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:textColor="@color/colorCals"
+                    android:text="1111"
+                    android:layout_gravity="center"
+                    android:padding="10dp"/>
+
+            <LinearLayout android:layout_width="wrap_content"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:layout_weight="1"
+                          android:layout_gravity="center">
+
+                <FrameLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center">
+                    <com.hookedonplay.decoviewlib.DecoView xmlns:custom="http://schemas.android.com/apk/res-auto"
+                                                           android:id="@+id/dynamicArcViews"
+                                                           android:layout_width="100dp"
+                                                           android:layout_height="100dp"
+                                                           custom:dv_lineWidth="8dp"
+                                                           android:layout_gravity="center">
+
+                    </com.hookedonplay.decoviewlib.DecoView>
+
+                    <ImageView
+                            android:id="@+id/imageView_teams"
+                            android:layout_width="80dp"
+                            android:layout_height="80dp"
+                            android:layout_gravity="center"/>
+
+                </FrameLayout>
+
+                <TextView
+                        android:id="@+id/team_name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textColor="@color/colorCals"
+                        android:text="CS5714"
+                        android:layout_gravity="center"
+                />
+
+
+            </LinearLayout>
 
 
 
 
 
-</LinearLayout>
+            <LinearLayout android:layout_width="80dp"
+                          android:layout_height="wrap_content"
+                          android:orientation="vertical"
+                          android:layout_weight="1"
+                          android:layout_gravity="center">
+
+                <TextView
+                        android:layout_weight="1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textColor="@color/colorCals"
+                        android:text="Captain"
+                        android:layout_gravity="center"/>
+
+                <TextView
+                        android:layout_weight="1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/team_captain"
+                        android:textSize="15sp"
+                        android:textColor="@color/colorCals"
+                        android:text="shuail8"
+                        android:layout_gravity="center"
+                        android:padding="10dp"/>
+
+
+            </LinearLayout>
+
+
+            <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_weight="1"
+                    android:layout_gravity="center">
+
+                <TextView
+                        android:layout_weight="1"
+                        android:id="@+id/team_steps"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textColor="@color/colorCals"
+                        android:text="2000"
+                        android:layout_gravity="center"/>
+
+                <TextView
+                        android:layout_weight="1"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textColor="@color/colorCals"
+                        android:text="steps"
+                        android:layout_gravity="center"
+                        android:padding="10dp"/>
+
+            </LinearLayout>
+
+
+
+
+
+        </LinearLayout>
+
+    </android.support.v7.widget.CardView>
+
+</FrameLayout>

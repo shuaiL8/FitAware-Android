@@ -1,4 +1,4 @@
-package com.example.fitaware.Home;
+package com.vt.fitaware.Home;
 
 import android.util.AttributeSet;
 import android.view.ViewGroup;

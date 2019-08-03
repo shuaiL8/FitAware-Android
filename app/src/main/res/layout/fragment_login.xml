@@ -43,7 +43,6 @@
                     android:id="@+id/et_password"
                     android:layout_width="match_parent"
                     android:layout_marginTop="20dp"
-
                     android:layout_height="60dp"
                     android:drawableRight="@drawable/ic_remove_red_eye_black_24dp"
                     android:hint="Password"
@@ -51,12 +50,36 @@
 
             </android.support.design.widget.TextInputLayout>
 
+            <LinearLayout
+                    android:layout_marginTop="10dp"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:id="@+id/rememberPasswordLinearLayout"
+                    android:layout_below="@+id/ti_password"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="20dp">
+
+                <CheckBox
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/rememberPasswordCheckBox"/>
+
+                <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Remember Password"/>
+
+            </LinearLayout>
+
+
+
             <Button
                 android:id="@+id/btn_login"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
-                android:layout_marginTop="20dp"
-                android:layout_below="@+id/ti_password"
+                android:layout_marginTop="10dp"
+                android:layout_below="@+id/rememberPasswordLinearLayout"
                 android:drawableRight="@drawable/ic_arrow_forward_black_24dp"
                 android:text="Login" />
 

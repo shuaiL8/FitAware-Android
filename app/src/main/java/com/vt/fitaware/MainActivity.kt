@@ -1,19 +1,25 @@
-package com.example.fitaware
+package com.vt.fitaware
 
+import android.Manifest
 import android.annotation.SuppressLint
+import android.app.*
 import android.arch.lifecycle.ViewModelProviders
 import android.content.*
-import android.os.Bundle
+import android.content.pm.PackageManager
+import android.os.*
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.Snackbar
 import android.support.v7.app.AppCompatActivity
 import android.view.View
 import android.widget.TextView
 import androidx.navigation.Navigation
-import android.os.AsyncTask
 import android.preference.PreferenceManager
+import android.support.v4.app.ActivityCompat
+import android.support.v4.app.NotificationCompat
+import android.support.v4.content.ContextCompat
 import android.util.Log
-import com.example.fitaware.FirebaseMessagingService.MyReceiver
+import android.widget.RemoteViews
+import com.vt.fitaware.FirebaseMessagingService.MyReceiver
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.Scopes
 import com.google.android.gms.common.api.GoogleApiClient
@@ -29,6 +35,10 @@ import com.google.android.gms.location.places.Places
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.database.*
 import com.google.firebase.iid.FirebaseInstanceId
+import com.vt.fitaware.Home.Teammates
+import com.vt.fitaware.Team.Team
+import com.vt.fitaware.Team.TeamAdapter
+import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
 
@@ -41,25 +51,27 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     private lateinit var database: DatabaseReference
     private var mClient: GoogleApiClient? = null
     private var receiver: BroadcastReceiver = MyReceiver()
+
     private var authInProgress = false
     private var REQUEST_OAUTH = 1
 
-    var loginStatus = 1
+    private var loginStatus = 1
+
+    private var allUsers = ArrayList<Teammates>(1)
+
 
     private var captain: String = "none"
 
-    private var daily_steps: Long = 0
-    private var daily_heartPoints: Long = 0
-    private var daily_duration: Long = 0
-    private var daily_calories: Long = 0
-    private var daily_distance: Long = 0
+    private var teamRank: String = "0"
+    private var teams = ArrayList<Team>(1)
 
     private var user_id: String = "none"
 
     private var periodical: String = "none"
     private var team: String = "none"
 
-    private var my_rank: String = "0"
+
+    private var my_steps: Long = 0
     private var my_duration: Long = 0
     private var my_heartPoints: Long = 0
     private var my_calories: Long = 0
@@ -67,17 +79,23 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
     private var sharedPreferences: SharedPreferences? = null
 
-    private var my_steps: Long = 0
     private var teammate_steps: Long = 0
     private var team_steps: Long = 0
 
+    private var my_rank: String = " "
     private var my_goal: Long = 0
     private var teammate_goal: Long = 0
     private var team_goal: Long = 0
 
+
+    private var teammemberCount: Int = 0
+    private var teamCount: Int = 0
+
+
     private var model: Communicator?=null
     private var mTimer: Timer? = null
     private var bottomNavigationView: BottomNavigationView? = null
+    private val RECORD_REQUEST_CODE = 101
 
 
 
@@ -144,26 +162,53 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     }
 
 
+    private fun setupPermissions() {
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "Permission to record denied")
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.READ_EXTERNAL_STORAGE),
+                RECORD_REQUEST_CODE)
+        }
+        if (ContextCompat.checkSelfPermission(this,
+                Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            Log.i(TAG, "Permission to record denied")
+            ActivityCompat.requestPermissions(this,
+                arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
+                RECORD_REQUEST_CODE)
+        }
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int,
+                                            permissions: Array<String>, grantResults: IntArray) {
+        when (requestCode) {
+            RECORD_REQUEST_CODE -> {
+
+                if (grantResults.isEmpty() || grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+
+                    Log.i(TAG, "Permission has been denied by user")
+                } else {
+                    Log.i(TAG, "Permission has been granted by user")
+                }
+            }
+        }
+    }
 
     @SuppressLint("StringFormatInvalid")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         initSharedPreferences()
+        setupPermissions()
 
         // initial all the values
         user_id = sharedPreferences!!.getString("user_id", "none")
         team = sharedPreferences!!.getString("team", "none")
         my_goal = sharedPreferences!!.getString("my_goal", "0").toLong()
+        my_rank = sharedPreferences!!.getString("my_rank", " ")
         team_goal = sharedPreferences!!.getString("team_goal", "0").toLong()
         captain = sharedPreferences!!.getString("captain", "none")
-
-        my_rank = sharedPreferences!!.getString("rank", "0")
-        my_steps = sharedPreferences!!.getString("currentSteps", "0").toLong()
-        my_duration = sharedPreferences!!.getString("duration", "0").toLong()
-        my_heartPoints = sharedPreferences!!.getString("heartPoints", "0").toLong()
-        my_distance = sharedPreferences!!.getString("distance", "0").toLong()
-        my_calories = sharedPreferences!!.getString("calories", "0").toLong()
+        periodical = sharedPreferences!!.getString("periodical", "none")
 
         loginStatus = sharedPreferences!!.getInt("loginStatus", 0)
         Log.i(TAG, "teamName: $team")
@@ -171,54 +216,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         Log.i(TAG, "sharedPreferences my_goal: $my_goal")
         Log.i(TAG, "user_id: $user_id")
         Log.i(TAG, "loginStatus: $loginStatus")
-
-        Log.i(TAG, "sharedPreferences my_steps: $my_steps")
-        Log.i(TAG, "sharedPreferences my_duration: $my_duration")
-        Log.i(TAG, "sharedPreferences my_heartPoints: $my_heartPoints")
-        Log.i(TAG, "sharedPreferences my_distance: $my_distance")
-        Log.i(TAG, "sharedPreferences my_calories: $my_calories")
-
-        //send Date and sync data
-        mTimer = Timer()
-        val delay = 3000 // delay for 0 sec.
-        val period = 5000 // repeat 5 sec.
-
-        mTimer!!.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
-                Log.w(TAG, "sendData$user_id")
-
-                val durationDataTask = DurationDataTask()
-                val stepsDataTask = StepsDataTask()
-                val heartPointsDataTask = HeartPointsDataTask()
-                val caloriesDataTask = CaloriesDataTask()
-                val distanceDataTask = DistanceDataTask()
-
-                durationDataTask.execute()
-                stepsDataTask.execute()
-                heartPointsDataTask.execute()
-                caloriesDataTask.execute()
-                distanceDataTask.execute()
-
-                sendData()
-            }
-        }, delay.toLong(), period.toLong())
-
-        // Firebase notification token
-        FirebaseInstanceId.getInstance().instanceId
-            .addOnCompleteListener(OnCompleteListener { task ->
-                if (!task.isSuccessful) {
-                    Log.w(TAG, "getInstanceId failed", task.exception)
-                    return@OnCompleteListener
-                }
-
-                // Get new Instance ID token
-                val token = task.result?.token
-
-                // Log and toast
-                val msg = getString(R.string.msg_token_fmt, token)
-                Log.d(TAG, msg)
-//                Toast.makeText(baseContext, message, Toast.LENGTH_SHORT).show()
-            })
 
 
 
@@ -230,11 +227,11 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         actionBar!!.title = ""
 
 
-        // get user_id
-//        receiveData()
-
-
         if(loginStatus == 1 && user_id != "none") {
+
+            //get date from google api
+            getData()
+
 
             val myRef = FirebaseDatabase.getInstance().reference.child("User")
             val myPostListener = object : ValueEventListener {
@@ -244,10 +241,12 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                     Log.i(TAG, "user: $my")
 
                     var iniTeamSteps = 0L
+                    var index = 1
+
+                    allUsers.clear()
 
                     for ((key, value) in my) {
                         val details = value as Map<String, String>
-
 
                         if (key == user_id) {
                             captain = details["captain"].toString()
@@ -266,30 +265,62 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                             my_goal = details["goal"].toString().toLong()
                             periodical = details["periodical"].toString()
                             team = details["team"].toString()
-                            team_goal = details["teamGoal"].toString().toLong()
 
                             iniTeamSteps += my_steps
 
                         }
-                        if(details["team"].toString() != "none") {
-                            if(details.getValue("team") == team && key != user_id){
+                        else {
+
+                            if(details["team"].toString() == team && details["team"].toString() != "none"){
                                 iniTeamSteps += details["currentSteps"].toString().toLong()
                             }
 
                         }
 
+                        allUsers.add(Teammates("1",  key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(), "#3ebfab"))
+
+
+                        index++
+
                         Log.i(TAG, "$key: $value")
-                        Log.i(TAG, "details: $details")
+                        Log.i(TAG, "details teammates: $details")
 
                     }
 
-                    team_steps = iniTeamSteps
-                    Log.i(TAG, "writeTeamStepsPost captain: $captain")
 
-                    if (captain != "none") {
+                    if (team != "none") {
+
+                        team_steps = iniTeamSteps
+
                         writeTeamStepsPost(user_id, team, team_steps.toString())
+
+                        val editor = sharedPreferences?.edit()
+                        editor!!.putString("teamSteps", team_steps.toString())
+
+                        editor.commit()
+
                     }
 
+
+                    // get my_rank from all Users
+                    val allUsersSort = allUsers.sortedWith(compareByDescending(Teammates::getSteps))
+                    allUsers = ArrayList(allUsersSort)
+                    var indexM = 1
+                    for(users in allUsers) {
+                        users.rank = indexM.toString()
+
+                        if(users.name == user_id) {
+                            my_rank = users.rank
+                            val editor = sharedPreferences?.edit()
+                            editor!!.putString("my_rank", my_rank)
+
+                            editor.commit()
+
+                            Log.i(TAG, "user_id: $user_id")
+                            Log.i(TAG, "my_rank $my_rank")
+                        }
+                        indexM++
+                    }
 
                 }
 
@@ -300,6 +331,120 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                 }
             }
             myRef.addValueEventListener(myPostListener)
+
+
+            if(team != "none") {
+                val myRefTeam = FirebaseDatabase.getInstance().reference.child("Teams")
+
+                val postListenerTeam = object : ValueEventListener {
+                    override fun onDataChange(dataSnapshot: DataSnapshot) {
+                        // Get Post object and use the values to update the UI
+                        if(dataSnapshot.value != null){
+                            val my = dataSnapshot.value as Map<String, Any>
+
+                            Log.i(TAG, "myTeamMember: $my")
+
+                            teams.clear()
+
+                            for((key, value) in my){
+                                val details = value as Map<String, String>
+
+                                teams.add(
+                                    Team(
+                                        key,
+                                        details.getValue("captain"),
+                                        "No. ?",
+                                        details.getValue("teamGoal"),
+                                        details.getValue("teamSteps").toInt(),
+                                        details.getValue("periodical"),
+                                        "#ff6347"
+                                    )
+                                )
+
+                                if(key == team){
+                                    team_goal = details.getValue("teamGoal").toLong()
+                                    periodical = details.getValue("periodical")
+
+                                }
+
+                                Log.i(TAG, "$key: $value")
+                                Log.i(TAG, "details: $details")
+                            }
+
+                            if(user_id != "none") {
+                                val childUpdates = HashMap<String, Any>()
+                                childUpdates["/User/$user_id/teamGoal"] = team_goal
+                                childUpdates["/User/$user_id/periodical"] = periodical
+
+                                database.updateChildren(childUpdates)
+
+                                val editor = sharedPreferences?.edit()
+                                editor!!.putString("periodical", periodical)
+
+                                editor!!.commit()
+                            }
+
+                            val teammsSort = teams.sortedWith(compareByDescending(Team::getTeamSteps))
+                            teams = ArrayList(teammsSort)
+                            var indexX = 1
+                            for(teamX in teams) {
+
+                                teamX.rank = indexX.toString()
+                                if(teamX.name == team) {
+                                    teamRank = teamX.rank
+
+                                    val editor = sharedPreferences?.edit()
+                                    editor!!.putString("teamRank", teamRank)
+
+                                    editor.commit()
+
+                                    Log.i(TAG, "teamRank: $teamRank")
+
+                                }
+                                indexX++
+                            }
+                            teamCount = indexX-1
+                        }
+
+                    }
+
+                    override fun onCancelled(databaseError: DatabaseError) {
+                        // Getting Post failed, log a message
+                        Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                        // ...
+                    }
+                }
+                myRefTeam.addValueEventListener(postListenerTeam)
+            }
+
+
+            val allSteps = HashMap<String, Any>()
+
+            allSteps["user_id"] = user_id
+            allSteps["periodical"] = periodical
+            allSteps["team"] = team
+            allSteps["captain"] = captain
+            allSteps["teamRank"] = teamRank
+
+            allSteps["teammate_steps"] = teammate_steps
+            allSteps["my_steps"] = my_steps
+            allSteps["my_heartPoints"] = my_heartPoints
+            allSteps["my_duration"] = my_duration
+            allSteps["my_distance"] = my_distance
+            allSteps["my_calories"] = my_calories
+
+            allSteps["team_steps"] = team_steps
+
+            allSteps["my_goal"] = my_goal
+            allSteps["my_rank"] = my_rank
+            allSteps["teammate_goal"] = teammate_goal
+            allSteps["team_goal"] = team_goal
+
+
+
+            model= ViewModelProviders.of(this).get(Communicator::class.java)
+            model!!.setMsgCommunicator(allSteps.toString())
+            Log.w(TAG, "allSteps$allSteps")
         }
 
         if (loginStatus == 1) {
@@ -330,82 +475,10 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             .build()
 
 
-        Log.w(TAG, "user_id"+user_id)
-
-
-
-
-
-        val allSteps = HashMap<String, Any>()
-
-        allSteps["user_id"] = user_id
-        allSteps["periodical"] = periodical
-        allSteps["team"] = team
-        allSteps["captain"] = captain
-
-        allSteps["teammate_steps"] = teammate_steps
-        allSteps["my_steps"] = my_steps
-        allSteps["my_heartPoints"] = my_heartPoints
-        allSteps["my_duration"] = my_duration
-        allSteps["my_distance"] = my_distance
-        allSteps["my_calories"] = my_calories
-
-        allSteps["team_steps"] = team_steps
-
-        allSteps["my_goal"] = my_goal
-        allSteps["teammate_goal"] = teammate_goal
-        allSteps["team_goal"] = team_goal
-
-
-
-        model= ViewModelProviders.of(this).get(Communicator::class.java)
-        model!!.setMsgCommunicator(allSteps.toString())
-        Log.w(TAG, "allSteps$allSteps")
+        Log.w(TAG, "user_id: "+user_id)
 
     }
 
-
-    private fun writeNewPost(id: String, currentSteps: String, duration:String, heartPoints:String, distance:String, calories:String) {
-        val childUpdates = HashMap<String, Any>()
-        val editor = sharedPreferences?.edit()
-
-        if(currentSteps != "0" ) {
-            childUpdates["/User/$id/currentSteps"] = currentSteps
-            editor!!.putString("currentSteps", currentSteps)
-            editor.commit()
-
-        }
-        if(duration != "0") {
-            childUpdates["/User/$id/duration"] = duration
-            editor!!.putString("duration", duration)
-            editor.commit()
-
-        }
-        if(heartPoints != "0") {
-            childUpdates["/User/$id/heartPoints"] = heartPoints
-            editor!!.putString("heartPoints", heartPoints)
-            editor.commit()
-
-        }
-        if(distance != "0") {
-            childUpdates["/User/$id/distance"] = distance
-            editor!!.putString("distance", distance)
-            editor.commit()
-
-        }
-        if(calories != "0") {
-            childUpdates["/User/$id/calories"] = calories
-            editor!!.putString("calories", calories)
-            editor.commit()
-
-            Log.w(TAG, "writeNewPostcalories: $calories")
-
-        }
-
-        Log.w(TAG, "childUpdates: $childUpdates")
-
-        database.updateChildren(childUpdates)
-    }
 
     private fun writeTeamStepsPost(id: String, teamN: String, teamSteps: String) {
         val childUpdates = HashMap<String, Any>()
@@ -419,16 +492,26 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     }
 
 
+    private fun getData(){
+        //get Date and sync data
+        mTimer = Timer()
+        val delay = 0 // delay for 0 sec.
+        val period = 5000 // repeat 5 sec.
+
+        mTimer!!.scheduleAtFixedRate(object : TimerTask() {
+            override fun run() {
+                Log.w(TAG, "sendData$user_id")
+
+                sendData()
+
+            }
+        }, delay.toLong(), period.toLong())
+    }
+
 
     private fun sendData() {
 
         this?.runOnUiThread {
-
-            if(user_id != "none") {
-                writeNewPost(user_id, daily_steps.toString(), daily_duration.toString(), daily_heartPoints.toString(), daily_distance.toString(), daily_calories.toString())
-
-            }
-
 
             val allSteps = HashMap<String, Any>()
 
@@ -436,6 +519,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             allSteps["periodical"] = periodical
             allSteps["team"] = team
             allSteps["captain"] = captain
+            allSteps["teamRank"] = teamRank
 
             allSteps["teammate_steps"] = teammate_steps
             allSteps["my_steps"] = my_steps
@@ -443,148 +527,19 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             allSteps["my_duration"] = my_duration
             allSteps["my_distance"] = my_distance
             allSteps["my_calories"] = my_calories
+
             allSteps["team_steps"] = team_steps
 
             allSteps["my_goal"] = my_goal
+            allSteps["my_rank"] = my_rank
             allSteps["teammate_goal"] = teammate_goal
             allSteps["team_goal"] = team_goal
 
 
-
             model!!.setMsgCommunicator(allSteps.toString())
-            Log.i(TAG, "MainActivity allSteps : $allSteps")
+            Log.i(TAG, "MainActivity allSteps test : $allSteps")
         }
     }
-
-    private inner class DurationDataTask : AsyncTask<Void, Void, Void>() {
-        override fun doInBackground(vararg params: Void): Void? {
-
-            var total: Long = 0
-
-            val result = Fitness.HistoryApi.readDailyTotal(mClient, DataType.TYPE_MOVE_MINUTES)
-            val totalResult = result.await(30, TimeUnit.SECONDS)
-            if (totalResult.status.isSuccess) {
-                val totalSet = totalResult.total
-                total = (if (totalSet!!.isEmpty)
-                    0
-                else
-                    totalSet.dataPoints[0].getValue(Field.FIELD_DURATION).asInt()).toLong()
-            } else {
-                Log.w(TAG, "There was a problem getting the duration.")
-            }
-
-            Log.i(TAG, "Total duration: $total")
-
-            daily_duration = total
-
-            return null
-        }
-    }
-
-    private inner class StepsDataTask : AsyncTask<Void, Void, Void>() {
-        override fun doInBackground(vararg params: Void): Void? {
-
-            var total: Long = 0
-
-            val result = Fitness.HistoryApi.readDailyTotal(mClient, DataType.TYPE_STEP_COUNT_DELTA)
-            val totalResult = result.await(30, TimeUnit.SECONDS)
-            if (totalResult.status.isSuccess) {
-                val totalSet = totalResult.total
-                total = (if (totalSet!!.isEmpty)
-                    0
-                else
-                    totalSet.dataPoints[0].getValue(Field.FIELD_STEPS).asInt()).toLong()
-            } else {
-                Log.w(TAG, "There was a problem getting the step count.")
-            }
-
-            Log.i(TAG, "Total steps: $total")
-
-            daily_steps = total
-
-            return null
-        }
-    }
-
-    private inner class HeartPointsDataTask : AsyncTask<Void, Void, Void>() {
-        override fun doInBackground(vararg params: Void): Void? {
-
-            var total: Long = 0
-
-            val result = Fitness.HistoryApi.readDailyTotal(mClient, DataType.TYPE_HEART_POINTS)
-            val totalResult = result.await(30, TimeUnit.SECONDS)
-            if (totalResult.status.isSuccess) {
-                val totalSet = totalResult.total
-                total = (if (totalSet!!.isEmpty)
-                    0
-                else
-                    "%.0f".format(totalSet.dataPoints[0].getValue(Field.FIELD_DURATION).asFloat())).toString().toLong()
-            } else {
-                Log.w(TAG, "There was a problem getting the HeartPoints.$result $totalResult")
-            }
-
-            Log.i(TAG, "Total HeartPoints: $total")
-
-            daily_heartPoints = total
-
-            return null
-        }
-    }
-
-
-    private inner class DistanceDataTask : AsyncTask<Void, Void, Void>() {
-        override fun doInBackground(vararg params: Void): Void? {
-
-            var total: Long = 0
-
-            val result = Fitness.HistoryApi.readDailyTotal(mClient, DataType.TYPE_DISTANCE_DELTA)
-            val totalResult = result.await(30, TimeUnit.SECONDS)
-            if (totalResult.status.isSuccess) {
-                val totalSet = totalResult.total
-                total = (if (totalSet!!.isEmpty)
-                    0
-                else
-                    "%.0f".format(totalSet.dataPoints[0].getValue(Field.FIELD_DISTANCE).asFloat())).toString().toLong()
-            } else {
-                Log.w(TAG, "There was a problem getting the Distance.")
-            }
-
-            Log.i(TAG, "Total Distance: $total")
-
-            daily_distance = total
-
-            return null
-        }
-    }
-
-
-    private inner class CaloriesDataTask : AsyncTask<Void, Void, Void>() {
-        override fun doInBackground(vararg params: Void): Void? {
-
-            var total: Long = 0
-
-            val result = Fitness.HistoryApi.readDailyTotal(mClient, DataType.TYPE_CALORIES_EXPENDED)
-            val totalResult = result.await(30, TimeUnit.SECONDS)
-            if (totalResult.status.isSuccess) {
-                val totalSet = totalResult.total
-                total = (if (totalSet!!.isEmpty)
-                    0
-                else
-                    "%.0f".format(totalSet.dataPoints[0].getValue(Field.FIELD_CALORIES).asFloat())).toString().toLong()
-            } else {
-                Log.w(TAG, "There was a problem getting the Calories.")
-            }
-
-            Log.i(TAG, "Total Calories: $total")
-
-            daily_calories = total
-
-            return null
-        }
-    }
-
-
-
 
     fun onPasswordChanged() {
         showSnackBarMessage("Password Changed Successfully !")
@@ -607,14 +562,17 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             .setDataTypes(DataType.TYPE_CALORIES_EXPENDED)
             .setDataSourceTypes(DataSource.TYPE_RAW)
             .build()
-        val dataSourcesResultCallback = ResultCallback<DataSourcesResult> {
-            //                for( DataSource dataSource : dataSourcesResult.getDataSources() ) {
-            //
-            //                    if( DataType.TYPE_STEP_COUNT_CADENCE.equals( dataSource.getDataType() ) ) {
-            //                        registerFitnessDataListener(dataSource, DataType.TYPE_STEP_COUNT_CADENCE);
-            //                    }
-            //                }
-        }
+
+        val dataSourcesResultCallback =
+            ResultCallback<DataSourcesResult> { dataSourcesResult ->
+//                for (dataSource in dataSourcesResult.dataSources) {
+//                    val type = dataSource.dataType
+//
+//                    if (DataType.TYPE_STEP_COUNT_DELTA == type || DataType.TYPE_STEP_COUNT_CUMULATIVE == type) {
+//                        registerFitnessDataListener(dataSource, DataType.TYPE_STEP_COUNT_DELTA)
+//                    }
+//                }
+            }
 
         Fitness.SensorsApi.findDataSources(mClient, dataSourcesRequest)
             .setResultCallback(dataSourcesResultCallback)
@@ -657,26 +615,104 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     private fun registerMyReceiver() {
 
         val filter = IntentFilter()
-        filter.addAction("BroadcastReceiver")
+        filter.addAction("com.vt.BroadcastReceiver")
         registerReceiver(receiver, filter)
 
+    }
+
+    // register MyNotificationService
+    private fun startMyNotificationService() {
+
+        val notificationService = MyNotificationService::class.java
+
+        val intent = Intent(applicationContext, notificationService)
+
+        intent.putExtra("user_id", user_id)
+        intent.putExtra("team", team)
+
+        if(loginStatus == 1){
+            if (!isServiceRunning(notificationService)) {
+                // Start the service
+                if (Build.VERSION.SDK_INT >= 26) {
+                    startForegroundService(intent)
+                } else {
+                    startService(intent)
+                }
+                Log.i(TAG, "Start MyNotificationService.")
+            } else {
+                Log.i(TAG, "MyNotificationService already running.")
+            }
+        }
+
+    }
+
+    //register MyBackgroundService
+    private fun startMyBackgroundService() {
+
+        val myBackgroundService = MyBackgroundService::class.java
+
+        val intent = Intent(applicationContext, myBackgroundService)
+
+        intent.putExtra("user_id", user_id)
+        intent.putExtra("periodical", periodical)
+        intent.putExtra("my_goal", my_goal)
+        intent.putExtra("my_rank", my_rank)
+
+
+        if(loginStatus == 1){
+            if (!isServiceRunning(myBackgroundService)) {
+                // Start the service
+                startService(intent)
+                Log.i(TAG, "Start MyBackgroundService.")
+            } else {
+                Log.i(TAG, "MyBackgroundService already running.")
+            }
+        }
+
+    }
+
+    // Custom method to determine whether a service is running
+    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
+        val activityManager = getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        // Loop through the running services
+        for (service in activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                // If the service is running then return true
+                return true
+            }
+        }
+        return false
     }
 
     override fun onStart() {
         super.onStart()
         mClient!!.connect()
+        startMyNotificationService()
+        startMyBackgroundService()
         registerMyReceiver()
 
-        val editor = sharedPreferences?.edit()
-        editor!!.putString("tabLayoutPeriodical", "all")
-
-        editor.commit()
+//        val editor = sharedPreferences?.edit()
+//        editor!!.putString("tabLayoutPeriodical", "all")
+//
+//        editor.commit()
     }
 
     override fun onStop() {
         super.onStop()
         mClient!!.disconnect()
         unregisterReceiver(receiver)
+
+        val editor = sharedPreferences!!.edit()
+
+        editor.remove("my_rank")
+        editor.remove("currentSteps")
+        editor.remove("duration")
+        editor.remove("heartPoints")
+        editor.remove("distance")
+        editor.remove("calories")
+
+        editor.commit()
     }
 
     override fun onPause() {

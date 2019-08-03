@@ -1,4 +1,4 @@
-package com.example.fitaware.Setting;
+package com.vt.fitaware.Setting;
 
 import android.content.Context;
 import android.os.Bundle;
@@ -12,10 +12,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.example.fitaware.MainActivity;
-import com.example.fitaware.R;
-import com.example.fitaware.model.Response;
-import com.example.fitaware.model.User;
+import com.vt.fitaware.MainActivity;
+import com.vt.fitaware.R;
+import com.vt.fitaware.model.Response;
+import com.vt.fitaware.model.User;
 //import com.example.fitaware.network.NetworkUtil;
 //import com.google.gson.Gson;
 //import com.google.gson.GsonBuilder;
@@ -24,10 +24,8 @@ import com.example.fitaware.model.User;
 //import rx.schedulers.Schedulers;
 //import rx.subscriptions.CompositeSubscription;
 
-import java.io.IOException;
-
-import static com.example.fitaware.utils.Validation.validateEmail;
-import static com.example.fitaware.utils.Validation.validateFields;
+import static com.vt.fitaware.utils.Validation.validateEmail;
+import static com.vt.fitaware.utils.Validation.validateFields;
 
 
 public class ResetpasswordFragment extends DialogFragment {

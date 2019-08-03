@@ -1,4 +1,4 @@
-package com.example.fitaware.Setting
+package com.vt.fitaware.Setting
 
 
 import android.arch.lifecycle.ViewModelProviders
@@ -9,14 +9,14 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.fitaware.R
+import com.vt.fitaware.R
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import java.util.HashMap
-import com.example.fitaware.utils.Validation.validateFields
+import com.vt.fitaware.utils.Validation.validateFields
 import android.support.design.widget.TextInputLayout
 import androidx.navigation.Navigation
-import com.example.fitaware.Communicator
+import com.vt.fitaware.Communicator
 import android.arch.lifecycle.Observer
 import android.content.SharedPreferences
 import android.preference.PreferenceManager

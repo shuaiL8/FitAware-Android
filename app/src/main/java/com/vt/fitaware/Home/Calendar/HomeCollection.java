@@ -1,4 +1,4 @@
-package com.example.fitaware.Home.Calendar;
+package com.vt.fitaware.Home.Calendar;
 
 
 class HomeCollection {

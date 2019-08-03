@@ -1,4 +1,4 @@
-package com.example.fitaware.Home;
+package com.vt.fitaware.Home;
 
 import android.graphics.Color;
 import android.os.Bundle;
@@ -7,7 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import com.example.fitaware.R;
+import com.vt.fitaware.R;
 import com.hookedonplay.decoviewlib.DecoView;
 import com.hookedonplay.decoviewlib.charts.SeriesItem;
 import com.hookedonplay.decoviewlib.events.DecoEvent;

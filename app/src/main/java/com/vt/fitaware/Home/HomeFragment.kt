@@ -1,4 +1,4 @@
-package com.example.fitaware.Home
+package com.vt.fitaware.Home
 
 
 import android.annotation.SuppressLint
@@ -8,31 +8,39 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.*
-import com.example.fitaware.R
-import com.example.fitaware.Home.Calendar.CalendarFragment
+import com.vt.fitaware.R
+import com.vt.fitaware.Home.Calendar.CalendarFragment
 import com.hookedonplay.decoviewlib.DecoView
 import com.hookedonplay.decoviewlib.charts.DecoDrawEffect
 import com.hookedonplay.decoviewlib.charts.SeriesItem
 import com.hookedonplay.decoviewlib.events.DecoEvent
 import java.text.SimpleDateFormat
 import java.util.*
-import com.example.fitaware.Communicator
+import com.vt.fitaware.Communicator
 import com.google.firebase.database.*
-import com.jjoe64.graphview.GraphView
-import com.jjoe64.graphview.series.DataPoint
-import com.jjoe64.graphview.series.LineGraphSeries
 import android.arch.lifecycle.Observer
+import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.*
+import android.os.Build
 import android.os.Handler
 import android.preference.PreferenceManager
+import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
 import android.support.v4.widget.SwipeRefreshLayout
 import android.widget.*
 import androidx.navigation.Navigation
-import org.w3c.dom.Text
-import kotlin.math.absoluteValue
-
+import com.github.mikephil.charting.charts.BarChart
+import com.github.mikephil.charting.data.BarData
+import com.github.mikephil.charting.data.BarDataSet
+import com.github.mikephil.charting.data.BarEntry
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.squareup.picasso.Picasso
+import com.vt.fitaware.MainActivity
+import com.vt.fitaware.MyBackgroundService
+import com.vt.fitaware.Team.Team
+import kotlin.collections.ArrayList
 
 
 class HomeFragment : Fragment(){
@@ -41,13 +49,13 @@ class HomeFragment : Fragment(){
 
     private val TAG = "HomeFragment"
     private var user_id: String = "none"
-    private var user_rank: String = ""
-
 
     private var team: String = "none"
     private var captain: String = "none"
+    private var periodical: String = "none"
 
-    private var teamRank: String = "1"
+    private var teamRank: String = "0"
+
 
     private var my_steps: Long = 0
     private var my_duration: Long = 0
@@ -57,21 +65,19 @@ class HomeFragment : Fragment(){
     private var teammate_steps: Long = 0
     private var team_steps: Long = 0
 
+    private var token: String = "none"
+
+
     private var newSelected: String = "none"
 
-    private var my_rank: String = "0"
-
+    private var my_rank: String = " "
 
     private var my_goal: Long = 0
     private var teammate_goal: Long = 0
     private var team_goal: Long = 0
 
-    private var mTimer: Timer? = null
-
     private lateinit var graphName:TextView
-    private lateinit var personalStepsGraph: GraphView
-
-    private var personalStepsSeries: LineGraphSeries<DataPoint>? = null
+    private lateinit var personalStepsGraph: BarChart
 
     private var mDecoViewTeam: DecoView? = null
     private var mBackIndexTeam: Int = 0
@@ -120,12 +126,15 @@ class HomeFragment : Fragment(){
     internal lateinit var rankActivity5: TextView
 
     private var gridViewDecoViews: ExpandableHeightGridView? = null
-    private var tempX : Long = 0L
 
     private var teammates = ArrayList<Teammates>(1)
     private var teammatesAdapter: TeammatesAdapter? = null
 
     private var sharedPreferences: SharedPreferences? = null
+
+    private var mStorageRef: StorageReference? = null
+
+    private var calendar_frameVisibility: String = "none"
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -137,6 +146,22 @@ class HomeFragment : Fragment(){
             false)
         setHasOptionsMenu(true)
         initSharedPreferences()
+
+        val toolbarTiltle = activity!!.findViewById<TextView>(R.id.toolbar_title)
+        toolbarTiltle.text = "FitAware"
+
+
+        user_id = sharedPreferences!!.getString("user_id", "none")
+        my_goal = sharedPreferences!!.getString("my_goal", "0").toLong()
+        my_rank = sharedPreferences!!.getString("my_rank", " ")
+        periodical = sharedPreferences!!.getString("periodical", "none")
+        my_steps = sharedPreferences!!.getString("currentSteps", "0").toLong()
+        my_duration = sharedPreferences!!.getString("duration", "0").toLong()
+        my_heartPoints = sharedPreferences!!.getString("heartPoints", "0").toLong()
+        my_distance = sharedPreferences!!.getString("distance", "0").toLong()
+        my_calories = sharedPreferences!!.getString("calories", "0").toLong()
+        token = sharedPreferences!!.getString("token", "none")
+        calendar_frameVisibility = sharedPreferences!!.getString("calendar_frameVisibility", "none")
 
 
         graphName = view.findViewById(R.id.graphName)
@@ -172,17 +197,34 @@ class HomeFragment : Fragment(){
         gridViewDecoViews = view.findViewById(R.id.gridViewDecoViews)
         gridViewDecoViews!!.isExpanded = true
 
-        calendar_frame.visibility = View.GONE;
-        dropDownButton.setImageResource(R.drawable. ic_keyboard_arrow_down_black_24dp)
+        if(calendar_frameVisibility == "none") {
+            calendar_frame.visibility = View.GONE
+            dropDownButton.setImageResource(R.drawable. ic_keyboard_arrow_down_black_24dp)
+
+        }
+        else{
+            calendar_frame.visibility = View.VISIBLE
+            dropDownButton.setImageResource(R.drawable. ic_keyboard_arrow_up_black_24dp)
+
+        }
 
         dropDownButton.setOnClickListener(View.OnClickListener {
             if(calendar_frame.visibility == View.GONE){
                 calendar_frame.visibility = View.VISIBLE
                 dropDownButton.setImageResource(R.drawable. ic_keyboard_arrow_up_black_24dp)
+
+                val editor = sharedPreferences?.edit()
+                editor!!.putString("calendar_frameVisibility", "VISIBLE")
+
+                editor.commit()
             }
             else {
                 calendar_frame.visibility = View.GONE
                 dropDownButton.setImageResource(R.drawable. ic_keyboard_arrow_down_black_24dp)
+                val editor = sharedPreferences?.edit()
+                editor!!.putString("calendar_frameVisibility", "none")
+
+                editor.commit()
             }
         })
 
@@ -201,8 +243,6 @@ class HomeFragment : Fragment(){
         tabLayoutHome.addTab(heartPoints, 2)
 
         tabLayoutHome.getTabAt(1)!!.select()
-
-
 
         mDecoView = view.findViewById(R.id.dynamicArcView)
         mDecoView2 = view.findViewById(R.id.dynamicArcView2)
@@ -231,12 +271,6 @@ class HomeFragment : Fragment(){
         rankActivity3 = view.findViewById(R.id.rankActivity3)
         rankActivity4 = view.findViewById(R.id.rankActivity4)
         rankActivity5 = view.findViewById(R.id.rankActivity5)
-
-        val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
-
-        swipeRefresh.setOnRefreshListener {
-            Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.homeFragment)
-        }
 
         val model = ViewModelProviders.of(activity!!).get(Communicator::class.java)
         val `object` = Observer<Any> { o ->
@@ -268,12 +302,15 @@ class HomeFragment : Fragment(){
             team_steps = allSteps["team_steps"]!!.toLong()
 
             my_goal = allSteps["my_goal"]!!.toLong()
+            my_rank = allSteps["my_rank"]!!.toString()
+            periodical = allSteps["periodical"]!!.toString()
             teammate_goal = allSteps["teammate_goal"]!!.toLong()
             team_goal = allSteps["team_goal"]!!.toLong()
+            teamRank = allSteps["teamRank"]!!.toString()
 
 
             if(team != "none") {
-                refreshEventsTeam(team_steps.toFloat())
+                refreshEventsTeam(team_steps.toFloat(), teamRank)
             }
 
             if(newSelected != "none") {
@@ -296,6 +333,72 @@ class HomeFragment : Fragment(){
         }
         model.message.observe(activity!!, `object`)
 
+
+        val calendarNY = Calendar.getInstance()
+        val mdformatNY = SimpleDateFormat("yyyy-MM-dd")
+        mdformatNY.timeZone = TimeZone.getTimeZone("America/New_York")
+        val strDate = mdformatNY.format(calendarNY.time)
+
+        initDaily(
+            user_id,
+            strDate,
+            my_calories.toString(),
+            my_goal.toString(),
+            my_heartPoints.toString(),
+            my_duration.toString(),
+            my_distance.toString(),
+            my_rank,
+            my_steps.toString(),
+            token)
+
+        val intent = Intent()
+        intent.action = "com.vt.MyBackgroundServiceReceiver"
+        intent.putExtra("my_rank", my_rank)
+        intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
+        activity!!.sendBroadcast(intent)
+
+        val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
+
+        swipeRefresh.setOnRefreshListener {
+            Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.homeFragment)
+
+            initDaily(
+                user_id,
+                strDate,
+                my_calories.toString(),
+                my_goal.toString(),
+                my_heartPoints.toString(),
+                my_duration.toString(),
+                my_distance.toString(),
+                my_rank,
+                my_steps.toString(),
+                token)
+
+            val intent = Intent()
+            intent.action = "com.vt.MyBackgroundServiceReceiver"
+            intent.putExtra("my_rank", my_rank)
+            intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
+            activity!!.sendBroadcast(intent)
+        }
+
+
+        mStorageRef = FirebaseStorage.getInstance().reference
+
+        val iconRef = mStorageRef!!.child("team_icon/$team/icon.jpg")
+
+        iconRef.downloadUrl.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val downloadIconUrl = task.result
+
+                Picasso.get().load(downloadIconUrl).into(imageView_teamIcon)
+
+            } else {
+                var bitmap = BitmapFactory.decodeResource(resources, R.drawable.teamwork)
+                bitmap = getCroppedBitmap(bitmap)
+                imageView_teamIcon!!.setImageBitmap(bitmap)
+            }
+        }
+
         if(tabLayoutHome.selectedTabPosition == 1) {
             val myRef = FirebaseDatabase.getInstance().reference.child("User")
 
@@ -313,26 +416,61 @@ class HomeFragment : Fragment(){
                     for((key, value) in my){
                         val details = value as Map<String, String>
 
+                        val myRefDailyRecord = FirebaseDatabase.getInstance().reference.child("DailyRecord/$key")
+                        val postListenerDailyRecord = object : ValueEventListener {
+                            override fun onDataChange(dataSnapshotDR: DataSnapshot) {
+                                // Get Post object and use the values to update the UI
+
+                                if(dataSnapshotDR.value != null) {
+                                    val myDR = dataSnapshotDR.value as Map<String, Any>
+
+                                    val calendar = Calendar.getInstance()
+                                    val mdformat = SimpleDateFormat("yyyy-MM-dd")
+                                    mdformat.timeZone = TimeZone.getTimeZone("America/New_York")
+                                    val strDate = mdformat.format(calendar.time)
+
+                                    if (!myDR.containsKey(strDate)) {
+                                        resetPost(
+                                            key,
+                                            "0",
+                                            "0",
+                                            "0",
+                                            "0",
+                                            "0"
+                                        )
+
+                                        Log.i(TAG, "reset DailyRecord: $key")
+
+                                    }
+                                }
+                            }
+
+                            override fun onCancelled(databaseErrorDR: DatabaseError) {
+                                // Getting Post failed, log a message
+                                Log.w(TAG, "loadPost:onCancelled", databaseErrorDR.toException())
+                                // ...
+                            }
+                        }
+                        myRefDailyRecord.addValueEventListener(postListenerDailyRecord)
 
                         if(key == user_id) {
                             team_goal = details["teamGoal"].toString().toLong()
 
                             Log.i(TAG, "3ebfab: $key")
-                            var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
-                            bitmap = getCroppedBitmap(bitmap)
-                            teammates.add(Teammates("-1", bitmap, key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(),"#008577"))
+                            teammates.add(Teammates("1", key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(),"#008577"))
                             captain = details.getValue("captain")
                             team = details.getValue("team")
+                            periodical = details["periodical"].toString()
 
                             iniTeamSteps += details["currentSteps"].toString().toLong()
                         }
-                        if(team != "none") {
-                            if(details.getValue("team") == team && key != user_id){
-                                var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
-                                bitmap = getCroppedBitmap(bitmap)
-                                teammates.add(Teammates("-1", bitmap, key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(), "#3ebfab"))
+                        else {
+
+                            if(details["team"].toString() == team && details["team"].toString() != "none"){
+                                teammates.add(Teammates("1",  key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(), "#3ebfab"))
                                 iniTeamSteps += details["currentSteps"].toString().toLong()
                             }
+
                         }
 
 
@@ -357,24 +495,13 @@ class HomeFragment : Fragment(){
                     }
                     Log.w(TAG, "teammates" + teammates.toString())
 
-                    teammatesAdapter = TeammatesAdapter(
-                        activity,
-                        R.layout.decoviews,
-                        teammates
-                    )
-                    gridViewDecoViews!!.adapter = teammatesAdapter
-
-                    for (id in teammates) {
-                        if(id.name == user_id) {
-                            my_rank = id.rank
-                            val editor = sharedPreferences?.edit()
-                            editor!!.putString("rank", my_rank)
-
-                            editor.commit()
-
-                            Log.i(TAG, "my_rank $my_rank")
-
-                        }
+                    if (activity !=null){
+                        teammatesAdapter = TeammatesAdapter(
+                            activity,
+                            R.layout.decoviews,
+                            teammates
+                        )
+                        gridViewDecoViews!!.adapter = teammatesAdapter
                     }
 
 
@@ -417,21 +544,19 @@ class HomeFragment : Fragment(){
                                     team_goal = details["teamGoal"].toString().toLong()
 
                                     Log.i(TAG, "3ebfab: $key")
-                                    var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
-                                    bitmap = getCroppedBitmap(bitmap)
-                                    teammates.add(Teammates("0", bitmap, key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(),"#008577"))
+                                    teammates.add(Teammates("0", key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(),"#008577"))
                                     captain = details.getValue("captain")
                                     team = details.getValue("team")
 
                                     iniTeamSteps += details["currentSteps"].toString().toLong()
                                 }
-                                if(team != "none") {
-                                    if(details.getValue("team") == team && key != user_id){
-                                        var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
-                                        bitmap = getCroppedBitmap(bitmap)
-                                        teammates.add(Teammates("0", bitmap, key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(),"#77e6f1"))
+                                else {
+
+                                    if(details["team"].toString() == team && details["team"].toString() != "none"){
+                                        teammates.add(Teammates("0",  key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(), "#77e6f1"))
                                         iniTeamSteps += details["currentSteps"].toString().toLong()
                                     }
+
                                 }
 
 
@@ -456,12 +581,14 @@ class HomeFragment : Fragment(){
                             }
                             Log.w(TAG, "teammates" + teammates.toString())
 
-                            teammatesAdapter = TeammatesAdapter(
-                                activity,
-                                R.layout.decoviews,
-                                teammates
-                            )
-                            gridViewDecoViews!!.adapter = teammatesAdapter
+                            if (activity !=null){
+                                teammatesAdapter = TeammatesAdapter(
+                                    activity,
+                                    R.layout.decoviews,
+                                    teammates
+                                )
+                                gridViewDecoViews!!.adapter = teammatesAdapter
+                            }
 
 
                         }
@@ -497,22 +624,21 @@ class HomeFragment : Fragment(){
                                     team_goal = details["teamGoal"].toString().toLong()
 
                                     Log.i(TAG, "3ebfab: $key")
-                                    var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
-                                    bitmap = getCroppedBitmap(bitmap)
-                                    teammates.add(Teammates("1", bitmap, key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(),"#008577"))
+                                    teammates.add(Teammates("1", key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(),"#008577"))
                                     captain = details.getValue("captain")
                                     team = details.getValue("team")
 
                                     iniTeamSteps += details["currentSteps"].toString().toLong()
                                 }
-                                if(team != "none") {
-                                    if(details.getValue("team") == team && key != user_id){
-                                        var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
-                                        bitmap = getCroppedBitmap(bitmap)
-                                        teammates.add(Teammates("1", bitmap, key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(),"#3ebfab"))
+                                else {
+
+                                    if(details["team"].toString() == team && details["team"].toString() != "none"){
+                                        teammates.add(Teammates("1",  key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(), "#3ebfab"))
                                         iniTeamSteps += details["currentSteps"].toString().toLong()
                                     }
+
                                 }
+
 
 
                                 index++
@@ -536,12 +662,14 @@ class HomeFragment : Fragment(){
                             }
                             Log.w(TAG, "teammates" + teammates.toString())
 
-                            teammatesAdapter = TeammatesAdapter(
-                                activity,
-                                R.layout.decoviews,
-                                teammates
-                            )
-                            gridViewDecoViews!!.adapter = teammatesAdapter
+                            if (activity !=null){
+                                teammatesAdapter = TeammatesAdapter(
+                                    activity,
+                                    R.layout.decoviews,
+                                    teammates
+                                )
+                                gridViewDecoViews!!.adapter = teammatesAdapter
+                            }
 
 
                         }
@@ -577,21 +705,19 @@ class HomeFragment : Fragment(){
                                     team_goal = details["teamGoal"].toString().toLong()
 
                                     Log.i(TAG, "3ebfab: $key")
-                                    var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
-                                    bitmap = getCroppedBitmap(bitmap)
-                                    teammates.add(Teammates("2", bitmap, key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(),"#008577"))
+                                    teammates.add(Teammates("2", key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(),"#008577"))
                                     captain = details.getValue("captain")
                                     team = details.getValue("team")
 
                                     iniTeamSteps += details["currentSteps"].toString().toLong()
                                 }
-                                if(team != "none") {
-                                    if(details.getValue("team") == team && key != user_id){
-                                        var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
-                                        bitmap = getCroppedBitmap(bitmap)
-                                        teammates.add(Teammates("2", bitmap, key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(),"#ff6347"))
+                                else {
+
+                                    if(details["team"].toString() == team && details["team"].toString() != "none"){
+                                        teammates.add(Teammates("2",  key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(), "#ff6347"))
                                         iniTeamSteps += details["currentSteps"].toString().toLong()
                                     }
+
                                 }
 
 
@@ -616,12 +742,14 @@ class HomeFragment : Fragment(){
                             }
                             Log.w(TAG, "teammates" + teammates.toString())
 
-                            teammatesAdapter = TeammatesAdapter(
-                                activity,
-                                R.layout.decoviews,
-                                teammates
-                            )
-                            gridViewDecoViews!!.adapter = teammatesAdapter
+                            if (activity !=null){
+                                teammatesAdapter = TeammatesAdapter(
+                                    activity,
+                                    R.layout.decoviews,
+                                    teammates
+                                )
+                                gridViewDecoViews!!.adapter = teammatesAdapter
+                            }
 
 
                         }
@@ -672,10 +800,6 @@ class HomeFragment : Fragment(){
                 tabLayoutHome.visibility =View.VISIBLE
                 gridViewDecoViews!!.visibility = View.VISIBLE
 
-                var bitmap = BitmapFactory.decodeResource(resources, R.drawable.teamwork)
-                bitmap = getCroppedBitmap(bitmap)
-
-                imageView_teamIcon.setImageBitmap(bitmap)
 
                 createBackSeriesTeam(team_goal.toFloat())
                 createDataSeriesTeam(team_goal.toFloat())
@@ -704,6 +828,12 @@ class HomeFragment : Fragment(){
 
                 newSelected = teammates[position].name
 
+                if(personalStepsGraph.visibility == View.VISIBLE) {
+                    graphName.text = "Steps Graph"
+                    setStepsGraph(newSelected)
+                    graphName.setTextColor(Color.parseColor("#3ebfab"))
+                }
+
             }
 
             Log.w(TAG, "selectedItemPosition$id")
@@ -715,11 +845,13 @@ class HomeFragment : Fragment(){
                 personalStepsGraph.visibility = View.VISIBLE
                 graphName.visibility = View.VISIBLE
                 graphName.text = "Duration Graph"
+                setDurGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#77e6f1"))
 
             }
             else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Duration Graph"){
                 graphName.text = "Duration Graph"
+                setDurGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#77e6f1"))
 
             }
@@ -734,11 +866,13 @@ class HomeFragment : Fragment(){
                 personalStepsGraph.visibility = View.VISIBLE
                 graphName.visibility = View.VISIBLE
                 graphName.text = "Steps Graph"
+                setStepsGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#3ebfab"))
 
             }
             else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Steps Graph"){
                 graphName.text = "Steps Graph"
+                setStepsGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#3ebfab"))
 
             }
@@ -752,11 +886,13 @@ class HomeFragment : Fragment(){
                 personalStepsGraph.visibility = View.VISIBLE
                 graphName.visibility = View.VISIBLE
                 graphName.text = "HeartPoints Graph"
+                setHPsGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#ff6347"))
 
             }
             else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "HeartPoints Graph"){
                 graphName.text = "HeartPoints Graph"
+                setHPsGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#ff6347"))
 
             }
@@ -771,11 +907,13 @@ class HomeFragment : Fragment(){
                 personalStepsGraph.visibility = View.VISIBLE
                 graphName.visibility = View.VISIBLE
                 graphName.text = "Distance Graph"
+                setDisGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#3ebfab"))
 
             }
             else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Distance Graph"){
                 graphName.text = "Distance Graph"
+                setDisGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#3ebfab"))
 
             }
@@ -790,11 +928,13 @@ class HomeFragment : Fragment(){
                 personalStepsGraph.visibility = View.VISIBLE
                 graphName.visibility = View.VISIBLE
                 graphName.text = "Calories Graph"
+                setCalsGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#3ebfab"))
 
             }
             else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Calories Graph"){
                 graphName.text = "Calories Graph"
+                setCalsGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#3ebfab"))
 
             }
@@ -805,63 +945,1002 @@ class HomeFragment : Fragment(){
         }
 
 
+        val myRefVersion = FirebaseDatabase.getInstance().reference.child("Version")
+        val postListenerVersion = object : ValueEventListener {
+            override fun onDataChange(dataSnapshotDR: DataSnapshot) {
+                // Get Post object and use the values to update the UI
 
-        personalStepsSeries = LineGraphSeries(arrayOf(DataPoint(0.0, my_steps.toDouble())))
-        tempX = System.currentTimeMillis()/1000L
+                if(dataSnapshotDR.value != null) {
+                    val cVersion = dataSnapshotDR.value as String
 
-        //updateUI
-        mTimer = Timer()
-        val delay = 1000 // delay for 0 sec.
-        val period = 5000 // repeat 5 sec.
+                    val versionName = context!!.packageManager.getPackageInfo("com.vt.fitaware", 0).versionName.toString()
 
-        mTimer!!.scheduleAtFixedRate(object : TimerTask() {
-            override fun run() {
+                    Log.i(TAG, "cVersion: $cVersion")
+                    Log.i(TAG, "versionName: $versionName")
 
-                updateUI()
+                    if(versionName.toDouble() < cVersion.toDouble()){
+                        Snackbar.make(view, "New Update Available !", Snackbar.LENGTH_SHORT).show()
+                    }
+
+                }
             }
-        }, delay.toLong(), period.toLong())
+
+            override fun onCancelled(databaseErrorDR: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseErrorDR.toException())
+                // ...
+            }
+        }
+        myRefVersion.addValueEventListener(postListenerVersion)
+
+
 
         return view
     }
 
 
+    private fun setDurGraph(id: String) {
 
-    private var second : Long = 0L
+        var graphID = id
 
-    private var unixTime : Long = 0L
+        if(graphID == "none") {
+            graphID = user_id
+        }
+
+        val calendar = Calendar.getInstance()
+        val mdformat = SimpleDateFormat("yyyy-MM-dd")
+
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val strDate = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+        val strDate1 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+        val strDate2 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+        val strDate3 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+        val strDate4 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+        val strDate5 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+        val strDate6 = mdformat.format(calendar.time)
 
 
-    private fun updateUI() {
+        var index = 0
 
-        // here you check the value of getActivity() and break up if needed
-        if (activity != null) {
-            activity!!.runOnUiThread {
+        var entriesDetail = ArrayList<BarEntryDetail>(1)
 
-                unixTime  = System.currentTimeMillis()/1000L
+        val entries = ArrayList<BarEntry>(1)
 
-                second = unixTime - tempX
+        var labels = ArrayList<String>(1)
 
 
-                personalStepsSeries!!.appendData(DataPoint(second.toDouble(), my_steps.toDouble()), true, 60)
-                // set manual X bounds
-                personalStepsGraph.viewport.isYAxisBoundsManual = true
-                personalStepsGraph.viewport.setMinY(0.0)
-                personalStepsGraph.viewport.setMaxY((my_steps + my_steps*0.3))
+        val myRef = FirebaseDatabase.getInstance().reference.child("DailyRecord/$graphID")
 
-                personalStepsGraph.viewport.isXAxisBoundsManual = true
-                personalStepsGraph.viewport.setMinX(0.0)
-                personalStepsGraph.viewport.setMaxX(second + second*0.3)
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
 
-                // enable scaling and scrolling
-                personalStepsGraph.viewport.isScalable = true
-                personalStepsGraph.viewport.setScalableY(true)
-                personalStepsGraph.addSeries(personalStepsSeries)
+                if(dataSnapshot.value != null) {
+                    val my = dataSnapshot.value as Map<String, Any>
 
-                Log.w(TAG, "unixTime" + unixTime )
-                Log.w(TAG, "second" + second.toDouble() )
+
+                    entriesDetail.clear()
+
+                    labels.clear()
+
+                    for((key, value) in my){
+                        val details = value as Map<String, String>
+
+                        if(strDate == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+
+                        }
+                        if(strDate1 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate2 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate3 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate4 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate5 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate6 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+
+
+                        Log.i(TAG, "$key: $value")
+                        Log.i(TAG, "details: $details")
+
+                    }
+
+                    if(!my.containsKey(strDate)) {
+                        entriesDetail.add(BarEntryDetail(strDate, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+
+                    }
+
+                    if(!my.containsKey(strDate1)) {
+                        entriesDetail.add(BarEntryDetail(strDate1, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate2)) {
+                        entriesDetail.add(BarEntryDetail(strDate2, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate3)) {
+                        entriesDetail.add(BarEntryDetail(strDate3, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate4)) {
+                        entriesDetail.add(BarEntryDetail(strDate4, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate5)) {
+                        entriesDetail.add(BarEntryDetail(strDate5, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate6)) {
+                        entriesDetail.add(BarEntryDetail(strDate6, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    val entriesDetailSort = entriesDetail.sortedWith(compareBy(BarEntryDetail::getmDate))
+                    entriesDetail = ArrayList(entriesDetailSort)
+
+                    entries.clear()
+                    for (value in entriesDetail) {
+                        entries.add(BarEntry(value.getmDuration().toFloat(), index))
+                        index++
+                    }
+
+
+                    labels = sortSunToMon(labels)
+
+
+
+                    val barDataSet = BarDataSet(entries, "Minis")
+
+                    val data = BarData(labels, barDataSet)
+                    personalStepsGraph.data = data // set the data and list of lables into chart
+
+                    personalStepsGraph.setDescription("Duration VS Date")  // set the description
+                    //barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
+                    barDataSet.color = resources.getColor(R.color.colorDis)
+
+                    personalStepsGraph.animateY(5000)
+
+
+                }
 
             }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                // ...
+            }
         }
+        myRef.addValueEventListener(postListener)
+
+    }
+
+    private fun setStepsGraph(id: String) {
+
+        var graphID = id
+
+        if(graphID == "none") {
+            graphID = user_id
+        }
+
+        val calendar = Calendar.getInstance()
+        val mdformat = SimpleDateFormat("yyyy-MM-dd")
+
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val strDate = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+        val strDate1 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+        val strDate2 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+        val strDate3 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+        val strDate4 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+        val strDate5 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+        val strDate6 = mdformat.format(calendar.time)
+
+        var index = 0
+
+        var entriesDetail = ArrayList<BarEntryDetail>(1)
+
+        val entries = ArrayList<BarEntry>(1)
+
+        var labels = ArrayList<String>(1)
+
+
+        val myRef = FirebaseDatabase.getInstance().reference.child("DailyRecord/$graphID")
+
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+
+                if(dataSnapshot.value != null) {
+                    val my = dataSnapshot.value as Map<String, Any>
+
+
+                    entriesDetail.clear()
+
+                    labels.clear()
+
+                    for((key, value) in my){
+                        val details = value as Map<String, String>
+
+
+                        if(strDate == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+
+                        }
+                        if(strDate1 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate2 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate3 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate4 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate5 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate6 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+
+
+                        Log.i(TAG, "$key: $value")
+                        Log.i(TAG, "details: $details")
+
+                    }
+
+                    if(!my.containsKey(strDate)) {
+                        entriesDetail.add(BarEntryDetail(strDate, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+
+                    }
+
+                    if(!my.containsKey(strDate1)) {
+                        entriesDetail.add(BarEntryDetail(strDate1, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate2)) {
+                        entriesDetail.add(BarEntryDetail(strDate2, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate3)) {
+                        entriesDetail.add(BarEntryDetail(strDate3, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate4)) {
+                        entriesDetail.add(BarEntryDetail(strDate4, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate5)) {
+                        entriesDetail.add(BarEntryDetail(strDate5, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate6)) {
+                        entriesDetail.add(BarEntryDetail(strDate6, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    val entriesDetailSort = entriesDetail.sortedWith(compareBy(BarEntryDetail::getmDate))
+                    entriesDetail = ArrayList(entriesDetailSort)
+
+                    entries.clear()
+                    for (value in entriesDetail) {
+                        entries.add(BarEntry(value.getmSteps().toFloat(), index))
+                        index++
+                    }
+
+                    labels = sortSunToMon(labels)
+
+
+                    val barDataSet = BarDataSet(entries, "Steps")
+
+                    val data = BarData(labels, barDataSet)
+                    personalStepsGraph.data = data // set the data and list of lables into chart
+
+                    personalStepsGraph.setDescription("Steps VS Date")  // set the description
+                    //barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
+                    barDataSet.color = resources.getColor(R.color.colorCals)
+
+                    personalStepsGraph.animateY(5000)
+
+
+                }
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                // ...
+            }
+        }
+        myRef.addValueEventListener(postListener)
+
+    }
+
+
+    private fun setHPsGraph(id: String) {
+
+        var graphID = id
+
+        if(graphID == "none") {
+            graphID = user_id
+        }
+
+        val calendar = Calendar.getInstance()
+        val mdformat = SimpleDateFormat("yyyy-MM-dd")
+
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val strDate = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+        val strDate1 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+        val strDate2 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+        val strDate3 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+        val strDate4 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+        val strDate5 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+        val strDate6 = mdformat.format(calendar.time)
+
+
+        var index = 0
+
+        var entriesDetail = ArrayList<BarEntryDetail>(1)
+
+        val entries = ArrayList<BarEntry>(1)
+
+        var labels = ArrayList<String>(1)
+
+
+        val myRef = FirebaseDatabase.getInstance().reference.child("DailyRecord/$graphID")
+
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+
+                if(dataSnapshot.value != null) {
+                    val my = dataSnapshot.value as Map<String, Any>
+
+
+                    entriesDetail.clear()
+
+                    labels.clear()
+
+                    for((key, value) in my){
+                        val details = value as Map<String, String>
+
+
+                        if(strDate == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+
+                        }
+                        if(strDate1 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate2 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate3 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate4 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate5 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate6 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+
+
+                        Log.i(TAG, "$key: $value")
+                        Log.i(TAG, "details: $details")
+
+                    }
+
+                    if(!my.containsKey(strDate)) {
+                        entriesDetail.add(BarEntryDetail(strDate, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+
+                    }
+
+                    if(!my.containsKey(strDate1)) {
+                        entriesDetail.add(BarEntryDetail(strDate1, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate2)) {
+                        entriesDetail.add(BarEntryDetail(strDate2, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate3)) {
+                        entriesDetail.add(BarEntryDetail(strDate3, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate4)) {
+                        entriesDetail.add(BarEntryDetail(strDate4, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate5)) {
+                        entriesDetail.add(BarEntryDetail(strDate5, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate6)) {
+                        entriesDetail.add(BarEntryDetail(strDate6, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    val entriesDetailSort = entriesDetail.sortedWith(compareBy(BarEntryDetail::getmDate))
+                    entriesDetail = ArrayList(entriesDetailSort)
+
+                    entries.clear()
+                    for (value in entriesDetail) {
+                        entries.add(BarEntry(value.getmHeartPoints().toFloat(), index))
+                        index++
+                    }
+
+
+                    labels = sortSunToMon(labels)
+
+
+
+
+                    val barDataSet = BarDataSet(entries, "HPs")
+
+                    val data = BarData(labels, barDataSet)
+                    personalStepsGraph.data = data // set the data and list of lables into chart
+
+                    personalStepsGraph.setDescription("HeartPoints VS Date")  // set the description
+                    //barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
+                    barDataSet.color = resources.getColor(R.color.colorHeart)
+
+                    personalStepsGraph.animateY(5000)
+
+
+                }
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                // ...
+            }
+        }
+        myRef.addValueEventListener(postListener)
+
+    }
+
+
+    private fun setDisGraph(id: String) {
+
+        var graphID = id
+
+        if(graphID == "none") {
+            graphID = user_id
+        }
+
+        val calendar = Calendar.getInstance()
+        val mdformat = SimpleDateFormat("yyyy-MM-dd")
+
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val strDate = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+        val strDate1 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+        val strDate2 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+        val strDate3 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+        val strDate4 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+        val strDate5 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+        val strDate6 = mdformat.format(calendar.time)
+
+
+        var index = 0
+
+        var entriesDetail = ArrayList<BarEntryDetail>(1)
+
+        val entries = ArrayList<BarEntry>(1)
+
+        var labels = ArrayList<String>(1)
+
+
+        val myRef = FirebaseDatabase.getInstance().reference.child("DailyRecord/$graphID")
+
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+
+                if(dataSnapshot.value != null) {
+                    val my = dataSnapshot.value as Map<String, Any>
+
+
+                    entriesDetail.clear()
+
+                    labels.clear()
+
+                    for((key, value) in my){
+                        val details = value as Map<String, String>
+
+
+                        if(strDate == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+
+                        }
+                        if(strDate1 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate2 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate3 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate4 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate5 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate6 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+
+
+                        Log.i(TAG, "$key: $value")
+                        Log.i(TAG, "details: $details")
+
+                    }
+
+                    if(!my.containsKey(strDate)) {
+                        entriesDetail.add(BarEntryDetail(strDate, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+
+                    }
+
+                    if(!my.containsKey(strDate1)) {
+                        entriesDetail.add(BarEntryDetail(strDate1, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate2)) {
+                        entriesDetail.add(BarEntryDetail(strDate2, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate3)) {
+                        entriesDetail.add(BarEntryDetail(strDate3, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate4)) {
+                        entriesDetail.add(BarEntryDetail(strDate4, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate5)) {
+                        entriesDetail.add(BarEntryDetail(strDate5, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate6)) {
+                        entriesDetail.add(BarEntryDetail(strDate6, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    val entriesDetailSort = entriesDetail.sortedWith(compareBy(BarEntryDetail::getmDate))
+                    entriesDetail = ArrayList(entriesDetailSort)
+
+                    entries.clear()
+                    for (value in entriesDetail) {
+                        entries.add(BarEntry(value.getmDistance().toFloat(), index))
+                        index++
+                    }
+
+
+                    labels = sortSunToMon(labels)
+
+
+
+                    val barDataSet = BarDataSet(entries, "Ms")
+
+                    val data = BarData(labels, barDataSet)
+                    personalStepsGraph.data = data // set the data and list of lables into chart
+
+                    personalStepsGraph.setDescription("Distance VS Date")  // set the description
+                    //barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
+                    barDataSet.color = resources.getColor(R.color.colorCals)
+
+                    personalStepsGraph.animateY(5000)
+
+
+                }
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                // ...
+            }
+        }
+        myRef.addValueEventListener(postListener)
+
+    }
+
+
+    private fun setCalsGraph(id: String) {
+
+        var graphID = id
+
+        if(graphID == "none") {
+            graphID = user_id
+        }
+
+        val calendar = Calendar.getInstance()
+        val mdformat = SimpleDateFormat("yyyy-MM-dd")
+
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+        val strDate = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+        val strDate1 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+        val strDate2 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+        val strDate3 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+        val strDate4 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+        val strDate5 = mdformat.format(calendar.time)
+        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+        val strDate6 = mdformat.format(calendar.time)
+
+
+        var index = 0
+
+        var entriesDetail = ArrayList<BarEntryDetail>(1)
+
+        val entries = ArrayList<BarEntry>(1)
+
+        var labels = ArrayList<String>(1)
+
+
+        val myRef = FirebaseDatabase.getInstance().reference.child("DailyRecord/$graphID")
+
+        val postListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+
+                if(dataSnapshot.value != null) {
+                    val my = dataSnapshot.value as Map<String, Any>
+
+
+                    entriesDetail.clear()
+
+                    labels.clear()
+
+                    for((key, value) in my){
+                        val details = value as Map<String, String>
+
+
+                        if(strDate == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+
+                        }
+                        if(strDate1 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate2 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate3 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate4 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate5 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+                        if(strDate6 == key) {
+                            entriesDetail.add(BarEntryDetail(key, details["Steps"], details["Minis"], details["HPs"], details["Ms"], details["Cals"]))
+
+                            calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+                            labels.add(SimpleDateFormat("E").format(calendar.time))
+                        }
+
+
+                        Log.i(TAG, "$key: $value")
+                        Log.i(TAG, "details: $details")
+
+                    }
+
+                    if(!my.containsKey(strDate)) {
+                        entriesDetail.add(BarEntryDetail(strDate, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.MONDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+
+                    }
+
+                    if(!my.containsKey(strDate1)) {
+                        entriesDetail.add(BarEntryDetail(strDate1, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.TUESDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate2)) {
+                        entriesDetail.add(BarEntryDetail(strDate2, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.WEDNESDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate3)) {
+                        entriesDetail.add(BarEntryDetail(strDate3, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.THURSDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate4)) {
+                        entriesDetail.add(BarEntryDetail(strDate4, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.FRIDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate5)) {
+                        entriesDetail.add(BarEntryDetail(strDate5, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SATURDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    if(!my.containsKey(strDate6)) {
+                        entriesDetail.add(BarEntryDetail(strDate6, "0", "0", "0", "0", "0"))
+                        calendar.set(Calendar.DAY_OF_WEEK, Calendar.SUNDAY)
+                        labels.add(SimpleDateFormat("E").format(calendar.time))
+                    }
+
+                    val entriesDetailSort = entriesDetail.sortedWith(compareBy(BarEntryDetail::getmDate))
+                    entriesDetail = ArrayList(entriesDetailSort)
+
+                    entries.clear()
+                    for (value in entriesDetail) {
+                        entries.add(BarEntry(value.getmCalories().toFloat(), index))
+                        index++
+                    }
+
+
+                    labels = sortSunToMon(labels)
+
+
+
+                    val barDataSet = BarDataSet(entries, "Cals")
+
+                    val data = BarData(labels, barDataSet)
+                    personalStepsGraph.data = data // set the data and list of lables into chart
+
+                    personalStepsGraph.setDescription("Calories VS Date")  // set the description
+                    //barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
+                    barDataSet.color = resources.getColor(R.color.colorCals)
+
+                    personalStepsGraph.animateY(5000)
+
+                }
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                // ...
+            }
+        }
+        myRef.addValueEventListener(postListener)
+
+    }
+
+    private fun sortSunToMon(lables: ArrayList<String>): ArrayList<String> {
+
+        var newLables = ArrayList<String>(1)
+
+
+        if(lables.contains("Sun")) {
+            newLables.add("Sun")
+        }
+        if(lables.contains("Mon")) {
+            newLables.add("Mon")
+        }
+        if(lables.contains("Tue")) {
+            newLables.add("Tue")
+        }
+        if(lables.contains("Wed")) {
+            newLables.add("Wed")
+        }
+        if(lables.contains("Thu")) {
+            newLables.add("Thu")
+        }
+        if(lables.contains("Fri")) {
+            newLables.add("Fri")
+        }
+        if(lables.contains("Sat")) {
+            newLables.add("Sat")
+        }
+
+        return newLables
     }
 
     fun getCroppedBitmap(bitmap:Bitmap ):Bitmap {
@@ -1086,11 +2165,11 @@ class HomeFragment : Fragment(){
         textRank.text = userRank
 
         mDecoView!!.addEvent(
-                DecoEvent.Builder(teammateSteps)
-                        .setIndex(mSeries1Index)
-                        .setDuration(1000)
-                        .setDelay(100)
-                        .build()
+            DecoEvent.Builder(teammateSteps)
+                .setIndex(mSeries1Index)
+                .setDuration(1000)
+                .setDelay(100)
+                .build()
         )
 
         mDecoView2!!.addEvent(
@@ -1125,7 +2204,7 @@ class HomeFragment : Fragment(){
 
     private fun createDataSeriesTeam(teamGoal: Float) {
 
-        rankOfTeam.text = "NO.$teamRank"
+        rankOfTeam.text = "NO. "
         teamID.text = team
 
         val seriesItemTeam = SeriesItem.Builder(Color.parseColor("#ff6347")) //colorActivity1
@@ -1169,7 +2248,10 @@ class HomeFragment : Fragment(){
         )
     }
 
-    private fun refreshEventsTeam(teamSteps: Float) {
+    private fun refreshEventsTeam(teamSteps: Float, teamR: String) {
+
+        rankOfTeam.text = "NO.$teamR"
+        teamID.text = team
 
         mDecoViewTeam!!.addEvent(
             DecoEvent.Builder(teamSteps)
@@ -1185,11 +2267,36 @@ class HomeFragment : Fragment(){
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
     }
 
+    private fun resetPost(id: String, currentSteps: String, duration:String, heartPoints:String, distance:String, calories:String) {
+        val childUpdates = HashMap<String, Any>()
+
+        childUpdates["/User/$id/currentSteps"] = currentSteps
+        childUpdates["/User/$id/duration"] = duration
+        childUpdates["/User/$id/heartPoints"] = heartPoints
+        childUpdates["/User/$id/distance"] = distance
+        childUpdates["/User/$id/calories"] = calories
 
 
-    override fun onStop() {
-        super.onStop()
-        mTimer!!.cancel()
+        Log.w(TAG, "resetPost childUpdates: $childUpdates")
+
+        FirebaseDatabase.getInstance().reference.updateChildren(childUpdates)
     }
 
+    private fun initDaily(id: String, date: String, Cals: String, Goal: String, HPs: String, Minis: String, Ms: String, Rank: String, Steps: String, Token: String) {
+
+        val childUpdates = java.util.HashMap<String, Any>()
+        childUpdates["/DailyRecord/$id/$date/Cals"] = Cals
+        childUpdates["/DailyRecord/$id/$date/Goal"] = Goal
+        childUpdates["/DailyRecord/$id/$date/HPs"] = HPs
+        childUpdates["/DailyRecord/$id/$date/Minis"] = Minis
+        childUpdates["/DailyRecord/$id/$date/Ms"] = Ms
+        childUpdates["/DailyRecord/$id/$date/Rank"] = Rank
+        childUpdates["/DailyRecord/$id/$date/Steps"] = Steps
+        childUpdates["/DailyRecord/$id/$date/Token"] = Token
+
+        Log.w(TAG, "initDaily childUpdates: $childUpdates")
+
+        FirebaseDatabase.getInstance().reference.updateChildren(childUpdates)
+
+    }
 }

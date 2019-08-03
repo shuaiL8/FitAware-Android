@@ -1,22 +1,17 @@
-package com.example.fitaware.Team
+package com.vt.fitaware.Team
 
 
 import android.app.Activity
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
-import android.support.design.widget.TabItem
 import android.support.v4.app.Fragment
 import androidx.navigation.Navigation
-import com.example.fitaware.R
+import com.vt.fitaware.R
 import android.support.design.widget.TabLayout
-import android.support.v4.widget.SwipeRefreshLayout
 import android.util.Log
 import android.view.*
 import android.widget.TextView
-import androidx.navigation.NavController
-import androidx.navigation.fragment.NavHostFragment
-import kotlinx.android.synthetic.main.fragment_team.*
 
 
 class TeamFragment : Fragment() {
@@ -24,6 +19,7 @@ class TeamFragment : Fragment() {
 
     private var sharedPreferences: SharedPreferences? = null
     private var selectTab = "all"
+    private var gridOrList = "grid"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -39,18 +35,27 @@ class TeamFragment : Fragment() {
         val toolbarTiltle = activity!!.findViewById<TextView>(R.id.toolbar_title)
         toolbarTiltle.text = "Team"
 
+        gridOrList = sharedPreferences!!.getString("gridOrList", "grid")
+
 
         val tabLayoutTeam = view.findViewById<TabLayout>(R.id.tabLayoutTeam)
 
         val tabLayoutPeriodical = view.findViewById<TabLayout>(R.id.tabLayoutPeriodical)
 
-        val allTeams = tabLayoutTeam.newTab()
-        allTeams.setIcon(R.drawable.ic_grid)
-        tabLayoutTeam.addTab(allTeams, 0)
+        val gridTeams = tabLayoutTeam.newTab()
+        gridTeams.setIcon(R.drawable.ic_grid)
+        tabLayoutTeam.addTab(gridTeams, 0)
 
-        val myTeam = tabLayoutTeam.newTab()
-        myTeam.setIcon(R.drawable.ic_list)
-        tabLayoutTeam.addTab(myTeam, 1)
+        val listTeam = tabLayoutTeam.newTab()
+        listTeam.setIcon(R.drawable.ic_list)
+        tabLayoutTeam.addTab(listTeam, 1)
+
+        if(gridOrList == "grid") {
+            tabLayoutTeam.getTabAt(0)!!.select()
+        }
+        else {
+            tabLayoutTeam.getTabAt(1)!!.select()
+        }
 
 
         tabLayoutTeam.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
@@ -58,10 +63,18 @@ class TeamFragment : Fragment() {
                 // called when tab selected
                 if (tab.position == 0) {
                     Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.allTeamsFragment)
+                    val editor = sharedPreferences?.edit()
+                    editor!!.putString("gridOrList", "grid")
+
+                    editor.commit()
 
 
                 } else {
                     Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.allTeamsFragment_list)
+                    val editor = sharedPreferences?.edit()
+                    editor!!.putString("gridOrList", "list")
+
+                    editor.commit()
 
                 }
             }

@@ -1,4 +1,4 @@
-package com.example.fitaware.Home.Calendar;
+package com.vt.fitaware.Home.Calendar;
 
 public class Dialogpojo {
     private String date;

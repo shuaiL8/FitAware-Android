@@ -1,4 +1,4 @@
-package com.example.fitaware.Home.Calendar
+package com.vt.fitaware.Home.Calendar
 
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -9,10 +9,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.*
-import com.example.fitaware.R
+import com.vt.fitaware.R
 import com.google.firebase.database.*
+import java.text.SimpleDateFormat
 import java.util.*
 import kotlin.collections.ArrayList
+
 
 
 class CalendarFragment : Fragment() {
@@ -24,8 +26,9 @@ class CalendarFragment : Fragment() {
     private val TAG = "CalendarFragment"
     private var date_collection_arr = ArrayList<HomeCollection>(1)
 
-    var user_id: String? = "none"
     private var sharedPreferences: SharedPreferences? = null
+
+    private var user_id: String = "none"
 
 
     override fun onCreateView(
@@ -41,7 +44,15 @@ class CalendarFragment : Fragment() {
         initSharedPreferences()
 
         user_id = sharedPreferences!!.getString("user_id", "none")
+
         Log.i(TAG, "calender user_id$user_id")
+
+        cal_month = GregorianCalendar.getInstance() as GregorianCalendar
+        cal_month_copy = cal_month.clone() as GregorianCalendar
+        hwAdapter = HwAdapter(activity, cal_month, date_collection_arr)
+
+        tv_month = view.findViewById(R.id.tv_month)
+        tv_month!!.text = android.text.format.DateFormat.format("MMMM yyyy", cal_month)
 
         val myRef = FirebaseDatabase.getInstance().reference.child("DailyRecord/$user_id")
 
@@ -54,6 +65,8 @@ class CalendarFragment : Fragment() {
 
                     Log.i(TAG, "myTeamMember: $my")
 
+
+                    date_collection_arr.clear()
 
                     for((key, value) in my){
                         val details = value as Map<String, String>
@@ -72,10 +85,8 @@ class CalendarFragment : Fragment() {
 
                     }
 
+                    refreshCalendar()
                 }
-
-
-
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
@@ -85,17 +96,6 @@ class CalendarFragment : Fragment() {
             }
         }
         myRef.addValueEventListener(postListener)
-
-
-
-
-        cal_month = GregorianCalendar.getInstance() as GregorianCalendar
-        cal_month_copy = cal_month.clone() as GregorianCalendar
-        hwAdapter = HwAdapter(activity, cal_month, date_collection_arr)
-
-        tv_month = view.findViewById(R.id.tv_month)
-        tv_month!!.text = android.text.format.DateFormat.format("MMMM yyyy", cal_month)
-
 
         val previous = view.findViewById<View>(R.id.ib_prev) as ImageButton
         previous.setOnClickListener {

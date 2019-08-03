@@ -25,6 +25,26 @@
     </FrameLayout>
 
     <TextView
+            android:id="@+id/award_date"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="13sp"
+            tools:text="date"
+            android:gravity="center_horizontal"/>
+
+    <TextView
+            android:id="@+id/award_prize"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textSize="15sp"
+            tools:text="1st"
+            android:textStyle="bold"
+            android:paddingTop="4dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
+            android:gravity="center_horizontal"/>
+
+    <TextView
             android:id="@+id/award_name"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -37,11 +57,16 @@
             android:gravity="center_horizontal"/>
 
     <TextView
-            android:id="@+id/award_date"
+            android:id="@+id/award_steps"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="12sp"
-            tools:text="date"
+            tools:text="1st"
+            android:textStyle="bold"
+            android:paddingTop="4dp"
+            android:paddingLeft="8dp"
+            android:paddingRight="8dp"
             android:gravity="center_horizontal"/>
+
 
 </LinearLayout>

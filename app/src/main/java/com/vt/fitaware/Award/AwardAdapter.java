@@ -1,4 +1,4 @@
-package com.example.fitaware.Award;
+package com.vt.fitaware.Award;
 
 import android.app.Activity;
 import android.content.Context;
@@ -7,7 +7,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
-import com.example.fitaware.R;
+import com.vt.fitaware.R;
 import android.widget.ArrayAdapter;
 import java.util.ArrayList;
 
@@ -33,7 +33,9 @@ public class AwardAdapter extends ArrayAdapter<Award>{
             LayoutInflater inflater = ((Activity) context).getLayoutInflater();
             row = inflater.inflate(layoutResourceId, parent, false);
             holder = new ViewHolder();
+            holder.prize = (TextView) row.findViewById(R.id.award_prize);
             holder.name = (TextView) row.findViewById(R.id.award_name);
+            holder.steps = (TextView) row.findViewById(R.id.award_steps);
             holder.date = (TextView) row.findViewById(R.id.award_date);
             holder.image = (ImageView) row.findViewById(R.id.imageView_awards);
             row.setTag(holder);
@@ -43,7 +45,9 @@ public class AwardAdapter extends ArrayAdapter<Award>{
 
 
         Award item = data.get(position);
+        holder.prize.setText(item.getPrize());
         holder.name.setText(item.getName());
+        holder.steps.setText(item.getSteps() + " steps");
         holder.date.setText(item.getDate());
 
         holder.image.setImageBitmap(item.getImage());
@@ -51,7 +55,9 @@ public class AwardAdapter extends ArrayAdapter<Award>{
     }
 
     class ViewHolder {
+        TextView prize;
         TextView name;
+        TextView steps;
         TextView date;
 
         ImageView image;

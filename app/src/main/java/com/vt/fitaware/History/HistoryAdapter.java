@@ -1,4 +1,4 @@
-package com.example.fitaware.History;
+package com.vt.fitaware.History;
 
 import android.app.Activity;
 import android.content.Context;
@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.TextView;
-import com.example.fitaware.R;
+import com.vt.fitaware.R;
 import com.hookedonplay.decoviewlib.DecoView;
 import com.hookedonplay.decoviewlib.charts.DecoDrawEffect;
 import com.hookedonplay.decoviewlib.charts.SeriesItem;
@@ -24,7 +24,6 @@ import java.util.ArrayList;
 public class HistoryAdapter extends ArrayAdapter<Histories> {
     private static final String TAG = "HistoryAdapter";
 
-    private DecoView mDecoView;
     private int mBackIndex = 0;
     private int mSeries1Index = 0;
 
@@ -60,7 +59,7 @@ public class HistoryAdapter extends ArrayAdapter<Histories> {
             holder.mDistance = row.findViewById(R.id.his_distance);
             holder.mCalories = row.findViewById(R.id.his_calories);
 
-            mDecoView = row.findViewById(R.id.dynamicArcViewRank);
+            holder.mDecoView = row.findViewById(R.id.dynamicArcViewRank);
 
             row.setTag(holder);
         } else {
@@ -70,7 +69,6 @@ public class HistoryAdapter extends ArrayAdapter<Histories> {
 
         Histories item = data.get(position);
 
-        Log.i(TAG, "memberSteps: "+ item.getmSteps());
 
         his_steps = Float.valueOf(item.getmSteps());
         his_goal = Float.valueOf(item.getmGoal());
@@ -84,9 +82,13 @@ public class HistoryAdapter extends ArrayAdapter<Histories> {
         holder.mDistance.setText(item.getmDistance());
         holder.mCalories.setText(item.getmCalories());
 
-        createBackSeries();
-        createDataSeries();
-        createEvents();
+        createBackSeries(holder.mDecoView, his_goal);
+        createDataSeries(holder.mDecoView, his_goal);
+        createEvents(holder.mDecoView, his_goal, his_steps);
+
+        Log.i(TAG, "memberDate: "+ item.getmDate());
+        Log.i(TAG, "memberSteps: "+ his_steps);
+        Log.i(TAG, "memberGoal: "+ his_goal);
 
         return row;
     }
@@ -100,41 +102,42 @@ public class HistoryAdapter extends ArrayAdapter<Histories> {
         TextView mDistance;
         TextView mCalories;
 
+        DecoView mDecoView;
     }
 
-    private void createBackSeries() {
+    private void createBackSeries(DecoView decoView, Float goal) {
         SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor("#FFE2E2E2"))
-                .setRange(0, 2000f, 0)
+                .setRange(-1f, goal, 0f)
                 .setInitialVisibility(true)
                 .build();
 
-        mBackIndex = mDecoView.addSeries(seriesItem);
+        mBackIndex = decoView.addSeries(seriesItem);
 
     }
 
-    private void createDataSeries() {
+    private void createDataSeries(DecoView decoView, Float goal) {
         SeriesItem seriesItem = new SeriesItem.Builder(Color.parseColor("#3ebfab"))
-                .setRange(-1, his_goal, 0)
+                .setRange(-1f, goal, 0f)
                 .setInitialVisibility(false)
                 .build();
 
-        mSeries1Index = mDecoView.addSeries(seriesItem);
+        mSeries1Index = decoView.addSeries(seriesItem);
 
 
     }
 
-    private void createEvents() {
-        mDecoView.executeReset();
+    private void createEvents(DecoView decoView, Float goal, Float steps) {
+        decoView.executeReset();
 
-        mDecoView.addEvent(
-                new DecoEvent.Builder(2000f)
+        decoView.addEvent(
+                new DecoEvent.Builder(goal)
                         .setIndex(mBackIndex)
                         .setDuration(1000)
                         .setDelay(100)
                         .build()
         );
 
-        mDecoView.addEvent(
+        decoView.addEvent(
                 new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_OUT)
                         .setIndex(mSeries1Index)
                         .setDuration(1000)
@@ -142,8 +145,8 @@ public class HistoryAdapter extends ArrayAdapter<Histories> {
                         .build()
         );
 
-        mDecoView.addEvent(
-                new DecoEvent.Builder(his_steps)
+        decoView.addEvent(
+                new DecoEvent.Builder(steps)
                         .setIndex(mSeries1Index)
                         .setDuration(1000)
                         .setDelay(100)

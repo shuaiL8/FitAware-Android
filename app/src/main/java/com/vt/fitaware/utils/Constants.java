@@ -1,4 +1,4 @@
-package com.example.fitaware.utils;
+package com.vt.fitaware.utils;
 
 public class Constants {
 

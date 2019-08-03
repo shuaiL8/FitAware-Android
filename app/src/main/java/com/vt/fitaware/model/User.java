@@ -1,4 +1,4 @@
-package com.example.fitaware.model;
+package com.vt.fitaware.model;
 
 
 public class User {

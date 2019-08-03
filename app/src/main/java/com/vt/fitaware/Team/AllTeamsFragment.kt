@@ -1,11 +1,10 @@
-package com.example.fitaware.Team
+package com.vt.fitaware.Team
 
 
 import android.app.Activity
 import android.app.AlertDialog
 import android.arch.lifecycle.ViewModelProviders
 import android.content.DialogInterface
-import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.preference.PreferenceManager
 import android.support.v4.app.Fragment
@@ -15,17 +14,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.GridView
-import com.example.fitaware.Communicator
-import com.example.fitaware.History.Histories
-import com.example.fitaware.R
+import com.vt.fitaware.Communicator
+import com.vt.fitaware.R
 import com.google.firebase.database.*
 import java.util.HashMap
 import android.arch.lifecycle.Observer
 import android.content.SharedPreferences
+import android.graphics.*
 import android.support.design.widget.Snackbar
 import android.support.v4.widget.SwipeRefreshLayout
 import androidx.navigation.Navigation
-import com.example.fitaware.Home.Teammates
 
 
 class AllTeamsFragment : Fragment() {
@@ -43,6 +41,8 @@ class AllTeamsFragment : Fragment() {
     private var tabLayoutPeriodical: String = ""
     private var oldTeamName: String = "none"
     private var oldTeamCaptain: String = "none"
+    private var team: String = "none"
+    private var gridOrList = "grid"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -56,6 +56,12 @@ class AllTeamsFragment : Fragment() {
         initSharedPreferences()
 
         tabLayoutPeriodical = sharedPreferences!!.getString("tabLayoutPeriodical", "0")
+        team = sharedPreferences!!.getString("team", "none")
+        gridOrList = sharedPreferences!!.getString("gridOrList", "grid")
+
+        if(gridOrList == "list") {
+            Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.allTeamsFragment_list)
+        }
 
         database = FirebaseDatabase.getInstance().reference
 
@@ -88,8 +94,6 @@ class AllTeamsFragment : Fragment() {
             Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.allTeamsFragment)
         }
 
-        teams.clear()
-
         val myRef = FirebaseDatabase.getInstance().reference.child("Teams")
 
         val postListener = object : ValueEventListener {
@@ -105,36 +109,94 @@ class AllTeamsFragment : Fragment() {
                     for((key, value) in my){
                         val details = value as Map<String, String>
 
+
+                        val myRefUser = FirebaseDatabase.getInstance().reference.child("User")
+                        val postListenerUser = object : ValueEventListener {
+                            override fun onDataChange(dataSnapshotUser: DataSnapshot) {
+                                // Get Post object and use the values to update the UI
+
+                                if(dataSnapshotUser.value != null) {
+                                    val myUser = dataSnapshotUser.value as Map<String, Any>
+
+                                    var iniTeamSteps = 0L
+
+                                    for((keyUser, valueUser) in myUser){
+                                        val detailsUser = valueUser as Map<String, String>
+
+
+                                        if (key == detailsUser.getValue("team")) {
+                                            iniTeamSteps += detailsUser["currentSteps"].toString().toLong()
+                                        }
+                                        Log.i(TAG, "$keyUser: $valueUser")
+                                        Log.i(TAG, "detailsDR: $detailsUser")
+                                    }
+                                    writeTeamStepsPost(key, iniTeamSteps.toString())
+                                }
+                            }
+
+                            override fun onCancelled(databaseErrorDR: DatabaseError) {
+                                // Getting Post failed, log a message
+                                Log.w(TAG, "loadPost:onCancelled", databaseErrorDR.toException())
+                                // ...
+                            }
+                        }
+                        myRefUser.addValueEventListener(postListenerUser)
+
                         if(tabLayoutPeriodical.toLowerCase() == details.getValue("periodical").toString().toLowerCase()) {
-
-                            var bitmap = BitmapFactory.decodeResource(resources, R.drawable.teamwork)
-
-                            teams.add(
-                                Team(
-                                    bitmap,
-                                    key,
-                                    details.getValue("captain"),
-                                    "No. ?",
-                                    details.getValue("teamGoal"),
-                                    details.getValue("teamSteps").toInt(),
-                                    details.getValue("periodical")
+                            if(team == key) {
+                                teams.add(
+                                    Team(
+                                        key,
+                                        details.getValue("captain"),
+                                        "No. ?",
+                                        details.getValue("teamGoal"),
+                                        details.getValue("teamSteps").toInt(),
+                                        details.getValue("periodical"),
+                                        "#008577"
+                                    )
                                 )
-                            )
+                            }
+                            else{
+                                teams.add(
+                                    Team(
+                                        key,
+                                        details.getValue("captain"),
+                                        "No. ?",
+                                        details.getValue("teamGoal"),
+                                        details.getValue("teamSteps").toInt(),
+                                        details.getValue("periodical"),
+                                        "#ff6347"
+                                    )
+                                )
+                            }
                         }
                         else if(tabLayoutPeriodical.toLowerCase() == "all") {
-                            var bitmap = BitmapFactory.decodeResource(resources, R.drawable.teamwork)
-
-                            teams.add(
-                                Team(
-                                    bitmap,
-                                    key,
-                                    details.getValue("captain"),
-                                    "No. ?",
-                                    details.getValue("teamGoal"),
-                                    details.getValue("teamSteps").toInt(),
-                                    details.getValue("periodical")
+                            if(team == key) {
+                                teams.add(
+                                    Team(
+                                        key,
+                                        details.getValue("captain"),
+                                        "No. ?",
+                                        details.getValue("teamGoal"),
+                                        details.getValue("teamSteps").toInt(),
+                                        details.getValue("periodical"),
+                                        "#008577"
+                                    )
                                 )
-                            )
+                            }
+                            else{
+                                teams.add(
+                                    Team(
+                                        key,
+                                        details.getValue("captain"),
+                                        "No. ?",
+                                        details.getValue("teamGoal"),
+                                        details.getValue("teamSteps").toInt(),
+                                        details.getValue("periodical"),
+                                        "#ff6347"
+                                    )
+                                )
+                            }
                         }
 
 
@@ -153,12 +215,14 @@ class AllTeamsFragment : Fragment() {
                         indexM++
                     }
 
-                    teamsAdapter = TeamAdapter(
-                        activity,
-                        R.layout.teams,
-                        teams
-                    )
-                    gridViewAllTeams.adapter = teamsAdapter
+                    if (activity !=null){
+                        teamsAdapter = TeamAdapter(
+                            activity,
+                            R.layout.teams,
+                            teams
+                        )
+                        gridViewAllTeams.adapter = teamsAdapter
+                    }
 
                 }
 
@@ -184,7 +248,7 @@ class AllTeamsFragment : Fragment() {
             if(captain == user_id) {
                 val dialogBuilder = AlertDialog.Builder(context)
                 dialogBuilder
-                    .setMessage("You are the captain of $selectedName")
+                    .setMessage("You are the captain of Team $selectedName")
                     .setNegativeButton("Cancel", DialogInterface.OnClickListener {
                             dialog, id -> dialog.cancel()
                     })
@@ -257,6 +321,17 @@ class AllTeamsFragment : Fragment() {
         database.child("/Teams/$team/teamMembers/$id").setValue(id)
     }
 
+
+    private fun writeTeamStepsPost(teamN: String, teamSteps: String) {
+        val childUpdates = HashMap<String, Any>()
+
+        childUpdates["/Teams/$teamN/teamSteps"] = teamSteps
+
+        Log.w(TAG, "childUpdates: $childUpdates")
+
+        database.updateChildren(childUpdates)
+    }
+
     private fun showSnackBarMessage(message: String) {
 
         if (view != null) {
@@ -269,5 +344,6 @@ class AllTeamsFragment : Fragment() {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
     }
+
 
 }

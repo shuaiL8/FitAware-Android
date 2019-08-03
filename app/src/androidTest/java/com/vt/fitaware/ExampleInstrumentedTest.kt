@@ -1,4 +1,4 @@
-package com.example.fitaware
+package com.vt.fitaware
 
 import android.support.test.InstrumentationRegistry
 import android.support.test.runner.AndroidJUnit4

@@ -1,5 +1,6 @@
-package com.example.fitaware.Setting;
+package com.vt.fitaware.Setting;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
@@ -9,23 +10,27 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.preference.PreferenceManager;
+import android.provider.MediaStore;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.*;
 import androidx.navigation.Navigation;
-import com.example.fitaware.MainActivity;
-import com.example.fitaware.R;
-import com.example.fitaware.model.Response;
-import com.example.fitaware.model.User;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.vt.fitaware.MainActivity;
+import com.vt.fitaware.R;
+import com.vt.fitaware.model.User;
 import com.google.firebase.database.*;
 //import com.example.fitaware.network.NetworkUtil;
 //import com.google.gson.Gson;
@@ -35,12 +40,15 @@ import com.google.firebase.database.*;
 //import rx.schedulers.Schedulers;
 //import rx.subscriptions.CompositeSubscription;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
-import java.util.Map;
+import java.util.TimeZone;
 
-import static com.example.fitaware.utils.Validation.validateEmail;
-import static com.example.fitaware.utils.Validation.validateFields;
+import static com.vt.fitaware.utils.Validation.validateEmail;
+import static com.vt.fitaware.utils.Validation.validateFields;
 
 
 public class RegisterFragment extends Fragment {
@@ -59,6 +67,9 @@ public class RegisterFragment extends Fragment {
     private TextInputLayout mTiStepsGoal;
     private Spinner mEtSpinner;
 
+    private StorageReference mStorageRef;
+
+
     private ProgressBar mProgressbar;
     private ImageView icon;
     private TextView setIcon;
@@ -67,19 +78,23 @@ public class RegisterFragment extends Fragment {
 
     private DatabaseReference database;
 
+    private Bitmap bitmap = null;
 
-//    private CompositeSubscription mSubscriptions;
 
     @Nullable
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.fragment_register,container,false);
-//        mSubscriptions = new CompositeSubscription();
         initViews(view);
         initSharedPreferences();
 
+        TextView toolbarTiltle = getActivity().findViewById(R.id.toolbar_title);
+        toolbarTiltle.setText("FitAware");
+
         database = FirebaseDatabase.getInstance().getReference();
+
+        mStorageRef = FirebaseStorage.getInstance().getReference();
 
         return view;
     }
@@ -102,10 +117,13 @@ public class RegisterFragment extends Fragment {
         setIcon = (TextView) v.findViewById(R.id.tv_setIcon);
 
 
-        Bitmap bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.shuail8);
+        bitmap = BitmapFactory.decodeResource(getContext().getResources(), R.drawable.shuail8);
         bitmap = getCroppedBitmap(bitmap);
 
         icon.setImageBitmap(bitmap);
+
+        setIcon.setOnClickListener(view -> setImage());
+
         mEtSpinner = (Spinner) v.findViewById(R.id.mEtSpinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
                 R.array.Daily_Weekly_Monthly, android.R.layout.simple_spinner_item);
@@ -116,6 +134,14 @@ public class RegisterFragment extends Fragment {
 
         mBtRegister.setOnClickListener(view -> register());
         mTvLogin.setOnClickListener(view -> goToLogin());
+    }
+
+    private void setImage() {
+        Intent pickPhoto = new Intent(
+                Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        );
+        startActivityForResult(pickPhoto, 0);
     }
 
     private void writeNewPost(String name, String email, String password, String stepsGoal, String captain, String team, String currentSteps, String periodical, String heartPoints, String duration, String distance, String calories, String teamGoal, String teamSteps) {
@@ -137,7 +163,29 @@ public class RegisterFragment extends Fragment {
         user.setTeamSteps(teamSteps);
         user.setPeriodical(periodical);
 
-        database.child("User/"+name.toLowerCase()).setValue(user);
+        String[] emailId = email.split("@");
+
+        database.child("User/"+emailId[0].toLowerCase()).setValue(user);
+    }
+
+
+    private void initDaily(String id, String date, String Cals, String Goal, String HPs, String Minis, String Ms, String Rank, String Steps, String Token) {
+
+        HashMap<String, Object> childUpdates = new HashMap<>();
+
+        childUpdates.put("/DailyRecord/" + id + "/" + date + "/Cals", Cals);
+        childUpdates.put("/DailyRecord/" + id + "/" + date + "/Goal", Goal);
+        childUpdates.put("/DailyRecord/" + id + "/" + date + "/HPs", HPs);
+        childUpdates.put("/DailyRecord/" + id + "/" + date + "/Minis", Minis);
+        childUpdates.put("/DailyRecord/" + id + "/" + date + "/Ms", Ms);
+        childUpdates.put("/DailyRecord/" + id + "/" + date + "/Rank", Rank);
+        childUpdates.put("/DailyRecord/" + id + "/" + date + "/Steps", Steps);
+        childUpdates.put("/DailyRecord/" + id + "/" + date + "/Token", Token);
+
+        Log.w(TAG, "childUpdates: $childUpdates");
+
+        FirebaseDatabase.getInstance().getReference().updateChildren(childUpdates);
+
     }
 
     private void initSharedPreferences() {
@@ -186,19 +234,17 @@ public class RegisterFragment extends Fragment {
 
         if (err == 0) {
 
+            Handler handler = new Handler();
+
+            handler.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    registerProcess(inputName, inputEmail, inputPassword, inputGoal, inputPeriodical);
+
+                }
+            }, 1000);
 
             mProgressbar.setVisibility(View.VISIBLE);
-
-            SharedPreferences.Editor editor = mSharedPreferences.edit();
-            editor.putString("user_id", inputName);
-            editor.putString("team", "none");
-            editor.putString("my_goal", inputGoal);
-
-            editor.putInt("loginStatus", 1);
-
-            editor.commit();
-            writeNewPost(inputName, inputEmail, inputPassword, inputGoal, "none", "none", "0", inputPeriodical, "0", "0", "0", "0", "0", "0");
-            startActivity();
 
         } else {
 
@@ -210,6 +256,50 @@ public class RegisterFragment extends Fragment {
     }
 
 
+    private void registerProcess(String inName, String inEmail, String  inPassword, String inGoal, String inPeriodical) {
+
+        Calendar calendar = Calendar.getInstance();
+        SimpleDateFormat mdformat = new SimpleDateFormat("yyyy-MM-dd");
+        mdformat.setTimeZone(TimeZone.getTimeZone("America/New_York"));
+        String strDate = mdformat.format(calendar.getTime());
+        SharedPreferences.Editor editor = mSharedPreferences.edit();
+
+
+        String[] emailId = inEmail.split("@");
+
+        editor.putString("user_id", emailId[0]);
+        editor.putString("user_email", inEmail);
+        editor.putString("user_password", inPassword);
+
+
+        editor.putString("team", "none");
+        editor.putString("my_goal", inGoal);
+        editor.putString("periodical", inPeriodical);
+
+
+        editor.putInt("loginStatus", 1);
+
+        editor.putString("initDaily", strDate);
+
+        editor.commit();
+
+
+        writeNewPost(inName, inEmail, inPassword, inGoal, "none", "none", "0", inPeriodical, "0", "0", "0", "0", "0", "0");
+        initDaily(emailId[0], strDate, "0", inGoal, "0", "0", "0", "0", "0", "0");
+
+        if(bitmap != null) {
+            StorageReference iconRef = mStorageRef.child("user_icon/"+inName+"/icon.jpg");
+
+            byte[] uploadImage = convertBitmapToByteArray(bitmap);
+
+            iconRef.putBytes(uploadImage);
+        }
+
+
+        goToHome();
+
+    }
+
     private void setError() {
 
         mTiName.setError(null);
@@ -217,11 +307,14 @@ public class RegisterFragment extends Fragment {
         mTiPassword.setError(null);
     }
 
-    private void startActivity() {
-        Intent i = new Intent(getActivity().getBaseContext(),
+    private void goToHome() {
+
+        getActivity().finish();
+
+        Intent intent = new Intent(getActivity().getBaseContext(),
                 MainActivity.class);
 
-        getActivity().startActivity(i);
+        getActivity().startActivity(intent);
     }
 
     private void showSnackBarMessage(String message) {
@@ -261,5 +354,44 @@ public class RegisterFragment extends Fragment {
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);
         return output;
+    }
+
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent imageReturnedIntent) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent);
+        if (requestCode == 0) {
+            if (resultCode == Activity.RESULT_OK) {
+                Uri selectedImage = imageReturnedIntent.getData();
+                Log.i(TAG, "selectedImage: $selectedImage");
+
+                try {
+                    bitmap = MediaStore.Images.Media.getBitmap(getContext().getContentResolver(), selectedImage);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                bitmap = getCroppedBitmap(bitmap);
+
+                icon.setImageBitmap(bitmap);
+            }
+        }
+    }
+
+    public byte[] convertBitmapToByteArray(Bitmap bMap) {
+        ByteArrayOutputStream baos = null;
+        try {
+            baos = new ByteArrayOutputStream();
+            bMap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+            return baos.toByteArray();
+        } finally {
+            if (baos != null) {
+                try {
+                    baos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
     }
 }

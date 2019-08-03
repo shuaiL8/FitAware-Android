@@ -1,31 +1,35 @@
-package com.example.fitaware.Setting
+package com.vt.fitaware.Setting
 
 
-import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.view.*
 import android.widget.*
 import androidx.navigation.Navigation
-import com.example.fitaware.R
+import com.vt.fitaware.R
 import android.content.Intent
 import android.util.Log
-import com.example.fitaware.Communicator
-import com.example.fitaware.MainActivity
+import com.vt.fitaware.MainActivity
 import com.google.firebase.database.*
-import android.arch.lifecycle.Observer
-import java.util.HashMap
-import android.R.id.edit
 import android.app.Activity
+import android.app.ActivityManager
 import android.app.AlertDialog
 import android.content.Context
 import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.graphics.*
+import android.os.Build
 import android.preference.PreferenceManager
+import android.provider.MediaStore
+import android.support.design.widget.BottomNavigationView
 import android.support.v4.widget.SwipeRefreshLayout
-import android.widget.Toast
+import com.google.firebase.storage.FirebaseStorage
+import com.google.firebase.storage.StorageReference
+import com.squareup.picasso.Picasso
+import com.vt.fitaware.MyBackgroundService
+import com.vt.fitaware.MyNotificationService
+import java.io.ByteArrayOutputStream
+import java.io.IOException
 
 
 /**
@@ -36,11 +40,13 @@ class SettingFragment : Fragment() {
 
     private val TAG = "SettingFragment"
 
-    private var user_id: String = ""
+    private var user_id: String = "none"
 
-    private lateinit var database: DatabaseReference
     private var sharedPreferences: SharedPreferences? = null
 
+    internal lateinit var icon: ImageView
+
+    private var mStorageRef: StorageReference? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -53,8 +59,6 @@ class SettingFragment : Fragment() {
         setHasOptionsMenu(true)
         initSharedPreferences()
 
-        database = FirebaseDatabase.getInstance().reference
-
         val toolbarTiltle = activity!!.findViewById<TextView>(R.id.toolbar_title)
         toolbarTiltle.text = ""
 
@@ -65,7 +69,10 @@ class SettingFragment : Fragment() {
         }
 
         val userListView = view.findViewById<ListView>(R.id.userListView)
-        val icon = view.findViewById<ImageView>(R.id.icon)
+        icon = view.findViewById<ImageView>(R.id.icon)
+
+
+
         val progressBar = view.findViewById<ProgressBar>(R.id.progressBar)
         progressBar.visibility = View.GONE
 
@@ -83,10 +90,6 @@ class SettingFragment : Fragment() {
 
         userListView.adapter = adapter
 
-        var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
-        bitmap = getCroppedBitmap(bitmap)
-
-        icon.setImageBitmap(bitmap)
 
         userListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, position, id ->
             if (position == 0) {
@@ -113,8 +116,18 @@ class SettingFragment : Fragment() {
                         editor.remove("loginStatus")
                         editor.remove("user_id")
 
+                        editor.remove("my_goal")
+                        editor.remove("rank")
+                        editor.remove("currentSteps")
+                        editor.remove("duration")
+                        editor.remove("heartPoints")
+                        editor.remove("distance")
+                        editor.remove("calories")
+
                         editor.commit()
-                        sendData()
+                        goToLogin()
+                        stopMyNotificationService()
+                        stopMyBackgroundService()
                     })
                     // negative button text and action
                     .setNegativeButton("Cancel", DialogInterface.OnClickListener {
@@ -130,11 +143,18 @@ class SettingFragment : Fragment() {
 
             }
             if (position == 4) {
+                val dialogBuilder = AlertDialog.Builder(context)
+                dialogBuilder.setMessage("Email: shuail8@vt.edu")
+                    .setNegativeButton("Cancel", DialogInterface.OnClickListener {
+                            dialog, id -> dialog.cancel()
+                    })
+                val alert = dialogBuilder.create()
+                alert.show()
 
             }
         }
 
-        user_id = sharedPreferences!!.getString("user_id", "")
+        user_id = sharedPreferences!!.getString("user_id", "none")
 
 
         val myRef = FirebaseDatabase.getInstance().reference.child("User/$user_id")
@@ -154,7 +174,7 @@ class SettingFragment : Fragment() {
                 tv_email.text = my["email"].toString()
 
                 if(my["team"].toString() != "none") {
-                    if(my["captain"].toString() == my["id"].toString()) {
+                    if(my["captain"].toString() == user_id) {
                         tv_group.text = "Captain of " + my["team"].toString()
                     }
                     else {
@@ -175,6 +195,49 @@ class SettingFragment : Fragment() {
         }
         myRef.addValueEventListener(postListener)
 
+        mStorageRef = FirebaseStorage.getInstance().reference
+
+
+        val iconRef = mStorageRef!!.child("user_icon/$user_id/icon.jpg")
+
+        iconRef.downloadUrl.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val downloadIconUrl = task.result
+
+                Picasso.get().load(downloadIconUrl).into(icon)
+
+            } else {
+                var bitmap = BitmapFactory.decodeResource(resources, R.drawable.shuail8)
+                bitmap = getCroppedBitmap(bitmap)
+                icon.setImageBitmap(bitmap)
+            }
+        }
+
+        icon.setOnClickListener{
+
+            // build alert dialog
+            val dialogBuilder = AlertDialog.Builder(context)
+
+            dialogBuilder.setMessage("Do you want to change your icon ?")
+                .setPositiveButton("Choose from Gallery", DialogInterface.OnClickListener {
+                        dialog, id ->
+                    val pickPhoto = Intent(
+                        Intent.ACTION_PICK,
+                        MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                    )
+                    startActivityForResult(pickPhoto, 0)
+
+
+                })
+                .setNegativeButton("Cancel", DialogInterface.OnClickListener {
+                        dialog, id -> dialog.cancel()
+                })
+
+            val alert = dialogBuilder.create()
+            alert.show()
+
+        }
+
         return view
     }
 
@@ -194,15 +257,47 @@ class SettingFragment : Fragment() {
 
 
 
-    private fun sendData() {
-        //INTENT OBJ
-        val intent = Intent(activity!!.baseContext, MainActivity::class.java)
+    private fun goToLogin() {
 
-        //PACK DATA
-//        intent.putExtra("Login_Status", loginStatus)
+        activity!!.finish()
 
-        //START ACTIVITY
+        val intent = Intent(
+            activity!!.baseContext,
+            MainActivity::class.java
+        )
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP)
+
         activity!!.startActivity(intent)
+
+    }
+
+
+    private fun stopMyNotificationService(){
+
+        val notificationService = MyNotificationService::class.java
+        val intent = Intent(context, notificationService)
+
+        intent.putExtra("user_id", "none")
+        intent.putExtra("team", "none")
+
+        context!!.stopService(intent)
+        Log.i(TAG, "Stop MyNotificationService.")
+
+    }
+
+    private fun stopMyBackgroundService(){
+
+        val backgroundService = MyBackgroundService::class.java
+        val intent = Intent(context, backgroundService)
+
+        intent.putExtra("user_id", "none")
+        intent.putExtra("periodical", "none")
+        intent.putExtra("my_goal", "none")
+        intent.putExtra("my_rank", "none")
+
+        context!!.stopService(intent)
+        Log.i(TAG, "Stop MyBackgroundService.")
+
     }
 
     private fun initSharedPreferences() {
@@ -229,5 +324,45 @@ class SettingFragment : Fragment() {
         paint.xfermode = PorterDuffXfermode(PorterDuff.Mode.SRC_IN);
         canvas.drawBitmap(bitmap, rect, rect, paint)
         return output
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, imageReturnedIntent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent)
+        when (requestCode) {
+            0 -> if (resultCode == Activity.RESULT_OK) {
+                val selectedImage = imageReturnedIntent!!.data
+                Log.i(TAG, "selectedImage: $selectedImage")
+
+                val iconRef = mStorageRef!!.child("user_icon/$user_id/icon.jpg")
+
+                var bitmap = MediaStore.Images.Media.getBitmap(context?.contentResolver, selectedImage)
+
+                bitmap = getCroppedBitmap(bitmap)
+
+                val uploadImage = convertBitmapToByteArray(bitmap)
+
+
+                iconRef.putBytes(uploadImage)
+
+                icon.setImageBitmap(bitmap)
+            }
+        }
+    }
+
+    fun convertBitmapToByteArray(bMap: Bitmap): ByteArray {
+        var baos: ByteArrayOutputStream? = null
+        try {
+            baos = ByteArrayOutputStream()
+            bMap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+            return baos!!.toByteArray()
+        } finally {
+            if (baos != null) {
+                try {
+                    baos!!.close()
+                } catch (e: IOException) {
+                }
+
+            }
+        }
     }
 }

@@ -4,9 +4,9 @@
             xmlns:tools="http://schemas.android.com/tools" android:id="@+id/navigation_awards"
             app:startDestination="@id/personalAwardFragment">
 
-    <fragment android:id="@+id/personalAwardFragment" android:name="com.example.fitaware.Award.PersonalAwardFragment"
+    <fragment android:id="@+id/personalAwardFragment" android:name="com.vt.fitaware.Award.PersonalAwardFragment"
               android:label="fragment_personal_award" tools:layout="@layout/fragment_personal_award"/>
-    <fragment android:id="@+id/teamAwardFragment" android:name="com.example.fitaware.Award.TeamAwardFragment"
+    <fragment android:id="@+id/teamAwardFragment" android:name="com.vt.fitaware.Award.TeamAwardFragment"
               android:label="fragment_team_award" tools:layout="@layout/fragment_team_award"/>
 
 </navigation>

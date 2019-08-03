@@ -1,4 +1,4 @@
-package com.example.fitaware.History;
+package com.vt.fitaware.History;
 
 
 /**
@@ -55,14 +55,13 @@ public class Histories {
         this.mSteps = mSteps;
     }
 
-    public void setmGoal(String mGoal) {
-        this.mGoal = mGoal;
-    }
-
     public String getmGoal() {
         return mGoal;
     }
 
+    public void setmGoal(String mGoal) {
+        this.mGoal = mGoal;
+    }
 
     public String getmDuration() {
         return mDuration;

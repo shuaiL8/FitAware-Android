@@ -1,41 +1,32 @@
-package com.example.fitaware.Team;
-
-import android.graphics.Bitmap;
+package com.vt.fitaware.Team;
 
 public class Team {
 
-    private Bitmap image;
     private String name;
     private String captain;
     private String rank;
     private String goal;
     private int teamSteps;
     private String periodical;
+    private String color;
 
 
 
-    public Team(Bitmap image, String name, String captain, String rank, String goal, int teamSteps, String periodical) {
+    public Team(String name, String captain, String rank, String goal, int teamSteps, String periodical, String color) {
         super();
-        this.image = image;
         this.name = name;
         this.captain = captain;
         this.rank = rank;
         this.goal = goal;
         this.teamSteps = teamSteps;
         this.periodical = periodical;
+        this.color = color;
 
 
     }
 
 
 
-    public Bitmap getImage() {
-        return image;
-    }
-
-    public void setImage(Bitmap image) {
-        this.image = image;
-    }
 
     public String getName() {
         return name;
@@ -84,5 +75,13 @@ public class Team {
 
     public void setGoal(String goal) {
         this.goal = goal;
+    }
+
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
     }
 }

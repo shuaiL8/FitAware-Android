@@ -1,4 +1,4 @@
-package com.example.fitaware.Setting;
+package com.vt.fitaware.Setting;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -15,12 +15,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import com.example.fitaware.MainActivity;
-import com.example.fitaware.R;
-import com.example.fitaware.model.Response;
-import com.example.fitaware.model.User;
+import com.vt.fitaware.MainActivity;
+import com.vt.fitaware.R;
 //import com.example.fitaware.network.NetworkUtil;
-import com.example.fitaware.utils.Constants;
+import com.vt.fitaware.utils.Constants;
 import com.google.firebase.database.*;
 //import com.google.gson.Gson;
 //import com.google.gson.GsonBuilder;
@@ -29,12 +27,10 @@ import com.google.firebase.database.*;
 //import rx.schedulers.Schedulers;
 //import rx.subscriptions.CompositeSubscription;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.fitaware.utils.Validation.validateEmail;
-import static com.example.fitaware.utils.Validation.validateFields;
+import static com.vt.fitaware.utils.Validation.validateFields;
 
 
 public class ChangepasswordFragment extends DialogFragment {

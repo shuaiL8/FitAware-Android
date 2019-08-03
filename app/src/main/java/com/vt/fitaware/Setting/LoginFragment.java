@@ -1,28 +1,27 @@
-package com.example.fitaware.Setting;
+package com.vt.fitaware.Setting;
 
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
+import android.support.design.widget.BottomNavigationView;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TextInputLayout;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.EditText;
-import android.widget.ProgressBar;
-import android.widget.TextView;
+import android.widget.*;
 import androidx.navigation.Navigation;
-import com.example.fitaware.MainActivity;
-import com.example.fitaware.R;
-import com.example.fitaware.model.Response;
+import com.vt.fitaware.MainActivity;
+import com.vt.fitaware.MyNotificationService;
+import com.vt.fitaware.R;
 //import com.example.fitaware.network.NetworkUtil;
-import com.example.fitaware.utils.Constants;
 import com.google.firebase.database.*;
 //import com.google.gson.Gson;
 //import com.google.gson.GsonBuilder;
@@ -32,21 +31,20 @@ import com.google.firebase.database.*;
 //import rx.subscriptions.CompositeSubscription;
 import android.os.Handler;
 
-import java.io.IOException;
-import java.util.Currency;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.example.fitaware.utils.Validation.validateEmail;
-import static com.example.fitaware.utils.Validation.validateFields;
+import static com.vt.fitaware.utils.Validation.validateEmail;
+import static com.vt.fitaware.utils.Validation.validateFields;
 
 
 public class LoginFragment extends Fragment {
-    public static final String TAG = LoginFragment.class.getSimpleName();
+    public static final String TAG = "LoginFragment";
     private DatabaseReference myRef;
 
     private EditText mEtEmail;
     private EditText mEtPassword;
+    private CheckBox rememberPasswordCheckBox;
     private Button mBtLogin;
     private TextView mTvRegister;
     private TextView mTvForgotPassword;
@@ -65,6 +63,12 @@ public class LoginFragment extends Fragment {
     public String my_goal = "none";
     public String teamGoal = "none";
     public String captain = "none";
+    public String periodical = "none";
+
+    public String user_email = "none";
+    public String user_password = "none";
+    public String user_checkBox = "none";
+
 
 
     @Nullable
@@ -72,28 +76,66 @@ public class LoginFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_login,container,false);
 //        mSubscriptions = new CompositeSubscription();
-        initViews(view);
         initSharedPreferences();
 
+        TextView toolbarTiltle = getActivity().findViewById(R.id.toolbar_title);
+                toolbarTiltle.setText("FitAware");
+
+        user_email = mSharedPreferences.getString("user_email", "none");
+        user_password = mSharedPreferences.getString("user_password", "none");
+        user_checkBox = mSharedPreferences.getString("user_checkBox", "none");
+
+        Log.i(TAG, "user_email: " + user_email);
+        Log.i(TAG, "user_password: " + user_password);
+        Log.i(TAG, "user_checkBox: " + user_checkBox);
+
+        mEtEmail = (EditText) view.findViewById(R.id.et_email);
+        mEtPassword = (EditText) view.findViewById(R.id.et_password);
+        rememberPasswordCheckBox = view.findViewById(R.id.rememberPasswordCheckBox);
+        mBtLogin = (Button) view.findViewById(R.id.btn_login);
+        mTiEmail = (TextInputLayout) view.findViewById(R.id.ti_email);
+        mTiPassword = (TextInputLayout) view.findViewById(R.id.ti_password);
+        mProgressBar = (ProgressBar) view.findViewById(R.id.progress);
+        mTvRegister = (TextView) view.findViewById(R.id.tv_register);
+        mTvForgotPassword = (TextView) view.findViewById(R.id.tv_forgot_password);
+
+
+        if(!user_email.equals("none")) {
+            mEtEmail.setText(user_email);
+        }
+
+        if(user_checkBox.equals("checked")){
+            rememberPasswordCheckBox.setChecked(true);
+            if(!user_password.equals("none")) {
+                mEtPassword.setText(user_password);
+            }
+        }
+        else{
+            rememberPasswordCheckBox.setChecked(false);
+        }
+
+        mBtLogin.setOnClickListener(V -> login());
+        mTvRegister.setOnClickListener(V -> goToRegister());
+        mTvForgotPassword.setOnClickListener(V -> showeRsetpasswordDialog());
+
+        rememberPasswordCheckBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if(rememberPasswordCheckBox.isChecked()){
+                    user_checkBox = "checked";
+                }
+                else {
+                    user_checkBox = "unchecked";
+                }
+                Log.i(TAG, "onCheckedChanged user_checkBox: " + user_checkBox);
+
+                SharedPreferences.Editor editor = mSharedPreferences.edit();
+                editor.putString("user_checkBox", user_checkBox);
+                editor.commit();
+            }
+        });
 
         return view;
-    }
-
-    private void initViews(View v) {
-
-        mEtEmail = (EditText) v.findViewById(R.id.et_email);
-        mEtPassword = (EditText) v.findViewById(R.id.et_password);
-        mBtLogin = (Button) v.findViewById(R.id.btn_login);
-        mTiEmail = (TextInputLayout) v.findViewById(R.id.ti_email);
-        mTiPassword = (TextInputLayout) v.findViewById(R.id.ti_password);
-        mProgressBar = (ProgressBar) v.findViewById(R.id.progress);
-        mTvRegister = (TextView) v.findViewById(R.id.tv_register);
-        mTvForgotPassword = (TextView) v.findViewById(R.id.tv_forgot_password);
-
-        mBtLogin.setOnClickListener(view -> login());
-        mTvRegister.setOnClickListener(view -> goToRegister());
-        mTvForgotPassword.setOnClickListener(view -> showeRsetpasswordDialog());
-
     }
 
 
@@ -112,7 +154,8 @@ public class LoginFragment extends Fragment {
         String[] inputId = inputEmail.split("@");
         user_id = inputId[0];
 
-
+        user_email = inputEmail;
+        user_password = inputPassword;
 
         Log.i(TAG, "inputEmail: " + inputEmail);
 
@@ -138,6 +181,7 @@ public class LoginFragment extends Fragment {
                 my_goal = myData.get("goal");
                 teamGoal = myData.get("teamGoal");
                 captain = myData.get("captain");
+                periodical = myData.get("periodical");
 
                 Log.d("testCallback", value);
 
@@ -194,14 +238,19 @@ public class LoginFragment extends Fragment {
         if(e .equals(email)  && p.equals(password) ) {
             SharedPreferences.Editor editor = mSharedPreferences.edit();
             editor.putString("user_id", user_id);
+
+            editor.putString("user_email", user_email);
+            editor.putString("user_password", user_password);
+
             editor.putString("team", team);
             editor.putString("my_goal", my_goal);
             editor.putString("team_goal", teamGoal);
             editor.putString("captain", captain);
+            editor.putString("periodical", periodical);
 
             editor.putInt("loginStatus", 1);
             editor.commit();
-            startActivity();
+            goToHome();
         }
         else {
             showSnackBarMessage("Wrong Email or Password !");
@@ -211,11 +260,16 @@ public class LoginFragment extends Fragment {
     }
 
 
-    private void startActivity() {
-        Intent i = new Intent(getActivity().getBaseContext(),
+    private void goToHome() {
+
+        getActivity().finish();
+
+        Intent intent = new Intent(getActivity().getBaseContext(),
                 MainActivity.class);
 
-        getActivity().startActivity(i);
+        intent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+
+        getActivity().startActivity(intent);
     }
 
     private void showSnackBarMessage(String message) {

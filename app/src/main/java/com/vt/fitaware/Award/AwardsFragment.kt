@@ -1,4 +1,4 @@
-package com.example.fitaware.Award
+package com.vt.fitaware.Award
 
 
 import android.app.Activity
@@ -7,7 +7,7 @@ import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
 import android.view.*
 import androidx.navigation.Navigation
-import com.example.fitaware.R
+import com.vt.fitaware.R
 
 
 class AwardsFragment : Fragment() {

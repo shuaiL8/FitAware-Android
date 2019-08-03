@@ -1,4 +1,4 @@
-package com.example.fitaware
+package com.vt.fitaware
 
 import org.junit.Test
 

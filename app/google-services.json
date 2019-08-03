@@ -15,7 +15,7 @@
       },
       "oauth_client": [
         {
-          "client_id": "122641114766-n6hubf1kcnhbhreiufb0s81hj1nvhq2u.apps.googleusercontent.com",
+          "client_id": "122641114766-gevg9ppfnkpq64qlnfltovqt8mv229jo.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
             "package_name": "com.example.fitaware",
@@ -23,11 +23,40 @@
           }
         },
         {
-          "client_id": "122641114766-ht5fom86af6mdfs0bfji0r99trpe2m6i.apps.googleusercontent.com",
+          "client_id": "122641114766-cai5um77kaugqbnhsvs2ch6n6valp3ha.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBZw7ruy673L3phsHk-ncQoXLFSY8OtGQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "122641114766-cai5um77kaugqbnhsvs2ch6n6valp3ha.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:122641114766:android:7b924ae2bfb205a8",
+        "android_client_info": {
+          "package_name": "com.vt.fitaware"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "122641114766-3d3r7hqqrqnikq6gb3rtn0hclid3f6bp.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
-            "package_name": "com.example.fitaware",
-            "certificate_hash": "836e4fd31fc5a5efd78e6d3d6881bf52b5ad1ad7"
+            "package_name": "com.vt.fitaware",
+            "certificate_hash": "a01c34fcfbf59c08c7e89c9491c8982a1240df53"
           }
         },
         {

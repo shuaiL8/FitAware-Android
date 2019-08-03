@@ -1,11 +1,10 @@
-package com.example.fitaware.Home;
+package com.vt.fitaware.Home;
 
 import android.graphics.Bitmap;
 
 public class Teammates {
 
     private String tab;
-    private Bitmap image;
     private String name;
     private String rank;
     private int steps;
@@ -17,10 +16,9 @@ public class Teammates {
 
     private String color;
 
-    public Teammates(String tab, Bitmap image, String name, String rank, int steps, String goal, int duration, int heartPoints, int distance, int calories, String color) {
+    public Teammates(String tab, String name, String rank, int steps, String goal, int duration, int heartPoints, int distance, int calories, String color) {
         super();
         this.tab = tab;
-        this.image = image;
         this.name = name;
         this.rank = rank;
         this.steps = steps;
@@ -40,14 +38,6 @@ public class Teammates {
 
     public void setTab(String tab) {
         this.tab = tab;
-    }
-
-    public Bitmap getImage() {
-        return image;
-    }
-
-    public void setImage(Bitmap image) {
-        this.image = image;
     }
 
     public String getName() {

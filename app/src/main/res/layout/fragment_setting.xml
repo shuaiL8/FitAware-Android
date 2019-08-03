@@ -52,33 +52,33 @@
                                 android:layout_height="wrap_content"
                                 android:layout_below="@+id/progressBar">
 
-                            <RelativeLayout
+                            <LinearLayout
                                     android:layout_width="match_parent"
-                                    android:layout_height="wrap_content">
+                                    android:layout_height="wrap_content"
+                                    android:orientation="vertical">
 
                                 <TextView
                                         android:id="@+id/tv_name"
                                         android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
-                                        android:layout_centerHorizontal="true"
-                                        android:textColor="@android:color/black"
-                                        android:textAppearance="?android:attr/textAppearanceLarge"/>
+                                        android:textSize="25dp"
+                                        android:layout_height="28dp"
+                                        android:layout_gravity="center"
+                                        android:textColor="@android:color/black"/>
 
                                 <TextView
                                         android:id="@+id/tv_email"
                                         android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
+                                        android:layout_height="28dp"
                                         android:layout_below="@+id/tv_name"
-                                        android:layout_centerHorizontal="true"
-                                        android:textAppearance="?android:attr/textAppearanceMedium"/>
+                                        android:layout_gravity="center"/>
 
                                 <TextView
                                         android:id="@+id/tv_group"
                                         android:layout_width="wrap_content"
-                                        android:layout_height="wrap_content"
+                                        android:layout_height="28dp"
                                         android:layout_below="@+id/tv_email"
-                                        android:layout_centerHorizontal="true"/>
-                            </RelativeLayout>
+                                        android:layout_gravity="center"/>
+                            </LinearLayout>
                         </android.support.v7.widget.CardView>
 
 

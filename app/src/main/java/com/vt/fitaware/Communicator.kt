@@ -1,4 +1,4 @@
-package com.example.fitaware
+package com.vt.fitaware
 
 import android.arch.lifecycle.MutableLiveData
 import android.arch.lifecycle.ViewModel
