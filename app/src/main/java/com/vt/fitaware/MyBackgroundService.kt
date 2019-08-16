@@ -253,7 +253,7 @@ class MyBackgroundService : Service() {
 
                     val calendar = Calendar.getInstance()
                     val mdformat = SimpleDateFormat("yyyy-MM-dd")
-                    mdformat.timeZone = TimeZone.getTimeZone("America/New_York")
+//                    mdformat.timeZone = TimeZone.getTimeZone("America/New_York")
                     val strDate = mdformat.format(calendar.time)
 
                     recordDaily(

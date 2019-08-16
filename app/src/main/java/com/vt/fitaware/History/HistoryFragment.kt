@@ -108,7 +108,7 @@ class HistoryFragment : Fragment() {
 
         val calendarNY = Calendar.getInstance()
         val mdformatNY = SimpleDateFormat("yyyy-MM-dd")
-        mdformatNY.timeZone = TimeZone.getTimeZone("America/New_York")
+//        mdformatNY.timeZone = TimeZone.getTimeZone("America/New_York")
         val strDate = mdformatNY.format(calendarNY.time)
 
         initDaily(

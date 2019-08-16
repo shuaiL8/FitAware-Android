@@ -336,7 +336,7 @@ class HomeFragment : Fragment(){
 
         val calendarNY = Calendar.getInstance()
         val mdformatNY = SimpleDateFormat("yyyy-MM-dd")
-        mdformatNY.timeZone = TimeZone.getTimeZone("America/New_York")
+//        mdformatNY.timeZone = TimeZone.getTimeZone("America/New_York")
         val strDate = mdformatNY.format(calendarNY.time)
 
         initDaily(
@@ -426,7 +426,7 @@ class HomeFragment : Fragment(){
 
                                     val calendar = Calendar.getInstance()
                                     val mdformat = SimpleDateFormat("yyyy-MM-dd")
-                                    mdformat.timeZone = TimeZone.getTimeZone("America/New_York")
+//                                    mdformat.timeZone = TimeZone.getTimeZone("America/New_York")
                                     val strDate = mdformat.format(calendar.time)
 
                                     if (!myDR.containsKey(strDate)) {

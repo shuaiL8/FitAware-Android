@@ -268,10 +268,10 @@ class HwAdapter extends BaseAdapter {
             final Dialog dialogs = new Dialog(context);
             dialogs.setContentView(R.layout.dialog_inform);
 
-            WindowManager.LayoutParams wmlp = dialogs.getWindow().getAttributes();
-            wmlp.gravity = Gravity.TOP | Gravity.LEFT;
-            wmlp.x = 75;   //x position
-            wmlp.y = 1100;   //y position
+//            WindowManager.LayoutParams wmlp = dialogs.getWindow().getAttributes();
+//            wmlp.gravity = Gravity.TOP | Gravity.LEFT;
+//            wmlp.x = 75;   //x position
+//            wmlp.y = 1100;   //y position
 
             tv_date = (TextView) dialogs.findViewById(R.id.tv_date);
             tv_date.setText(date);
@@ -298,6 +298,7 @@ class HwAdapter extends BaseAdapter {
                         }
 
                         Navigation.findNavController(context, R.id.my_nav_host_fragment).navigate(R.id.userFragment);
+                        dialogs.dismiss();
 
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
 

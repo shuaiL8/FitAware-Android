@@ -59,7 +59,7 @@ class PersonalAwardFragment : Fragment() {
 
         val calendar = Calendar.getInstance()
         val mdformat = SimpleDateFormat("yyyy-MM-dd")
-        mdformat.timeZone = TimeZone.getTimeZone("America/New_York")
+//        mdformat.timeZone = TimeZone.getTimeZone("America/New_York")
         calendar.add(Calendar.DATE, -1)
         val strDate1 = mdformat.format(calendar.time)
 
