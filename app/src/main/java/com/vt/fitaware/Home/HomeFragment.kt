@@ -108,6 +108,7 @@ class HomeFragment : Fragment(){
     internal lateinit var imageActivity3: ImageView
     internal lateinit var imageActivity4: ImageView
     internal lateinit var imageActivity5: ImageView
+    internal lateinit var imageActivity6: ImageView
 
     internal lateinit var textName: TextView
     internal lateinit var textRank: TextView
@@ -122,8 +123,10 @@ class HomeFragment : Fragment(){
 
     internal lateinit var textActivity4: TextView
     internal lateinit var textActivity5: TextView
+    internal lateinit var textActivity6: TextView
     internal lateinit var rankActivity4: TextView
     internal lateinit var rankActivity5: TextView
+    internal lateinit var rankActivity6: TextView
 
     private var gridViewDecoViews: ExpandableHeightGridView? = null
 
@@ -259,18 +262,21 @@ class HomeFragment : Fragment(){
         imageActivity3 = view.findViewById(R.id.imageActivity3)
         imageActivity4 = view.findViewById(R.id.imageActivity4)
         imageActivity5 = view.findViewById(R.id.imageActivity5)
+        imageActivity6 = view.findViewById(R.id.imageActivity6)
 
         textActivity1 = view.findViewById(R.id.textActivity1)
         textActivity2 = view.findViewById(R.id.textActivity2)
         textActivity3 = view.findViewById(R.id.textActivity3)
         textActivity4 = view.findViewById(R.id.textActivity4)
         textActivity5 = view.findViewById(R.id.textActivity5)
+        textActivity6 = view.findViewById(R.id.textActivity6)
 
         rankActivity1 = view.findViewById(R.id.rankActivity1)
         rankActivity2 = view.findViewById(R.id.rankActivity2)
         rankActivity3 = view.findViewById(R.id.rankActivity3)
         rankActivity4 = view.findViewById(R.id.rankActivity4)
         rankActivity5 = view.findViewById(R.id.rankActivity5)
+        rankActivity6 = view.findViewById(R.id.rankActivity6)
 
         val model = ViewModelProviders.of(activity!!).get(Communicator::class.java)
         val `object` = Observer<Any> { o ->
@@ -319,6 +325,7 @@ class HomeFragment : Fragment(){
                         refreshEvents(id.name, "No. "+id.rank, id.duration.toFloat(), id.steps.toFloat(), id.heartPoints.toFloat())
                         textActivity4.text = id.distance.toString()
                         textActivity5.text = id.calories.toString()
+                        textActivity6.text = id.calories.toString()
                     }
 
                 }
@@ -327,6 +334,7 @@ class HomeFragment : Fragment(){
                 refreshEvents("","" , my_duration.toFloat(), my_steps.toFloat(), my_heartPoints.toFloat())
                 textActivity4.text = my_distance.toString()
                 textActivity5.text = my_calories.toString()
+                textActivity6.text = my_calories.toString()
             }
 
 
@@ -829,7 +837,7 @@ class HomeFragment : Fragment(){
                 newSelected = teammates[position].name
 
                 if(personalStepsGraph.visibility == View.VISIBLE) {
-                    graphName.text = "Steps Graph"
+                    graphName.text = "Steps"
                     setStepsGraph(newSelected)
                     graphName.setTextColor(Color.parseColor("#3ebfab"))
                 }
@@ -844,18 +852,18 @@ class HomeFragment : Fragment(){
             if(personalStepsGraph.visibility == View.GONE) {
                 personalStepsGraph.visibility = View.VISIBLE
                 graphName.visibility = View.VISIBLE
-                graphName.text = "Duration Graph"
+                graphName.text = "Duration"
                 setDurGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#77e6f1"))
 
             }
-            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Duration Graph"){
-                graphName.text = "Duration Graph"
+            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Duration"){
+                graphName.text = "Duration"
                 setDurGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#77e6f1"))
 
             }
-            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "Duration Graph"){
+            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "Duration"){
                 personalStepsGraph.visibility = View.GONE
                 graphName.visibility = View.GONE
             }
@@ -865,18 +873,18 @@ class HomeFragment : Fragment(){
             if(personalStepsGraph.visibility == View.GONE) {
                 personalStepsGraph.visibility = View.VISIBLE
                 graphName.visibility = View.VISIBLE
-                graphName.text = "Steps Graph"
+                graphName.text = "Steps"
                 setStepsGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#3ebfab"))
 
             }
-            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Steps Graph"){
-                graphName.text = "Steps Graph"
+            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Steps"){
+                graphName.text = "Steps"
                 setStepsGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#3ebfab"))
 
             }
-            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "Steps Graph"){
+            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "Steps"){
                 personalStepsGraph.visibility = View.GONE
                 graphName.visibility = View.GONE
             }
@@ -885,18 +893,18 @@ class HomeFragment : Fragment(){
             if(personalStepsGraph.visibility == View.GONE) {
                 personalStepsGraph.visibility = View.VISIBLE
                 graphName.visibility = View.VISIBLE
-                graphName.text = "HeartPoints Graph"
+                graphName.text = "HeartPoints"
                 setHPsGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#ff6347"))
 
             }
-            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "HeartPoints Graph"){
-                graphName.text = "HeartPoints Graph"
+            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "HeartPoints"){
+                graphName.text = "HeartPoints"
                 setHPsGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#ff6347"))
 
             }
-            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "HeartPoints Graph"){
+            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "HeartPoints"){
                 personalStepsGraph.visibility = View.GONE
                 graphName.visibility = View.GONE
             }
@@ -906,18 +914,18 @@ class HomeFragment : Fragment(){
             if(personalStepsGraph.visibility == View.GONE) {
                 personalStepsGraph.visibility = View.VISIBLE
                 graphName.visibility = View.VISIBLE
-                graphName.text = "Distance Graph"
+                graphName.text = "Distance"
                 setDisGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#3ebfab"))
 
             }
-            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Distance Graph"){
-                graphName.text = "Distance Graph"
+            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Distance"){
+                graphName.text = "Distance"
                 setDisGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#3ebfab"))
 
             }
-            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "Distance Graph"){
+            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "Distance"){
                 personalStepsGraph.visibility = View.GONE
                 graphName.visibility = View.GONE
             }
@@ -927,18 +935,39 @@ class HomeFragment : Fragment(){
             if(personalStepsGraph.visibility == View.GONE) {
                 personalStepsGraph.visibility = View.VISIBLE
                 graphName.visibility = View.VISIBLE
-                graphName.text = "Calories Graph"
+                graphName.text = "Calories"
                 setCalsGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#3ebfab"))
 
             }
-            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Calories Graph"){
-                graphName.text = "Calories Graph"
+            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Calories"){
+                graphName.text = "Calories"
                 setCalsGraph(newSelected)
                 graphName.setTextColor(Color.parseColor("#3ebfab"))
 
             }
-            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "Calories Graph"){
+            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "Calories"){
+                personalStepsGraph.visibility = View.GONE
+                graphName.visibility = View.GONE
+            }
+        }
+
+        imageActivity6.setOnClickListener {
+            if(personalStepsGraph.visibility == View.GONE) {
+                personalStepsGraph.visibility = View.VISIBLE
+                graphName.visibility = View.VISIBLE
+                graphName.text = "Carbon Footprint"
+                setCalsGraph(newSelected)
+                graphName.setTextColor(Color.parseColor("#3ebfab"))
+
+            }
+            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Carbon Footprint"){
+                graphName.text = "Carbon Footprint"
+                setCalsGraph(newSelected)
+                graphName.setTextColor(Color.parseColor("#3ebfab"))
+
+            }
+            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "Carbon Footprint"){
                 personalStepsGraph.visibility = View.GONE
                 graphName.visibility = View.GONE
             }
@@ -2109,6 +2138,7 @@ class HomeFragment : Fragment(){
 
         textActivity4.text = "0"
         textActivity5.text = "0"
+        textActivity6.text = "0"
 
         mDecoView!!.executeReset()
 
