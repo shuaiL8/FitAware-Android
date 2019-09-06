@@ -195,15 +195,16 @@ class MyBackgroundService : Service() {
 
                     val resultHeartPoints = Fitness.HistoryApi.readDailyTotal(mClient, DataType.TYPE_HEART_POINTS)
                     val totalResultHeartPoints = resultHeartPoints.await(30, TimeUnit.SECONDS)
-//                    if (totalResultHeartPoints.status.isSuccess) {
-//                        val totalSetHeartPoints = totalResultHeartPoints.total
-//                        totalHeartPoints = (if (totalSetHeartPoints!!.isEmpty)
-//                            0
-//                        else
-//                            totalSetHeartPoints.dataPoints[0].getValue(Field.FIELD_MAX).asInt()).toLong()
-//                    } else {
-//                        Log.w(TAG, "There was a problem getting the HeartPoints.")
-//                    }
+                    if (totalResultHeartPoints.status.isSuccess) {
+                        val totalSetHeartPoints = totalResultHeartPoints.total
+                        totalHeartPoints = (if (totalSetHeartPoints!!.isEmpty)
+                            0
+                        else
+                        "%.0f".format(totalSetHeartPoints.dataPoints[0].getValue(Field.FIELD_INTENSITY).asFloat())).toString().toLong()
+
+                    } else {
+                        Log.w(TAG, "There was a problem getting the HeartPoints.")
+                    }
 
                     Log.i(TAG, "Total HeartPoints: $resultHeartPoints")
                     Log.i(TAG, "Total HeartPoints: $totalResultHeartPoints")

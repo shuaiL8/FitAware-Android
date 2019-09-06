@@ -3,6 +3,7 @@ package com.vt.fitaware.Home
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import android.app.AlertDialog
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -19,6 +20,7 @@ import java.util.*
 import com.vt.fitaware.Communicator
 import com.google.firebase.database.*
 import android.arch.lifecycle.Observer
+import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.*
@@ -325,7 +327,7 @@ class HomeFragment : Fragment(){
                         refreshEvents(id.name, "No. "+id.rank, id.duration.toFloat(), id.steps.toFloat(), id.heartPoints.toFloat())
                         textActivity4.text = id.distance.toString()
                         textActivity5.text = id.calories.toString()
-                        textActivity6.text = id.calories.toString()
+                        textActivity6.text = "0"
                     }
 
                 }
@@ -334,7 +336,7 @@ class HomeFragment : Fragment(){
                 refreshEvents("","" , my_duration.toFloat(), my_steps.toFloat(), my_heartPoints.toFloat())
                 textActivity4.text = my_distance.toString()
                 textActivity5.text = my_calories.toString()
-                textActivity6.text = my_calories.toString()
+                textActivity6.text = "0"
             }
 
 
@@ -953,24 +955,35 @@ class HomeFragment : Fragment(){
         }
 
         imageActivity6.setOnClickListener {
-            if(personalStepsGraph.visibility == View.GONE) {
-                personalStepsGraph.visibility = View.VISIBLE
-                graphName.visibility = View.VISIBLE
-                graphName.text = "Carbon Footprint"
-                setCalsGraph(newSelected)
-                graphName.setTextColor(Color.parseColor("#3ebfab"))
+//            if(personalStepsGraph.visibility == View.GONE) {
+//                personalStepsGraph.visibility = View.VISIBLE
+//                graphName.visibility = View.VISIBLE
+//                graphName.text = "Carbon Footprint"
+//                setCalsGraph(newSelected)
+//                graphName.setTextColor(Color.parseColor("#3ebfab"))
+//
+//            }
+//            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Carbon Footprint"){
+//                graphName.text = "Carbon Footprint"
+//                setCalsGraph(newSelected)
+//                graphName.setTextColor(Color.parseColor("#3ebfab"))
+//
+//            }
+//            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "Carbon Footprint"){
+//                personalStepsGraph.visibility = View.GONE
+//                graphName.visibility = View.GONE
+//            }
 
-            }
-            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text != "Carbon Footprint"){
-                graphName.text = "Carbon Footprint"
-                setCalsGraph(newSelected)
-                graphName.setTextColor(Color.parseColor("#3ebfab"))
 
-            }
-            else if(personalStepsGraph.visibility == View.VISIBLE && graphName.text == "Carbon Footprint"){
-                personalStepsGraph.visibility = View.GONE
-                graphName.visibility = View.GONE
-            }
+            //Temp Implementation
+            val dialogBuilder = AlertDialog.Builder(context)
+            dialogBuilder
+                .setMessage("Available soon!")
+                .setNegativeButton("Cancel", DialogInterface.OnClickListener {
+                        dialog, id -> dialog.cancel()
+                })
+            val alert = dialogBuilder.create()
+            alert.show()
         }
 
 
@@ -1548,7 +1561,7 @@ class HomeFragment : Fragment(){
 
                     personalStepsGraph.setDescription("HeartPoints VS Date")  // set the description
                     //barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
-                    barDataSet.color = resources.getColor(R.color.colorHeart)
+                    barDataSet.color = resources.getColor(R.color.colorTime)
 
                     personalStepsGraph.animateY(5000)
 
