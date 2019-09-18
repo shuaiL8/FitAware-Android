@@ -19,6 +19,10 @@ import android.support.v4.app.NotificationCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.widget.RemoteViews
+import androidx.work.ExistingPeriodicWorkPolicy
+import androidx.work.OneTimeWorkRequest
+import androidx.work.PeriodicWorkRequest
+import androidx.work.WorkManager
 import com.vt.fitaware.FirebaseMessagingService.MyReceiver
 import com.google.android.gms.common.ConnectionResult
 import com.google.android.gms.common.Scopes
@@ -97,6 +101,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     private var bottomNavigationView: BottomNavigationView? = null
     private val RECORD_REQUEST_CODE = 101
 
+    private val workManager: WorkManager = WorkManager.getInstance()
 
 
     private val mOnNavigationItemSelectedListener = BottomNavigationView.OnNavigationItemSelectedListener { item ->
@@ -200,6 +205,14 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         setContentView(R.layout.activity_main)
         initSharedPreferences()
         setupPermissions()
+
+        val myBackgroundWorker = PeriodicWorkRequest.Builder(
+            MyBackgroundWorker::class.java,
+            15,
+            TimeUnit.MINUTES
+        ).build()
+
+        workManager.enqueue(myBackgroundWorker)
 
         // initial all the values
         user_id = sharedPreferences!!.getString("user_id", "none")

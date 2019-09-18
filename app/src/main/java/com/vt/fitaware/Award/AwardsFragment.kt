@@ -2,15 +2,22 @@ package com.vt.fitaware.Award
 
 
 import android.app.Activity
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.preference.PreferenceManager
 import android.support.design.widget.TabLayout
 import android.support.v4.app.Fragment
+import android.support.v4.view.ViewPager
 import android.view.*
 import androidx.navigation.Navigation
 import com.vt.fitaware.R
 
 
 class AwardsFragment : Fragment() {
+
+    private lateinit var viewPager: ViewPager
+    private lateinit var awardCollectionPagerAdapter: AwardCollectionPagerAdapter
+    private var sharedPreferences: SharedPreferences? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -21,35 +28,15 @@ class AwardsFragment : Fragment() {
             R.layout.fragment_awards, container,
             false)
         setHasOptionsMenu(true)
+        initSharedPreferences()
 
-        val tabLayoutTeam = view.findViewById<TabLayout>(R.id.tabLayoutAwards)
+        val tabLayoutAwards = view.findViewById<TabLayout>(R.id.tabLayoutAwards)
 
-        val myTeam = tabLayoutTeam.newTab() // Create a new Tab names "First Tab"
-        myTeam.text = "Personal" // set the Text for the first Tab
-        tabLayoutTeam.addTab(myTeam, 0)
+        awardCollectionPagerAdapter = AwardCollectionPagerAdapter(childFragmentManager)
+        viewPager = view.findViewById(R.id.awardPager)
+        viewPager.adapter = awardCollectionPagerAdapter
+        tabLayoutAwards.setupWithViewPager(viewPager)
 
-        val allTeams = tabLayoutTeam.newTab() // Create a new Tab names "First Tab"
-        allTeams.text = "Team" // set the Text for the first Tab
-        tabLayoutTeam.addTab(allTeams, 1)
-
-        tabLayoutTeam.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
-            override fun onTabSelected(tab: TabLayout.Tab) {
-                // called when tab selected
-                if (tab.position == 0) {
-                    Navigation.findNavController(context as Activity, R.id.my_nav_awards_fragment).navigate(R.id.personalAwardFragment)
-                } else {
-                    Navigation.findNavController(context as Activity, R.id.my_nav_awards_fragment).navigate(R.id.teamAwardFragment)
-                }
-            }
-
-            override fun onTabUnselected(tab: TabLayout.Tab) {
-                // called when tab unselected
-            }
-
-            override fun onTabReselected(tab: TabLayout.Tab) {
-                // called when a tab is reselected
-            }
-        })
 
         return view
     }
@@ -70,6 +57,11 @@ class AwardsFragment : Fragment() {
             // Invoke the superclass to handle it.
             super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun initSharedPreferences() {
+
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(activity)
     }
 
 }

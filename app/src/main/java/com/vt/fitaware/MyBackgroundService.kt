@@ -161,9 +161,6 @@ class MyBackgroundService : Service() {
                         Log.w(TAG, "There was a problem getting the duration.")
                     }
 
-                    Log.i(TAG, "Total duration: $resultDuration")
-                    Log.i(TAG, "Total duration: $totalResultDuration")
-
                     Log.i(TAG, "Total duration: $totalDuration")
 
                     daily_duration = totalDuration
@@ -182,9 +179,6 @@ class MyBackgroundService : Service() {
                     } else {
                         Log.w(TAG, "There was a problem getting the step count.")
                     }
-
-                    Log.i(TAG, "Total steps: $resultSteps")
-                    Log.i(TAG, "Total steps: $totalResultSteps")
 
                     Log.i(TAG, "Total steps: $totalSteps")
 
@@ -205,9 +199,6 @@ class MyBackgroundService : Service() {
                     } else {
                         Log.w(TAG, "There was a problem getting the HeartPoints.")
                     }
-
-                    Log.i(TAG, "Total HeartPoints: $resultHeartPoints")
-                    Log.i(TAG, "Total HeartPoints: $totalResultHeartPoints")
 
                     Log.i(TAG, "Total HeartPoints: $totalHeartPoints")
 

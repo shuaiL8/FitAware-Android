@@ -60,7 +60,7 @@ class TeamAwardFragment : Fragment() {
         val gridViewTeamAwards = view.findViewById<GridView>(R.id.gridViewTeamAwards)
         val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
         swipeRefresh.setOnRefreshListener {
-            Navigation.findNavController(context as Activity, R.id.my_nav_awards_fragment).navigate(R.id.teamAwardFragment)
+            Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.awardsFragment)
         }
         val calendar = Calendar.getInstance()
         val mdformat = SimpleDateFormat("yyyy-MM-dd")
@@ -130,7 +130,7 @@ class TeamAwardFragment : Fragment() {
 
                                     val teammatesSort = teammates.sortedWith(compareByDescending(Teammates::getSteps))
                                     teammates = ArrayList(teammatesSort)
-                                    writeAwardsPost(strDate1, teammates[0].name, teammates[0].steps.toString())
+                                    writeTeamAwardsPost(strDate1, teammates[0].name, teammates[0].steps.toString())
                                 }
 
                                 override fun onCancelled(databaseError: DatabaseError) {
@@ -229,7 +229,7 @@ class TeamAwardFragment : Fragment() {
         return view
     }
 
-    private fun writeAwardsPost(date: String, awardId: String, steps: String) {
+    private fun writeTeamAwardsPost(date: String, awardId: String, steps: String) {
         val childUpdates = HashMap<String, Any>()
 
         childUpdates["/Award/$date/team"] = awardId

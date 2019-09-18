@@ -261,7 +261,7 @@ class MyNotificationService : Service() {
             val channel = NotificationChannel(
                 CHANNEL_ID,
                 "Notification Drawer",
-                NotificationManager.IMPORTANCE_DEFAULT
+                NotificationManager.IMPORTANCE_LOW
             )
 
             (getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(channel)

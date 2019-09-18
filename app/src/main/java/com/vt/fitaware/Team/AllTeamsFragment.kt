@@ -42,7 +42,6 @@ class AllTeamsFragment : Fragment() {
     private var oldTeamName: String = "none"
     private var oldTeamCaptain: String = "none"
     private var team: String = "none"
-    private var gridOrList = "grid"
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -55,13 +54,9 @@ class AllTeamsFragment : Fragment() {
         setHasOptionsMenu(false)
         initSharedPreferences()
 
-        tabLayoutPeriodical = sharedPreferences!!.getString("tabLayoutPeriodical", "0")
+        tabLayoutPeriodical = sharedPreferences!!.getString("tabLayoutPeriodical", "All")
         team = sharedPreferences!!.getString("team", "none")
-        gridOrList = sharedPreferences!!.getString("gridOrList", "grid")
 
-        if(gridOrList == "list") {
-            Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.allTeamsFragment_list)
-        }
 
         database = FirebaseDatabase.getInstance().reference
 
@@ -91,7 +86,7 @@ class AllTeamsFragment : Fragment() {
         val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
 
         swipeRefresh.setOnRefreshListener {
-            Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.allTeamsFragment)
+            Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
         }
 
         val myRef = FirebaseDatabase.getInstance().reference.child("Teams")
@@ -279,7 +274,7 @@ class AllTeamsFragment : Fragment() {
 
                         writeNewPost(user_id, selectedName, captain,  teamGoal, periodical)
                         showSnackBarMessage("You joined in $selectedName!")
-                        Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.allTeamsFragment)
+                        Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
 
                     })
                     .setNegativeButton("Cancel", DialogInterface.OnClickListener {

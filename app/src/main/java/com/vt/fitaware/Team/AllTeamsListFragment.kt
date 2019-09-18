@@ -88,7 +88,7 @@ class AllTeamsListFragment : Fragment() {
         val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
 
         swipeRefresh.setOnRefreshListener {
-            Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.allTeamsFragment_list)
+            Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
         }
 
 
@@ -274,7 +274,7 @@ class AllTeamsListFragment : Fragment() {
 
                         writeNewPost(user_id, selectedName, captain,  teamGoal, periodical)
                         showSnackBarMessage("You joined in $selectedName!")
-                        Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.allTeamsFragment)
+                        Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
 
                     })
                     .setNegativeButton("Cancel", DialogInterface.OnClickListener {

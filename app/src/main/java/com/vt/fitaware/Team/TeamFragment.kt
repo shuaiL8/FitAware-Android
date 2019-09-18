@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment
 import androidx.navigation.Navigation
 import com.vt.fitaware.R
 import android.support.design.widget.TabLayout
+import android.support.v4.view.ViewPager
 import android.util.Log
 import android.view.*
 import android.widget.TextView
@@ -19,7 +20,10 @@ class TeamFragment : Fragment() {
 
     private var sharedPreferences: SharedPreferences? = null
     private var selectTab = "all"
-    private var gridOrList = "grid"
+    private var gridOrList = "list"
+
+    private lateinit var viewPager: ViewPager
+    private lateinit var teamCollectionPagerAdapter: TeamCollectionPagerAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,8 +39,7 @@ class TeamFragment : Fragment() {
         val toolbarTiltle = activity!!.findViewById<TextView>(R.id.toolbar_title)
         toolbarTiltle.text = "Team"
 
-        gridOrList = sharedPreferences!!.getString("gridOrList", "grid")
-
+        gridOrList = sharedPreferences!!.getString("gridOrList", "list")
 
         val tabLayoutTeam = view.findViewById<TabLayout>(R.id.tabLayoutTeam)
 
@@ -56,21 +59,31 @@ class TeamFragment : Fragment() {
         else {
             tabLayoutTeam.getTabAt(1)!!.select()
         }
-
+        teamCollectionPagerAdapter = TeamCollectionPagerAdapter(childFragmentManager, gridOrList)
+        viewPager = view.findViewById(R.id.teamPager)
+        viewPager.adapter = teamCollectionPagerAdapter
+        tabLayoutPeriodical.setupWithViewPager(viewPager)
 
         tabLayoutTeam.addOnTabSelectedListener(object : TabLayout.OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
                 // called when tab selected
                 if (tab.position == 0) {
-                    Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.allTeamsFragment)
+                    teamCollectionPagerAdapter = TeamCollectionPagerAdapter(childFragmentManager, "grid")
+                    viewPager = view.findViewById(R.id.teamPager)
+                    viewPager.adapter = teamCollectionPagerAdapter
+                    tabLayoutPeriodical.setupWithViewPager(viewPager)
+
                     val editor = sharedPreferences?.edit()
                     editor!!.putString("gridOrList", "grid")
 
                     editor.commit()
 
-
                 } else {
-                    Navigation.findNavController(context as Activity, R.id.my_nav_team_fragment).navigate(R.id.allTeamsFragment_list)
+                    teamCollectionPagerAdapter = TeamCollectionPagerAdapter(childFragmentManager, "list")
+                    viewPager = view.findViewById(R.id.teamPager)
+                    viewPager.adapter = teamCollectionPagerAdapter
+                    tabLayoutPeriodical.setupWithViewPager(viewPager)
+
                     val editor = sharedPreferences?.edit()
                     editor!!.putString("gridOrList", "list")
 
@@ -88,15 +101,7 @@ class TeamFragment : Fragment() {
             }
         })
 
-        tabLayoutPeriodical.addTab(tabLayoutPeriodical.newTab().setText("all"))
-        tabLayoutPeriodical.addTab(tabLayoutPeriodical.newTab().setText("daily"))
-        tabLayoutPeriodical.addTab(tabLayoutPeriodical.newTab().setText("3 days"))
-        tabLayoutPeriodical.addTab(tabLayoutPeriodical.newTab().setText("5 days"))
-        tabLayoutPeriodical.addTab(tabLayoutPeriodical.newTab().setText("weekly"))
-
-
-
-        selectTab = sharedPreferences!!.getString("tabLayoutPeriodical", "0")// called when a tab is reselected
+        selectTab = sharedPreferences!!.getString("tabLayoutPeriodical", "all")// called when a tab is reselected
 
         // called when tab selected
         when (selectTab) {
@@ -115,25 +120,27 @@ class TeamFragment : Fragment() {
                 // called when tab selected
                 val editor = sharedPreferences?.edit()
 
-                if (tab.position == 0) {
-                    selectTab = "all"
-                    Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
-                }
-                else if (tab.position == 1) {
-                    selectTab = "daily"
-                    Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
-                }
-                else if (tab.position == 2) {
-                    selectTab = "3 days"
-                    Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
-                }
-                else if (tab.position == 3){
-                    selectTab = "5 days"
-                    Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
-                }
-                else if (tab.position == 4){
-                    selectTab = "weekly"
-                    Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
+                when {
+                    tab.position == 0 -> {
+                        selectTab = "all"
+                        Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
+                    }
+                    tab.position == 1 -> {
+                        selectTab = "daily"
+                        Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
+                    }
+                    tab.position == 2 -> {
+                        selectTab = "3 days"
+                        Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
+                    }
+                    tab.position == 3 -> {
+                        selectTab = "5 days"
+                        Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
+                    }
+                    tab.position == 4 -> {
+                        selectTab = "weekly"
+                        Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.teamFragment)
+                    }
                 }
                 editor!!.putString("tabLayoutPeriodical", selectTab)
                 editor.commit()

@@ -54,7 +54,7 @@ class PersonalAwardFragment : Fragment() {
         val gridViewPersonalAwards = view.findViewById<GridView>(R.id.gridViewPersonalAwards)
         val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
         swipeRefresh.setOnRefreshListener {
-            Navigation.findNavController(context as Activity, R.id.my_nav_awards_fragment).navigate(R.id.personalAwardFragment)
+            Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.awardsFragment)
         }
 
         val calendar = Calendar.getInstance()
@@ -82,7 +82,7 @@ class PersonalAwardFragment : Fragment() {
                         val date = details.getValue(strDate1)
 
                         if(date!!.getValue("Rank") == "1"){
-                            writeAwardsPost(strDate1, key, date!!.getValue("Steps"))
+                            writePersonalAwardsPost(strDate1, key, date!!.getValue("Steps"))
                         }
                     }
                     Log.i(TAG, "$key: $value")
@@ -166,7 +166,7 @@ class PersonalAwardFragment : Fragment() {
     }
 
 
-    private fun writeAwardsPost(date: String, awardId: String, steps: String) {
+    private fun writePersonalAwardsPost(date: String, awardId: String, steps: String) {
         val childUpdates = HashMap<String, Any>()
 
         childUpdates["/Award/$date/personal"] = awardId
