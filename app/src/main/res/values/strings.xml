@@ -12,7 +12,7 @@
 
     <string-array name="UserStatus">
         <item>Profile</item>
-        <item>Advance Setting</item>
+<!--        <item>Advance Setting</item>-->
         <item>Change Password</item>
         <item>Log out</item>
         <item>Contact Us</item>

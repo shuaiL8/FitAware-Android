@@ -96,11 +96,9 @@ class SettingFragment : Fragment() {
                 Navigation.findNavController(activity!!, R.id.my_nav_host_fragment).navigate(R.id.profileFragment)
             }
             if (position == 1) {
-            }
-            if (position == 2) {
                 showChangepasswordDialog()
             }
-            if (position == 3) {
+            if (position == 2) {
 
                 // build alert dialog
                 val dialogBuilder = AlertDialog.Builder(context)
@@ -142,7 +140,7 @@ class SettingFragment : Fragment() {
                 alert.show()
 
             }
-            if (position == 4) {
+            if (position == 3) {
                 val dialogBuilder = AlertDialog.Builder(context)
                 dialogBuilder.setMessage("Email: shuail8@vt.edu")
                     .setNegativeButton("Cancel", DialogInterface.OnClickListener {

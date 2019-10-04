@@ -19,6 +19,7 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.database.ValueEventListener
 import com.google.firebase.iid.FirebaseInstanceId
+import com.vt.fitaware.Home.Teammates
 import java.text.SimpleDateFormat
 import java.util.*
 import java.util.concurrent.TimeUnit
@@ -56,6 +57,8 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
     private var my_goal: Long = 0
     private var token = "none"
 
+    private var allUsers = ArrayList<Teammates>(1)
+
     override fun doWork(): Result {
 
         initSharedPreferences()
@@ -63,7 +66,6 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         // initial all the values
         user_id = sharedPreferences!!.getString("user_id", "none")
         my_goal = sharedPreferences!!.getString("my_goal", "0").toLong()
-        my_rank = sharedPreferences!!.getString("my_rank", " ")
         periodical = sharedPreferences!!.getString("periodical", "none")
 
         mClient = GoogleApiClient.Builder(applicationContext)
@@ -87,6 +89,7 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
             Log.d(TAG, "user_id: $user_id")
 
             getDeviceToken()
+            getRank()
             getGoogleFitAPITasks()
 
             Result.success()
@@ -117,6 +120,45 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
                 editor!!.commit()
             })
     }
+
+    fun getRank() {
+        val myRef = FirebaseDatabase.getInstance().reference.child("User")
+        val myPostListener = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+                val my = dataSnapshot.value as Map<String, Any>
+                Log.i(TAG, "user: $my")
+
+                allUsers.clear()
+                for ((key, value) in my) {
+                    val details = value as Map<String, String>
+                    allUsers.add(Teammates("1",  key, "0", details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(), "#3ebfab"))
+                }
+
+                // get my_rank from all Users
+                val allUsersSort = allUsers.sortedWith(compareByDescending(Teammates::getSteps))
+                allUsers = ArrayList(allUsersSort)
+                var indexM = 1
+                for(users in allUsers) {
+                    users.rank = indexM.toString()
+
+                    if(users.name == user_id) {
+                        my_rank = users.rank
+                    }
+                    indexM++
+                }
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                // ...
+            }
+        }
+        myRef.addValueEventListener(myPostListener)
+    }
+
 
     fun getGoogleFitAPITasks() {
 
@@ -232,64 +274,64 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
             daily_steps.toString(),
             token)
 
-//
-//        when {
-//            periodical.toLowerCase() == "daily" -> {
-//
-//                writeNewPost(
-//                    user_id,
-//                    daily_steps.toString(),
-//                    daily_duration.toString(),
-//                    daily_heartPoints.toString(),
-//                    daily_distance.toString(),
-//                    daily_calories.toString()
-//                )
-//
-//            }
-//
-//            periodical == "3 days" -> {
-//
-//                threeDaysRecord()
-//
-//                writeNewPost(
-//                    user_id,
-//                    threeDays_steps.toString(),
-//                    daily_duration.toString(),
-//                    daily_heartPoints.toString(),
-//                    threeDays_distance.toString(),
-//                    threeDays_calories.toString()
-//                )
-//
-//
-//                Log.i(TAG, "threeDays_steps: $threeDays_steps")
-//
-//            }
-//            periodical == "5 days" -> {
-//
-//                fiveDaysRecord()
-//
-//                writeNewPost(
-//                    user_id,
-//                    fiveDays_steps.toString(),
-//                    daily_duration.toString(),
-//                    daily_heartPoints.toString(),
-//                    fiveDays_distance.toString(),
-//                    fiveDays_calories.toString()
-//                )
-//            }
-//            periodical.toLowerCase() == "weekly" -> {
-//                weeklyRecord()
-//
-//                writeNewPost(
-//                    user_id,
-//                    weekly_steps.toString(),
-//                    daily_duration.toString(),
-//                    daily_heartPoints.toString(),
-//                    weekly_distance.toString(),
-//                    weekly_calories.toString()
-//                )
-//            }
-//        }
+
+        when {
+            periodical.toLowerCase() == "daily" -> {
+
+                writeNewPost(
+                    user_id,
+                    daily_steps.toString(),
+                    daily_duration.toString(),
+                    daily_heartPoints.toString(),
+                    daily_distance.toString(),
+                    daily_calories.toString()
+                )
+
+            }
+
+            periodical == "3 days" -> {
+
+                threeDaysRecord()
+
+                writeNewPost(
+                    user_id,
+                    threeDays_steps.toString(),
+                    daily_duration.toString(),
+                    daily_heartPoints.toString(),
+                    threeDays_distance.toString(),
+                    threeDays_calories.toString()
+                )
+
+
+                Log.i(TAG, "threeDays_steps: $threeDays_steps")
+
+            }
+            periodical == "5 days" -> {
+
+                fiveDaysRecord()
+
+                writeNewPost(
+                    user_id,
+                    fiveDays_steps.toString(),
+                    daily_duration.toString(),
+                    daily_heartPoints.toString(),
+                    fiveDays_distance.toString(),
+                    fiveDays_calories.toString()
+                )
+            }
+            periodical.toLowerCase() == "weekly" -> {
+                weeklyRecord()
+
+                writeNewPost(
+                    user_id,
+                    weekly_steps.toString(),
+                    daily_duration.toString(),
+                    daily_heartPoints.toString(),
+                    weekly_distance.toString(),
+                    weekly_calories.toString()
+                )
+            }
+        }
     }
 
     private fun threeDaysRecord(){

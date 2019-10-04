@@ -111,17 +111,6 @@ class HistoryFragment : Fragment() {
 //        mdformatNY.timeZone = TimeZone.getTimeZone("America/New_York")
         val strDate = mdformatNY.format(calendarNY.time)
 
-        initDaily(
-            user_id,
-            strDate,
-            my_calories.toString(),
-            my_goal.toString(),
-            my_heartPoints.toString(),
-            my_duration.toString(),
-            my_distance.toString(),
-            my_rank,
-            my_steps.toString(),
-            token)
 
         val intent = Intent()
         intent.action = "com.vt.MyBackgroundServiceReceiver"

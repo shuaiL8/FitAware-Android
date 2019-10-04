@@ -33,7 +33,7 @@
             <android.support.design.widget.TabLayout
                     android:layout_weight="3"
                     android:id="@+id/tabLayoutTeam"
-                    android:layout_width="match_parent"
+                    android:layout_width="380dp"
                     android:layout_height="wrap_content">
 
             </android.support.design.widget.TabLayout>
