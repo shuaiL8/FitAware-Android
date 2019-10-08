@@ -23,7 +23,6 @@
             android:text="Workout"
             android:layout_marginRight="10dp"
             android:layout_marginLeft="10dp"
-            android:layout_toRightOf="@+id/img_cross"
             android:textSize="18dp"
             android:textColor="@color/colorPrimary"
             android:id="@+id/tv_date"/>
