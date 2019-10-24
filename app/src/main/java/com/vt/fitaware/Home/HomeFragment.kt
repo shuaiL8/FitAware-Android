@@ -24,7 +24,6 @@ import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.graphics.*
-import android.os.Build
 import android.os.Handler
 import android.preference.PreferenceManager
 import android.support.design.widget.Snackbar
@@ -32,16 +31,9 @@ import android.support.design.widget.TabLayout
 import android.support.v4.widget.SwipeRefreshLayout
 import android.widget.*
 import androidx.navigation.Navigation
-import com.github.mikephil.charting.charts.BarChart
-import com.github.mikephil.charting.data.BarData
-import com.github.mikephil.charting.data.BarDataSet
-import com.github.mikephil.charting.data.BarEntry
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
-import com.vt.fitaware.MainActivity
-import com.vt.fitaware.MyBackgroundService
-import com.vt.fitaware.Team.Team
 import kotlin.collections.ArrayList
 
 

@@ -12,21 +12,16 @@ import android.util.Log
 import com.vt.fitaware.MainActivity
 import com.google.firebase.database.*
 import android.app.Activity
-import android.app.ActivityManager
 import android.app.AlertDialog
-import android.content.Context
 import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.graphics.*
-import android.os.Build
 import android.preference.PreferenceManager
 import android.provider.MediaStore
-import android.support.design.widget.BottomNavigationView
 import android.support.v4.widget.SwipeRefreshLayout
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
-import com.vt.fitaware.MyBackgroundService
 import com.vt.fitaware.MyNotificationService
 import java.io.ByteArrayOutputStream
 import java.io.IOException
@@ -48,6 +43,12 @@ class SettingFragment : Fragment() {
 
     private var mStorageRef: StorageReference? = null
 
+    private var settings = ArrayList<Settings>(1)
+    private lateinit var settingAdapter: SettingAdaptor
+
+    private var myNotificationServiceStatus: String = "startMyNotificationService"
+
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -58,6 +59,8 @@ class SettingFragment : Fragment() {
             false)
         setHasOptionsMenu(true)
         initSharedPreferences()
+
+        myNotificationServiceStatus = sharedPreferences!!.getString("MyNotificationServiceStatus", "startMyNotificationService")
 
         val toolbarTiltle = activity!!.findViewById<TextView>(R.id.toolbar_title)
         toolbarTiltle.text = ""
@@ -82,23 +85,49 @@ class SettingFragment : Fragment() {
 
         val tv_group = view.findViewById<TextView>(R.id.tv_group)
 
-        val user = resources.getStringArray(R.array.UserStatus)
-        val adapter = ArrayAdapter<String>(
-            activity!!,
-            android.R.layout.simple_list_item_1, user
-        )
+        settings.clear()
 
-        userListView.adapter = adapter
+        settings.add(Settings("Profile", false, false))
+
+        Log.i(TAG, "myNotificationServiceStatus: $myNotificationServiceStatus")
+
+        if(myNotificationServiceStatus == "startMyNotificationService") {
+            settings.add(Settings("Aways on Notification", true, true))
+        }
+        else {
+            settings.add(Settings("Aways on Notification", true, false))
+        }
+
+        settings.add(Settings("Change Password", false, false))
+        settings.add(Settings("Log out", false, false))
+        settings.add(Settings("Contact Us", false, false))
+
+        if (activity !=null){
+            settingAdapter = SettingAdaptor(
+                activity,
+                R.layout.settings,
+                settings
+            )
+            userListView.adapter = settingAdapter
+        }
+
+//        val user = resources.getStringArray(R.array.UserStatus)
+//        val adapter = ArrayAdapter<String>(
+//            activity!!,
+//            android.R.layout.simple_list_item_1, user
+//        )
+//
+//        userListView.adapter = adapter
 
 
         userListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, position, id ->
             if (position == 0) {
                 Navigation.findNavController(activity!!, R.id.my_nav_host_fragment).navigate(R.id.profileFragment)
             }
-            if (position == 1) {
+            if (position == 2) {
                 showChangepasswordDialog()
             }
-            if (position == 2) {
+            if (position == 3) {
 
                 // build alert dialog
                 val dialogBuilder = AlertDialog.Builder(context)
@@ -125,7 +154,6 @@ class SettingFragment : Fragment() {
                         editor.commit()
                         goToLogin()
                         stopMyNotificationService()
-                        stopMyBackgroundService()
                     })
                     // negative button text and action
                     .setNegativeButton("Cancel", DialogInterface.OnClickListener {
@@ -140,7 +168,7 @@ class SettingFragment : Fragment() {
                 alert.show()
 
             }
-            if (position == 3) {
+            if (position == 4) {
                 val dialogBuilder = AlertDialog.Builder(context)
                 dialogBuilder.setMessage("Email: shuail8@vt.edu")
                     .setNegativeButton("Cancel", DialogInterface.OnClickListener {
@@ -283,20 +311,6 @@ class SettingFragment : Fragment() {
 
     }
 
-    private fun stopMyBackgroundService(){
-
-        val backgroundService = MyBackgroundService::class.java
-        val intent = Intent(context, backgroundService)
-
-        intent.putExtra("user_id", "none")
-        intent.putExtra("periodical", "none")
-        intent.putExtra("my_goal", "none")
-        intent.putExtra("my_rank", "none")
-
-        context!!.stopService(intent)
-        Log.i(TAG, "Stop MyBackgroundService.")
-
-    }
 
     private fun initSharedPreferences() {
 

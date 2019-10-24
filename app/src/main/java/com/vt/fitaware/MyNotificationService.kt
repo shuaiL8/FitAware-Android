@@ -52,12 +52,11 @@ class MyNotificationService : Service() {
         // Send a notification that service is started
         Log.i(TAG, "Service started.")
 
-        Log.d(TAG,intent.extras.getString("user_id"))
-        Log.d(TAG,intent.extras.getString("team"))
+        Log.d(TAG,"user_id " + intent.extras.getString("user_id"))
+        Log.d(TAG,"team " + intent.extras.getString("team"))
 
         user_id = intent.extras.getString("user_id")
         team = intent.extras.getString("team")
-
 
         showNotification()
 
@@ -71,6 +70,11 @@ class MyNotificationService : Service() {
         super.onCreate()
         Log.d(TAG, "service oncreate")
 
+        getFireBaseData()
+
+    }
+
+    fun getFireBaseData() {
         val myRef = FirebaseDatabase.getInstance().reference.child("User")
         val myPostListener = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
@@ -208,9 +212,7 @@ class MyNotificationService : Service() {
             }
         }
         myRef.addValueEventListener(myPostListener)
-
     }
-
 
     private fun runNotification() {
 
@@ -286,7 +288,7 @@ class MyNotificationService : Service() {
         else{
 
             val notificationManager =
-                getSystemService(Context.NOTIFICATION_SERVICE) as android.app.NotificationManager
+                getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
             notificationManager.notify(1, notification)
         }
 

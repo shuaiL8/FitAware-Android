@@ -1,7 +1,10 @@
 package com.vt.fitaware
 
+import android.app.ActivityManager
 import android.content.Context
+import android.content.Intent
 import android.content.SharedPreferences
+import android.os.Build
 import android.preference.PreferenceManager
 import android.util.Log
 import androidx.work.Worker
@@ -57,6 +60,11 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
     private var my_goal: Long = 0
     private var token = "none"
 
+    private var loginStatus = 1
+    private var team: String = "none"
+
+    private var myNotificationServiceStatus: String = "startMyNotificationService"
+
     private var allUsers = ArrayList<Teammates>(1)
 
     override fun doWork(): Result {
@@ -67,6 +75,11 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         user_id = sharedPreferences!!.getString("user_id", "none")
         my_goal = sharedPreferences!!.getString("my_goal", "0").toLong()
         periodical = sharedPreferences!!.getString("periodical", "none")
+
+        loginStatus = sharedPreferences!!.getInt("loginStatus", 0)
+        team = sharedPreferences!!.getString("team", "none")
+
+        myNotificationServiceStatus = sharedPreferences!!.getString("MyNotificationServiceStatus", "startMyNotificationService")
 
         mClient = GoogleApiClient.Builder(applicationContext)
             .addApi(Fitness.SENSORS_API)
@@ -92,10 +105,71 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
             getRank()
             getGoogleFitAPITasks()
 
+            Log.i(TAG, "myNotificationServiceStatus: $myNotificationServiceStatus")
+            if(myNotificationServiceStatus == "startMyNotificationService") {
+                startMyNotificationService()
+            }
+            else {
+                stopMyNotificationService()
+            }
+
             Result.success()
         } catch (throwable: Throwable) {
             Result.failure()
         }
+    }
+
+    // register MyNotificationService
+    private fun startMyNotificationService() {
+
+        val notificationService = MyNotificationService::class.java
+
+        val intent = Intent(applicationContext, notificationService)
+
+        intent.putExtra("user_id", user_id)
+        intent.putExtra("team", team)
+
+        if(loginStatus == 1){
+            if (!isServiceRunning(notificationService)) {
+                // Start the service
+                if (Build.VERSION.SDK_INT >= 26) {
+                    applicationContext.startForegroundService(intent)
+                } else {
+                    applicationContext.startService(intent)
+                }
+                Log.i(TAG, "Start MyNotificationService.")
+            } else {
+                Log.i(TAG, "MyNotificationService already running.")
+            }
+        }
+
+    }
+
+    private fun stopMyNotificationService(){
+
+        val notificationService = MyNotificationService::class.java
+        val intent = Intent(applicationContext, notificationService)
+
+        intent.putExtra("user_id", "none")
+        intent.putExtra("team", "none")
+
+        applicationContext.stopService(intent)
+        Log.i(TAG, "Stop MyNotificationService.")
+
+    }
+
+    // Custom method to determine whether a service is running
+    private fun isServiceRunning(serviceClass: Class<*>): Boolean {
+        val activityManager = applicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+
+        // Loop through the running services
+        for (service in activityManager.getRunningServices(Integer.MAX_VALUE)) {
+            if (serviceClass.name == service.service.className) {
+                // If the service is running then return true
+                return true
+            }
+        }
+        return false
     }
 
     fun getDeviceToken() {

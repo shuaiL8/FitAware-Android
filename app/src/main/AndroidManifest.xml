@@ -17,17 +17,10 @@
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
 
         <service
-                android:name=".MyBackgroundService"
-                android:enabled="true"
-                android:exported="false"
-                android:stopWithTask="true">
-        </service>
-
-        <service
                 android:name=".MyNotificationService"
                 android:enabled="true"
                 android:exported="false"
-                android:stopWithTask="true">
+                android:stopWithTask="false">
         </service>
 
         <activity
