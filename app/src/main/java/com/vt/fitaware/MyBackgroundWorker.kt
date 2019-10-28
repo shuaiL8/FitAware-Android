@@ -1,12 +1,18 @@
 package com.vt.fitaware
 
 import android.app.ActivityManager
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import android.content.SharedPreferences
+import android.media.RingtoneManager
 import android.os.Build
 import android.preference.PreferenceManager
+import android.support.v4.app.NotificationCompat
 import android.util.Log
+import android.widget.RemoteViews
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.google.android.gms.common.Scopes
@@ -41,6 +47,13 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
     private var daily_duration: Long = 0
     private var daily_calories: Long = 0
     private var daily_distance: Long = 0
+
+    private var fireBase_steps = "none"
+    private var fireBase_heartPoints = "none"
+    private var fireBase_duration = "none"
+    private var fireBase_calories = "none"
+    private var fireBase_distance = "none"
+
 
     private var periodical: String = "none"
 
@@ -113,10 +126,69 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
                 stopMyNotificationService()
             }
 
+            val calendar = Calendar.getInstance()
+            val mdformat = SimpleDateFormat("HH:mm:ss")
+            val curTime = mdformat.format(calendar.time).toString()
+            Log.d(TAG, "curTime: $curTime")
+
+            val from =  mdformat.parse("17:00:00").toString()
+            val to = mdformat.parse("19:00:00").toString()
+
+            // Test use
+//            sendNotification()
+
+            if(curTime > from && curTime < to) {
+                Log.d(TAG, "curTime2: $curTime")
+                getReportData()
+                sendNotification()
+            }
+
             Result.success()
         } catch (throwable: Throwable) {
             Result.failure()
         }
+    }
+
+    private fun sendNotification() {
+
+        val collapsedView = RemoteViews(applicationContext.packageName, R.layout.report_notification_collapsed)
+        collapsedView.setTextViewText(R.id.textMySteps, fireBase_steps)
+        collapsedView.setTextViewText(R.id.textMyMins, fireBase_duration)
+        collapsedView.setTextViewText(R.id.textMyHPs, fireBase_heartPoints)
+        collapsedView.setTextViewText(R.id.textMyDis, fireBase_distance)
+        collapsedView.setTextViewText(R.id.textMyCals, fireBase_calories)
+
+        val expandedView = RemoteViews(applicationContext.packageName, R.layout.report_notification_expended)
+        expandedView.setTextViewText(R.id.textMySteps, "$fireBase_steps Steps")
+        expandedView.setTextViewText(R.id.textMyMins, "$fireBase_duration Mins")
+        expandedView.setTextViewText(R.id.textMyHPs, "$fireBase_heartPoints HPs")
+        expandedView.setTextViewText(R.id.textMyDis, "$fireBase_distance Ms")
+        expandedView.setTextViewText(R.id.textMyCals, "$fireBase_calories Cals")
+
+        val CHANNEL_ID = "Report Notification"
+        if(Build.VERSION.SDK_INT >= 26) {
+            val channel = NotificationChannel(
+                CHANNEL_ID,
+                "Report Notification",
+                NotificationManager.IMPORTANCE_DEFAULT
+            )
+            (applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager).createNotificationChannel(channel)
+        }
+
+        val notification = NotificationCompat.Builder(applicationContext, CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_steps)
+            .setContentTitle("Progress Report")
+            .setContentText("")
+            .setAutoCancel(true)
+            .setContentIntent(PendingIntent.getActivity(applicationContext, 0, Intent(applicationContext, MainActivity::class.java), 0))
+            .setCustomContentView(collapsedView)
+            .setCustomBigContentView(expandedView)
+            .setStyle(NotificationCompat.DecoratedCustomViewStyle())
+            .build()
+
+        val notificationManager =
+            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(2, notification)
     }
 
     // register MyNotificationService
@@ -172,6 +244,36 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         return false
     }
 
+    fun getReportData() {
+        val myRefUser = FirebaseDatabase.getInstance().reference.child("User")
+        val myPostListenerUser = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+                val my = dataSnapshot.value as Map<String, Any>
+                Log.i(TAG, "user: $my")
+
+                for ((key, value) in my) {
+                    val details = value as Map<String, String>
+                    if(key == user_id) {
+                        fireBase_steps = details.getValue("currentSteps")
+                        fireBase_duration = details.getValue("duration")
+                        fireBase_heartPoints = details.getValue("heartPoints")
+                        fireBase_calories = details.getValue("calories")
+                        fireBase_distance =details.getValue("distance")
+                    }
+                }
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                // ...
+            }
+        }
+        myRefUser.addValueEventListener(myPostListenerUser)
+    }
+
     fun getDeviceToken() {
         // Firebase notification token
         FirebaseInstanceId.getInstance().instanceId
@@ -196,20 +298,47 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
     }
 
     fun getRank() {
-        val myRef = FirebaseDatabase.getInstance().reference.child("User")
-        val myPostListener = object : ValueEventListener {
+        val calendar = Calendar.getInstance()
+        val mdformat = SimpleDateFormat("yyyy-MM-dd")
+//                    mdformat.timeZone = TimeZone.getTimeZone("America/New_York")
+        val strDate = mdformat.format(calendar.time)
+
+        val myRefDailyRecord = FirebaseDatabase.getInstance().reference.child("DailyRecord")
+        val postListenerDailyRecord = object : ValueEventListener {
             override fun onDataChange(dataSnapshot: DataSnapshot) {
                 // Get Post object and use the values to update the UI
                 val my = dataSnapshot.value as Map<String, Any>
-                Log.i(TAG, "user: $my")
 
                 allUsers.clear()
-                for ((key, value) in my) {
-                    val details = value as Map<String, String>
-                    allUsers.add(Teammates("1",  key, "0", details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(), "#3ebfab"))
+
+                var index = 1
+                for((key, value) in my){
+                    val details = value as Map<String, Map<String, String>>
+
+                    if(details.containsKey(strDate)) {
+                        val dateMap = details.getValue(strDate)
+                        allUsers.add(
+                            Teammates(
+                                "1",
+                                key,
+                                index.toString(),
+                                dateMap.getValue("Steps").toInt(),
+                                dateMap.getValue("Rank"),
+                                dateMap.getValue("Minis").toInt(),
+                                dateMap.getValue("HPs").toInt(),
+                                dateMap.getValue("Ms").toInt(),
+                                dateMap.getValue("Cals").toInt(),
+                                "#3ebfab"))
+                        index++
+                        Log.i(TAG, "dateMap: $key $dateMap")
+                    }
+
+                    Log.i(TAG, "$key: $value")
+                    Log.i(TAG, "details: $details")
+
                 }
 
-                // get my_rank from all Users
+                // get overall_rank from all Users
                 val allUsersSort = allUsers.sortedWith(compareByDescending(Teammates::getSteps))
                 allUsers = ArrayList(allUsersSort)
                 var indexM = 1
@@ -218,19 +347,24 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
 
                     if(users.name == user_id) {
                         my_rank = users.rank
+
+                        val editor = sharedPreferences?.edit()
+                        editor!!.putString("my_rank", my_rank)
+                        editor.commit()
+
+                        Log.i(TAG, "user_id: $user_id")
+                        Log.i(TAG, "my_rank $my_rank")
                     }
                     indexM++
                 }
-
             }
-
             override fun onCancelled(databaseError: DatabaseError) {
                 // Getting Post failed, log a message
                 Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
                 // ...
             }
         }
-        myRef.addValueEventListener(myPostListener)
+        myRefDailyRecord.addValueEventListener(postListenerDailyRecord)
     }
 
 

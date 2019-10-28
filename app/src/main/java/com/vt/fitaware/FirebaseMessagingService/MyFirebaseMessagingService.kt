@@ -130,12 +130,12 @@ class MyFirebaseMessagingService : FirebaseMessagingService() {
 
     private fun handleNow(data: Map<String, String>) {
 
-        val CHANNEL_ID = "my_channel_like"
+        val CHANNEL_ID = "Regular Notification"
 
         if(Build.VERSION.SDK_INT >= 26) {
             val channel = NotificationChannel(
                 CHANNEL_ID,
-                "Notification Like",
+                "Regular Notification",
                 NotificationManager.IMPORTANCE_DEFAULT
             )
 

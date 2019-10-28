@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+    <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:gravity="center">
+
+        <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Daily Report"
+                android:textSize="20dp"
+                android:gravity="center"
+                android:textColor="@color/colorCals"
+                android:padding="6dp"/>
+
+        <TextView
+                android:id="@+id/textMySteps"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="15dp"
+                android:gravity="center"
+                android:padding="6dp"/>
+
+
+        <TextView
+                android:id="@+id/textMyMins"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="15dp"
+                android:gravity="center"
+                android:padding="6dp"/>
+
+        <TextView
+                android:id="@+id/textMyHPs"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="15dp"
+                android:gravity="center"
+                android:padding="6dp"/>
+
+        <TextView
+                android:id="@+id/textMyDis"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="15dp"
+                android:gravity="center"
+                android:padding="6dp"/>
+
+        <TextView
+                android:id="@+id/textMyCals"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="0"
+                android:textSize="15dp"
+                android:gravity="center"
+                android:padding="6dp"/>
+
+
+
+    </LinearLayout>
+
+
+</FrameLayout>

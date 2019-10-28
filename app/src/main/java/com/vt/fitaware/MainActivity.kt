@@ -101,8 +101,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     private var bottomNavigationView: BottomNavigationView? = null
     private val RECORD_REQUEST_CODE = 101
 
-    private val workManager: WorkManager = WorkManager.getInstance()
-
     private var token = "none"
 
     private var daily_steps: Long = 0
@@ -228,22 +226,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         initSharedPreferences()
         setupPermissions()
 
-        val myBackgroundWorker = PeriodicWorkRequest.Builder(
-            MyBackgroundWorker::class.java,
-            15,
-            TimeUnit.MINUTES
-        ).build()
-
-        workManager.enqueue(myBackgroundWorker)
-
-//        val myNotificationWorker = PeriodicWorkRequest.Builder(
-//            MyNotificationWorke::class.java,
-//            15,
-//            TimeUnit.MINUTES
-//        ).build()
-//
-//        workManager.enqueue(myNotificationWorker)
-
         mClient = GoogleApiClient.Builder(this)
             .addApi(Fitness.SENSORS_API)
             .addApi(Fitness.RECORDING_API)
@@ -278,8 +260,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         Log.i(TAG, "user_id: $user_id")
         Log.i(TAG, "loginStatus: $loginStatus")
 
-
-
         bottomNavigationView = findViewById<View>(R.id.bottomNavigation) as BottomNavigationView
         bottomNavigationView!!.setOnNavigationItemSelectedListener(mOnNavigationItemSelectedListener)
 
@@ -312,6 +292,14 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
         if(loginStatus == 1 && user_id != "none") {
 
+            val myBackgroundWorker = PeriodicWorkRequest.Builder(
+                MyBackgroundWorker::class.java,
+                15,
+                TimeUnit.MINUTES
+            ).build()
+
+            WorkManager.getInstance().enqueue(myBackgroundWorker)
+
             val fitnessDataTask = FitnessDataTask()
             fitnessDataTask.execute()
 
@@ -319,8 +307,8 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             getData()
 
 
-            val myRef = FirebaseDatabase.getInstance().reference.child("User")
-            val myPostListener = object : ValueEventListener {
+            val myRefUser = FirebaseDatabase.getInstance().reference.child("User")
+            val myPostListenerUser = object : ValueEventListener {
                 override fun onDataChange(dataSnapshot: DataSnapshot) {
                     // Get Post object and use the values to update the UI
                     val my = dataSnapshot.value as Map<String, Any>
@@ -328,8 +316,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
                     var iniTeamSteps = 0L
                     var index = 1
-
-                    allUsers.clear()
 
                     for ((key, value) in my) {
                         val details = value as Map<String, String>
@@ -363,7 +349,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
                         }
 
-                        allUsers.add(Teammates("1",  key, index.toString(), details.getValue("currentSteps").toInt(), details["goal"], details.getValue("duration").toInt(), details.getValue("heartPoints").toInt(), details.getValue("distance").toInt(), details.getValue("calories").toInt(), "#3ebfab"))
 
 
                         index++
@@ -387,27 +372,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
                     }
 
-
-                    // get my_rank from all Users
-                    val allUsersSort = allUsers.sortedWith(compareByDescending(Teammates::getSteps))
-                    allUsers = ArrayList(allUsersSort)
-                    var indexM = 1
-                    for(users in allUsers) {
-                        users.rank = indexM.toString()
-
-                        if(users.name == user_id) {
-                            my_rank = users.rank
-                            val editor = sharedPreferences?.edit()
-                            editor!!.putString("my_rank", my_rank)
-
-                            editor.commit()
-
-                            Log.i(TAG, "user_id: $user_id")
-                            Log.i(TAG, "my_rank $my_rank")
-                        }
-                        indexM++
-                    }
-
                 }
 
                 override fun onCancelled(databaseError: DatabaseError) {
@@ -416,7 +380,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                     // ...
                 }
             }
-            myRef.addValueEventListener(myPostListener)
+            myRefUser.addValueEventListener(myPostListenerUser)
 
 
             if(team != "none") {
@@ -502,6 +466,78 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                 }
                 myRefTeam.addValueEventListener(postListenerTeam)
             }
+
+
+            val myRefDailyRecord = FirebaseDatabase.getInstance().reference.child("DailyRecord")
+
+            val postListenerDailyRecord = object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    // Get Post object and use the values to update the UI
+                    val my = dataSnapshot.value as Map<String, Any>
+
+                    allUsers.clear()
+
+                    val calendar = Calendar.getInstance()
+                    val mdformat = SimpleDateFormat("yyyy-MM-dd")
+//                    mdformat.timeZone = TimeZone.getTimeZone("America/New_York")
+                    val strDate = mdformat.format(calendar.time)
+
+                    var index = 1
+                    for((key, value) in my){
+                        val details = value as Map<String, Map<String, String>>
+
+                        if(details.containsKey(strDate)) {
+                            val dateMap = details.getValue(strDate)
+                            allUsers.add(
+                                Teammates(
+                                    "1",
+                                    key,
+                                    index.toString(),
+                                    dateMap.getValue("Steps").toInt(),
+                                    dateMap.getValue("Rank"),
+                                    dateMap.getValue("Minis").toInt(),
+                                    dateMap.getValue("HPs").toInt(),
+                                    dateMap.getValue("Ms").toInt(),
+                                    dateMap.getValue("Cals").toInt(),
+                                    "#3ebfab"))
+                            index++
+                            Log.i(TAG, "dateMap: $key $dateMap")
+                        }
+
+                        Log.i(TAG, "$key: $value")
+                        Log.i(TAG, "details: $details")
+
+                    }
+
+                    // get overall_rank from all Users
+                    val allUsersSort = allUsers.sortedWith(compareByDescending(Teammates::getSteps))
+                    allUsers = ArrayList(allUsersSort)
+                    var indexM = 1
+                    for(users in allUsers) {
+                        users.rank = indexM.toString()
+
+                        if(users.name == user_id) {
+                            my_rank = users.rank
+                            val editor = sharedPreferences?.edit()
+                            editor!!.putString("my_rank", my_rank)
+
+                            editor.commit()
+
+                            Log.i(TAG, "user_id: $user_id")
+                            Log.i(TAG, "my_rank $my_rank")
+                        }
+                        indexM++
+                    }
+
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                    // Getting Post failed, log a message
+                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                    // ...
+                }
+            }
+            myRefDailyRecord.addValueEventListener(postListenerDailyRecord)
 
 
             val allSteps = HashMap<String, Any>()

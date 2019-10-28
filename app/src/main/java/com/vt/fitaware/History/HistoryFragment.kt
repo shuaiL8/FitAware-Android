@@ -112,13 +112,6 @@ class HistoryFragment : Fragment() {
         val strDate = mdformatNY.format(calendarNY.time)
 
 
-        val intent = Intent()
-        intent.action = "com.vt.MyBackgroundServiceReceiver"
-        intent.putExtra("my_rank", my_rank)
-        intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
-        activity!!.sendBroadcast(intent)
-
-
         val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
         swipeRefresh.setOnRefreshListener {
             Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.historyFragment)
@@ -134,12 +127,6 @@ class HistoryFragment : Fragment() {
                 my_rank,
                 my_steps.toString(),
                 token)
-
-            val intent = Intent()
-            intent.action = "com.vt.MyBackgroundServiceReceiver"
-            intent.putExtra("my_rank", my_rank)
-            intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
-            activity!!.sendBroadcast(intent)
         }
 
         val myRef = FirebaseDatabase.getInstance().reference.child("DailyRecord")

@@ -345,12 +345,6 @@ class HomeFragment : Fragment(){
             my_steps.toString(),
             token)
 
-        val intent = Intent()
-        intent.action = "com.vt.MyBackgroundServiceReceiver"
-        intent.putExtra("my_rank", my_rank)
-        intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
-        activity!!.sendBroadcast(intent)
-
         val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
 
         swipeRefresh.setOnRefreshListener {
@@ -368,11 +362,6 @@ class HomeFragment : Fragment(){
                 my_steps.toString(),
                 token)
 
-            val intent = Intent()
-            intent.action = "com.vt.MyBackgroundServiceReceiver"
-            intent.putExtra("my_rank", my_rank)
-            intent.flags = Intent.FLAG_INCLUDE_STOPPED_PACKAGES
-            activity!!.sendBroadcast(intent)
         }
 
 

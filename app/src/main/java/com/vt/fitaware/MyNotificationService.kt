@@ -31,7 +31,7 @@ class MyNotificationService : Service() {
     private var mTimer: Timer? = null
 
     private var my_steps: Long = 0
-    private var my_rank: String = "0"
+    private var my_rank_inTeam: String = "0"
 
     private var team: String = "none"
 
@@ -130,10 +130,10 @@ class MyNotificationService : Service() {
                         teammate.rank = indexM.toString()
 
                         if(teammate.name == user_id) {
-                            my_rank = teammate.rank
+                            my_rank_inTeam = teammate.rank
 
                             Log.i(TAG, "user_id $user_id")
-                            Log.i(TAG, "my_rank $my_rank")
+                            Log.i(TAG, "my_rank $my_rank_inTeam")
                         }
                         indexM++
                         Log.w(TAG, "indexM counts"+ indexM)
@@ -229,7 +229,7 @@ class MyNotificationService : Service() {
                     showNotification()
 
                     Log.d(TAG, "test service my_steps $my_steps")
-                    Log.d(TAG, "test service my_rank $my_rank/$teammemberCount")
+                    Log.d(TAG, "test service my_rank $my_rank_inTeam/$teammemberCount")
                     Log.d(TAG, "test service team_steps $team_steps")
                     Log.d(TAG, "test service teamRank $teamRank/$teamCount")
 
@@ -246,18 +246,18 @@ class MyNotificationService : Service() {
 
         val collapsedView = RemoteViews(packageName, R.layout.notif_collapsed)
         collapsedView.setTextViewText(R.id.textMySteps, my_steps.toString())
-        collapsedView.setTextViewText(R.id.textMyRank, "$my_rank/$teammemberCount")
+        collapsedView.setTextViewText(R.id.textMyRank, "$my_rank_inTeam/$teammemberCount")
         collapsedView.setTextViewText(R.id.textTeamSteps, team_steps.toString())
         collapsedView.setTextViewText(R.id.textTeamRank, "$teamRank/$teamCount")
 
         val expandedView = RemoteViews(packageName, R.layout.notif_expanded)
         expandedView.setTextViewText(R.id.textMySteps, my_steps.toString())
-        expandedView.setTextViewText(R.id.textMyRank, "$my_rank/$teammemberCount")
+        expandedView.setTextViewText(R.id.textMyRank, "$my_rank_inTeam/$teammemberCount")
         expandedView.setTextViewText(R.id.textTeamSteps, team_steps.toString())
         expandedView.setTextViewText(R.id.textTeamRank, "$teamRank/$teamCount")
 
 
-        val CHANNEL_ID = "my_channel_01"
+        val CHANNEL_ID = "Notification Drawer"
 
         if(Build.VERSION.SDK_INT >= 26) {
             val channel = NotificationChannel(
