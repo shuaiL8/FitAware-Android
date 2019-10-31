@@ -423,7 +423,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
                             if(user_id != "none") {
                                 val childUpdates = HashMap<String, Any>()
-                                childUpdates["/User/$user_id/teamGoal"] = team_goal
+                                childUpdates["/User/$user_id/teamGoal"] = team_goal.toString()
                                 childUpdates["/User/$user_id/periodical"] = periodical
 
                                 database.updateChildren(childUpdates)
