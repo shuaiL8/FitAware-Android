@@ -7,7 +7,9 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.support.design.widget.BottomNavigationView;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.*;
 import android.widget.*;
 import androidx.navigation.Navigation;
@@ -49,6 +51,7 @@ class HwAdapter extends BaseAdapter {
     private TextView tv_date;
     private ListView listTeachers;
     private ArrayList<Dialogpojo> alCustom=new ArrayList<Dialogpojo>();
+
 
     public HwAdapter(Activity context, GregorianCalendar monthCalendar, ArrayList<HomeCollection> date_collection_arr) {
         this.date_collection_arr=date_collection_arr;
@@ -297,15 +300,30 @@ class HwAdapter extends BaseAdapter {
                             }
                         }
 
-                        Navigation.findNavController(context, R.id.my_nav_host_fragment).navigate(R.id.userFragment);
-                        dialogs.dismiss();
-
                         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+                        String team = sharedPreferences.getString("team", "none");
+                        Log.i(TAG, "team: " + team);
+                        BottomNavigationView bottomNavigationView = context.findViewById(R.id.bottomNavigation);
 
-                        SharedPreferences.Editor editor = sharedPreferences.edit();
-                        editor.putString("newSelectedDate", date);
 
-                        editor.commit();
+                        if(!team.equals("none")) {
+                            bottomNavigationView.setSelectedItemId(R.id.navigation_history);
+                            Navigation.findNavController(context, R.id.my_nav_host_fragment).navigate(R.id.userFragment);
+                            dialogs.dismiss();
+
+
+                            SharedPreferences.Editor editor = sharedPreferences.edit();
+                            editor.putString("newSelectedDate", date);
+
+                            editor.commit();
+                        }
+                        else {
+                            bottomNavigationView.setSelectedItemId(R.id.navigation_history);
+                            Navigation.findNavController(context, R.id.my_nav_host_fragment).navigate(R.id.historyFragment);
+                            dialogs.dismiss();
+
+                        }
+
                     }
                 }
             });
@@ -348,6 +366,7 @@ class HwAdapter extends BaseAdapter {
         }
         return alCustom;
     }
+
 }
 
 

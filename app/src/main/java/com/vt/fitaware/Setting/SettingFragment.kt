@@ -353,7 +353,6 @@ class SettingFragment : Fragment() {
 
                 val uploadImage = convertBitmapToByteArray(bitmap)
 
-
                 iconRef.putBytes(uploadImage)
 
                 icon.setImageBitmap(bitmap)

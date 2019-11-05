@@ -2,6 +2,8 @@ package com.vt.fitaware.Team
 
 
 import android.app.Activity
+import android.app.AlertDialog
+import android.content.DialogInterface
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.preference.PreferenceManager
@@ -25,6 +27,10 @@ class TeamFragment : Fragment() {
     private lateinit var viewPager: ViewPager
     private lateinit var teamCollectionPagerAdapter: TeamCollectionPagerAdapter
 
+    private var user_id = "none"
+    private var captain = "none"
+    private var team = "none"
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -40,6 +46,9 @@ class TeamFragment : Fragment() {
         toolbarTiltle.text = "Team"
 
         gridOrList = sharedPreferences!!.getString("gridOrList", "list")
+        user_id = sharedPreferences!!.getString("user_id", "none")
+        captain = sharedPreferences!!.getString("captain", "none")
+        team = sharedPreferences!!.getString("team", "none")
 
         val tabLayoutTeam = view.findViewById<TabLayout>(R.id.tabLayoutTeam)
 
@@ -169,7 +178,19 @@ class TeamFragment : Fragment() {
     override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
         R.id.add -> {
             // User chose the "Settings" item, show the app settings UI...
-            Navigation.findNavController(activity!!, R.id.my_nav_host_fragment).navigate(R.id.createNewTeamFragment)
+            if(captain == user_id) {
+                val dialogBuilder = AlertDialog.Builder(context)
+                dialogBuilder
+                    .setMessage("You are the captain of Team: $team")
+                    .setNegativeButton("Cancel", DialogInterface.OnClickListener {
+                            dialog, id -> dialog.cancel()
+                    })
+                val alert = dialogBuilder.create()
+                alert.show()
+            }
+            else {
+                Navigation.findNavController(activity!!, R.id.my_nav_host_fragment).navigate(R.id.createNewTeamFragment)
+            }
 
             true
         }

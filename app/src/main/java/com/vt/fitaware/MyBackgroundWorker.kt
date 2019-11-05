@@ -69,7 +69,7 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
     private var weekly_distance: Long = 0
     private var weekly_calories: Long = 0
 
-    private var my_rank: String = " "
+    private var my_rank: String = "1"
     private var my_goal: Long = 0
     private var token = "none"
 
@@ -94,6 +94,8 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
 
         myNotificationServiceStatus = sharedPreferences!!.getString("MyNotificationServiceStatus", "startMyNotificationService")
 
+//        my_rank = sharedPreferences!!.getString("my_rank", "1")
+
         mClient = GoogleApiClient.Builder(applicationContext)
             .addApi(Fitness.SENSORS_API)
             .addApi(Fitness.RECORDING_API)
@@ -115,7 +117,7 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
             Log.d(TAG, "user_id: $user_id")
 
             getDeviceToken()
-            getRank()
+//            getRank()
             getGoogleFitAPITasks()
 
             Log.i(TAG, "myNotificationServiceStatus: $myNotificationServiceStatus")

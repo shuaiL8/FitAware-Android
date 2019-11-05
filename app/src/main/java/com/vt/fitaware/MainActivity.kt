@@ -86,7 +86,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     private var teammate_steps: Long = 0
     private var team_steps: Long = 0
 
-    private var my_rank: String = " "
     private var my_goal: Long = 0
     private var teammate_goal: Long = 0
     private var team_goal: Long = 0
@@ -247,11 +246,11 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         user_id = sharedPreferences!!.getString("user_id", "none")
         team = sharedPreferences!!.getString("team", "none")
         my_goal = sharedPreferences!!.getString("my_goal", "0").toLong()
-        my_rank = sharedPreferences!!.getString("my_rank", " ")
         team_goal = sharedPreferences!!.getString("team_goal", "0").toLong()
         captain = sharedPreferences!!.getString("captain", "none")
         periodical = sharedPreferences!!.getString("periodical", "none")
         myNotificationServiceStatus = sharedPreferences!!.getString("MyNotificationServiceStatus", "startMyNotificationService")
+
 
         loginStatus = sharedPreferences!!.getInt("loginStatus", 0)
         Log.i(TAG, "teamName: $team")
@@ -300,6 +299,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
             WorkManager.getInstance().enqueue(myBackgroundWorker)
 
+
             val fitnessDataTask = FitnessDataTask()
             fitnessDataTask.execute()
 
@@ -326,6 +326,11 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                                 bottomNavigationView!!.menu.getItem(0).title = "Captain"
 
                                 bottomNavigationView!!.menu.getItem(0).setIcon(R.drawable.ic_captain_america_shield)
+
+                                val editor = sharedPreferences?.edit()
+                                editor!!.putString("captain", details["captain"].toString())
+
+                                editor.commit()
                             }
 
                             my_steps = details["currentSteps"].toString().toLong()
@@ -381,7 +386,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                 }
             }
             myRefUser.addValueEventListener(myPostListenerUser)
-
 
             if(team != "none") {
                 val myRefTeam = FirebaseDatabase.getInstance().reference.child("Teams")
@@ -468,78 +472,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             }
 
 
-            val myRefDailyRecord = FirebaseDatabase.getInstance().reference.child("DailyRecord")
-
-            val postListenerDailyRecord = object : ValueEventListener {
-                override fun onDataChange(dataSnapshot: DataSnapshot) {
-                    // Get Post object and use the values to update the UI
-                    val my = dataSnapshot.value as Map<String, Any>
-
-                    allUsers.clear()
-
-                    val calendar = Calendar.getInstance()
-                    val mdformat = SimpleDateFormat("yyyy-MM-dd")
-//                    mdformat.timeZone = TimeZone.getTimeZone("America/New_York")
-                    val strDate = mdformat.format(calendar.time)
-
-                    var index = 1
-                    for((key, value) in my){
-                        val details = value as Map<String, Map<String, String>>
-
-                        if(details.containsKey(strDate)) {
-                            val dateMap = details.getValue(strDate)
-                            allUsers.add(
-                                Teammates(
-                                    "1",
-                                    key,
-                                    index.toString(),
-                                    dateMap.getValue("Steps").toInt(),
-                                    dateMap.getValue("Rank"),
-                                    dateMap.getValue("Minis").toInt(),
-                                    dateMap.getValue("HPs").toInt(),
-                                    dateMap.getValue("Ms").toInt(),
-                                    dateMap.getValue("Cals").toInt(),
-                                    "#3ebfab"))
-                            index++
-                            Log.i(TAG, "dateMap: $key $dateMap")
-                        }
-
-                        Log.i(TAG, "$key: $value")
-                        Log.i(TAG, "details: $details")
-
-                    }
-
-                    // get overall_rank from all Users
-                    val allUsersSort = allUsers.sortedWith(compareByDescending(Teammates::getSteps))
-                    allUsers = ArrayList(allUsersSort)
-                    var indexM = 1
-                    for(users in allUsers) {
-                        users.rank = indexM.toString()
-
-                        if(users.name == user_id) {
-                            my_rank = users.rank
-                            val editor = sharedPreferences?.edit()
-                            editor!!.putString("my_rank", my_rank)
-
-                            editor.commit()
-
-                            Log.i(TAG, "user_id: $user_id")
-                            Log.i(TAG, "my_rank $my_rank")
-                        }
-                        indexM++
-                    }
-
-                }
-
-                override fun onCancelled(databaseError: DatabaseError) {
-                    // Getting Post failed, log a message
-                    Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
-                    // ...
-                }
-            }
-            myRefDailyRecord.addValueEventListener(postListenerDailyRecord)
-
-
             val allSteps = HashMap<String, Any>()
 
             allSteps["user_id"] = user_id
@@ -558,7 +490,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             allSteps["team_steps"] = team_steps
 
             allSteps["my_goal"] = my_goal
-            allSteps["my_rank"] = my_rank
             allSteps["teammate_goal"] = teammate_goal
             allSteps["team_goal"] = team_goal
 
@@ -704,7 +635,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                         daily_heartPoints.toString(),
                         daily_duration.toString(),
                         daily_distance.toString(),
-                        my_rank,
                         daily_steps.toString(),
                         token)
 
@@ -1160,7 +1090,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
     }
 
 
-    private fun recordDaily(id: String, date: String, Cals: String, Goal: String, HPs: String, Minis: String, Ms: String, Rank: String, Steps: String, Token: String) {
+    private fun recordDaily(id: String, date: String, Cals: String, Goal: String, HPs: String, Minis: String, Ms: String, Steps: String, Token: String) {
 
         val childUpdates = java.util.HashMap<String, Any>()
 
@@ -1197,7 +1127,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         childUpdates["/DailyRecord/$id/$date/HPs"] = HPs
         childUpdates["/DailyRecord/$id/$date/Minis"] = Minis
         childUpdates["/DailyRecord/$id/$date/Ms"] = Ms
-        childUpdates["/DailyRecord/$id/$date/Rank"] = Rank
         childUpdates["/DailyRecord/$id/$date/Steps"] = Steps
         childUpdates["/DailyRecord/$id/$date/Token"] = Token
 
@@ -1295,7 +1224,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
             allSteps["team_steps"] = team_steps
 
             allSteps["my_goal"] = my_goal
-            allSteps["my_rank"] = my_rank
             allSteps["teammate_goal"] = teammate_goal
             allSteps["team_goal"] = team_goal
 
@@ -1465,7 +1393,6 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
 
         val editor = sharedPreferences!!.edit()
 
-        editor.remove("my_rank")
         editor.remove("currentSteps")
         editor.remove("duration")
         editor.remove("heartPoints")

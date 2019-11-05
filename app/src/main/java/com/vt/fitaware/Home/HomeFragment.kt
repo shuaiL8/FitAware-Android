@@ -26,6 +26,7 @@ import android.content.SharedPreferences
 import android.graphics.*
 import android.os.Handler
 import android.preference.PreferenceManager
+import android.provider.MediaStore
 import android.support.design.widget.Snackbar
 import android.support.design.widget.TabLayout
 import android.support.v4.widget.SwipeRefreshLayout
@@ -34,6 +35,8 @@ import androidx.navigation.Navigation
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
+import java.io.ByteArrayOutputStream
+import java.io.IOException
 import kotlin.collections.ArrayList
 
 
@@ -65,7 +68,6 @@ class HomeFragment : Fragment(){
     private var newSelected: String = "none"
     private var newGraph: String = "none"
 
-    private var my_rank: String = " "
 
     private var my_goal: Long = 0
     private var teammate_goal: Long = 0
@@ -131,6 +133,8 @@ class HomeFragment : Fragment(){
 
     private var calendar_frameVisibility: String = "none"
 
+    private var imageView_teamIcon:ImageView? = null
+
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -147,8 +151,9 @@ class HomeFragment : Fragment(){
 
 
         user_id = sharedPreferences!!.getString("user_id", "none")
+        captain = sharedPreferences!!.getString("captain", "none")
+        team = sharedPreferences!!.getString("team", "none")
         my_goal = sharedPreferences!!.getString("my_goal", "0").toLong()
-        my_rank = sharedPreferences!!.getString("my_rank", " ")
         periodical = sharedPreferences!!.getString("periodical", "none")
         my_steps = sharedPreferences!!.getString("currentSteps", "0").toLong()
         my_duration = sharedPreferences!!.getString("duration", "0").toLong()
@@ -174,7 +179,66 @@ class HomeFragment : Fragment(){
 
 
         mDecoViewTeam = view.findViewById<DecoView>(R.id.dynamicArcViewsTeam)
-        val imageView_teamIcon = view.findViewById<ImageView>(R.id.imageView_teamIcon)
+        imageView_teamIcon = view.findViewById<ImageView>(R.id.imageView_teamIcon)
+
+        imageView_teamIcon!!.setOnClickListener {
+            if(captain == user_id) {
+
+                val dialogBuilder = AlertDialog.Builder(context)
+                dialogBuilder
+                    .setMessage("Do you want to change the Team icon?")
+                    .setPositiveButton("Choose from Gallery", DialogInterface.OnClickListener {
+                            dialog, id ->
+
+                        val pickPhoto = Intent(
+                            Intent.ACTION_PICK,
+                            MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+                        )
+                        startActivityForResult(pickPhoto, 0)
+
+                    })
+                    .setNegativeButton("Cancel", DialogInterface.OnClickListener {
+                            dialog, id -> dialog.cancel()
+                    })
+                val alert = dialogBuilder.create()
+                alert.show()
+
+
+
+            }
+            else {
+                val dialogBuilder = AlertDialog.Builder(context)
+                dialogBuilder
+                    .setMessage("Only team captain can change the Team icon")
+                    .setNegativeButton("Cancel", DialogInterface.OnClickListener {
+                            dialog, id -> dialog.cancel()
+                    })
+                val alert = dialogBuilder.create()
+                alert.show()
+            }
+
+        }
+
+
+        mStorageRef = FirebaseStorage.getInstance().reference
+
+        val iconRef = mStorageRef!!.child("team_icon/$team/icon.jpg")
+
+        iconRef.downloadUrl.addOnCompleteListener { task ->
+            if (task.isSuccessful) {
+                val downloadIconUrl = task.result
+
+                Picasso.get().load(downloadIconUrl).into(imageView_teamIcon)
+
+            } else {
+                var bMap = BitmapFactory.decodeResource(resources, R.drawable.teamwork)
+                bMap = getCroppedBitmap(bMap)
+                imageView_teamIcon!!.setImageBitmap(bMap)
+            }
+        }
+
+
+
         rankOfTeam = view.findViewById<TextView>(R.id.rankOfTeam)
         teamID = view.findViewById<TextView>(R.id.teamID)
         stepsOfGoal = view.findViewById<TextView>(R.id.stepsOfGoal)
@@ -294,7 +358,6 @@ class HomeFragment : Fragment(){
             team_steps = allSteps["team_steps"]!!.toLong()
 
             my_goal = allSteps["my_goal"]!!.toLong()
-            my_rank = allSteps["my_rank"]!!.toString()
             periodical = allSteps["periodical"]!!.toString()
             teammate_goal = allSteps["teammate_goal"]!!.toLong()
             team_goal = allSteps["team_goal"]!!.toLong()
@@ -341,12 +404,10 @@ class HomeFragment : Fragment(){
             my_heartPoints.toString(),
             my_duration.toString(),
             my_distance.toString(),
-            my_rank,
             my_steps.toString(),
             token)
 
         val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
-
         swipeRefresh.setOnRefreshListener {
             Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.homeFragment)
 
@@ -358,29 +419,11 @@ class HomeFragment : Fragment(){
                 my_heartPoints.toString(),
                 my_duration.toString(),
                 my_distance.toString(),
-                my_rank,
                 my_steps.toString(),
                 token)
 
         }
 
-
-        mStorageRef = FirebaseStorage.getInstance().reference
-
-        val iconRef = mStorageRef!!.child("team_icon/$team/icon.jpg")
-
-        iconRef.downloadUrl.addOnCompleteListener { task ->
-            if (task.isSuccessful) {
-                val downloadIconUrl = task.result
-
-                Picasso.get().load(downloadIconUrl).into(imageView_teamIcon)
-
-            } else {
-                var bitmap = BitmapFactory.decodeResource(resources, R.drawable.teamwork)
-                bitmap = getCroppedBitmap(bitmap)
-                imageView_teamIcon!!.setImageBitmap(bitmap)
-            }
-        }
 
         if(tabLayoutHome.selectedTabPosition == 1) {
             val myRef = FirebaseDatabase.getInstance().reference.child("User")
@@ -1249,7 +1292,7 @@ class HomeFragment : Fragment(){
         FirebaseDatabase.getInstance().reference.updateChildren(childUpdates)
     }
 
-    private fun initDaily(id: String, date: String, Cals: String, Goal: String, HPs: String, Minis: String, Ms: String, Rank: String, Steps: String, Token: String) {
+    private fun initDaily(id: String, date: String, Cals: String, Goal: String, HPs: String, Minis: String, Ms: String, Steps: String, Token: String) {
 
         val childUpdates = java.util.HashMap<String, Any>()
         childUpdates["/DailyRecord/$id/$date/Cals"] = Cals
@@ -1257,7 +1300,6 @@ class HomeFragment : Fragment(){
         childUpdates["/DailyRecord/$id/$date/HPs"] = HPs
         childUpdates["/DailyRecord/$id/$date/Minis"] = Minis
         childUpdates["/DailyRecord/$id/$date/Ms"] = Ms
-        childUpdates["/DailyRecord/$id/$date/Rank"] = Rank
         childUpdates["/DailyRecord/$id/$date/Steps"] = Steps
         childUpdates["/DailyRecord/$id/$date/Token"] = Token
 
@@ -1265,5 +1307,52 @@ class HomeFragment : Fragment(){
 
         FirebaseDatabase.getInstance().reference.updateChildren(childUpdates)
 
+    }
+    private fun showSnackBarMessage(message: String) {
+
+        if (view != null) {
+
+            Snackbar.make(view!!, message, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, imageReturnedIntent: Intent?) {
+        super.onActivityResult(requestCode, resultCode, imageReturnedIntent)
+        when (requestCode) {
+            0 -> if (resultCode == Activity.RESULT_OK) {
+                val selectedImage = imageReturnedIntent!!.data
+                Log.i(TAG, "selectedImage: $selectedImage")
+
+                var bitmap = MediaStore.Images.Media.getBitmap(context?.contentResolver, selectedImage)
+
+                bitmap = getCroppedBitmap(bitmap!!)
+
+                val iconRef = mStorageRef!!.child("team_icon/$team/icon.jpg")
+
+                val uploadImage = convertBitmapToByteArray(bitmap!!)
+                iconRef.putBytes(uploadImage)
+
+                imageView_teamIcon!!.setImageBitmap(bitmap)
+
+                showSnackBarMessage("Team icon updated !")
+            }
+        }
+    }
+
+    fun convertBitmapToByteArray(bMap: Bitmap): ByteArray {
+        var baos: ByteArrayOutputStream? = null
+        try {
+            baos = ByteArrayOutputStream()
+            bMap.compress(Bitmap.CompressFormat.PNG, 100, baos)
+            return baos!!.toByteArray()
+        } finally {
+            if (baos != null) {
+                try {
+                    baos!!.close()
+                } catch (e: IOException) {
+                }
+
+            }
+        }
     }
 }

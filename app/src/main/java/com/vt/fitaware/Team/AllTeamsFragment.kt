@@ -243,7 +243,7 @@ class AllTeamsFragment : Fragment() {
             if(captain == user_id) {
                 val dialogBuilder = AlertDialog.Builder(context)
                 dialogBuilder
-                    .setMessage("You are the captain of Team $selectedName")
+                    .setMessage("You are the captain of Team: $selectedName")
                     .setNegativeButton("Cancel", DialogInterface.OnClickListener {
                             dialog, id -> dialog.cancel()
                     })

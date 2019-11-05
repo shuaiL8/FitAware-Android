@@ -31,6 +31,8 @@ class UserFragment : Fragment() {
 
     private var user_id: String = "none"
     private var newSelectedDate: String = "none"
+    private var team: String = "none"
+    private var teamMembers: Map<String, Any>? = null
 
     @SuppressLint("SetTextI18n")
     override fun onCreateView(
@@ -46,6 +48,7 @@ class UserFragment : Fragment() {
 
         user_id = sharedPreferences!!.getString("user_id", "none")
         newSelectedDate = sharedPreferences!!.getString("newSelectedDate", "none")
+        team = sharedPreferences!!.getString("team", "none")
 
 
         val toolbarTiltle = activity!!.findViewById<TextView>(R.id.toolbar_title)
@@ -58,6 +61,29 @@ class UserFragment : Fragment() {
             Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.userFragment)
         }
 
+
+        val myRefTeam = FirebaseDatabase.getInstance().reference.child("Teams")
+        val postListenerTeam = object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                // Get Post object and use the values to update the UI
+                if(dataSnapshot.value != null){
+                    val my = dataSnapshot.value as Map<String, Any>
+
+                    if(team != "none") {
+                        val teamDetails = my.getValue(team) as Map<String, String>
+                        teamMembers = teamDetails.getValue("teamMembers") as Map<String, Any>
+                    }
+                }
+
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                // Getting Post failed, log a message
+                Log.w(TAG, "loadPost:onCancelled", databaseError.toException())
+                // ...
+            }
+        }
+        myRefTeam.addValueEventListener(postListenerTeam)
 
         val myRef = FirebaseDatabase.getInstance().reference.child("DailyRecord")
 
@@ -73,71 +99,76 @@ class UserFragment : Fragment() {
                 for((key, value) in my){
                     val details = value as Map<String, Map<String, String>>
 
-                    for((name, data) in details) {
-                        val date = data
+                    if(teamMembers!!.contains(key)) {
 
-                        if(newSelectedDate == name) {
+                        for((whichDay, data) in details) {
+                            val date = data
+
+                            if(newSelectedDate == whichDay) {
 
 
-                            if(date.containsKey("Likes")) {
+                                if(date.containsKey("Likes")) {
 
-                                val likes = date.getValue("Likes") as Map<String, String>
-                                Log.i(TAG, "likestest: $likes")
+                                    val likes = date.getValue("Likes") as Map<String, String>
+                                    Log.i(TAG, "likestest: $likes")
 
-                                var count = 0
-                                for((name1, name2) in likes) {
-                                    count++
-                                }
+                                    var count = 0
+                                    for((name1, name2) in likes) {
+                                        count++
+                                    }
 
-                                if(likes.containsKey(user_id)){
-                                    Log.i(TAG, "likeChecked: $user_id")
+                                    if(likes.containsKey(user_id)){
+                                        Log.i(TAG, "likeChecked: $user_id")
 
-                                    userDetail.add(
-                                        UserDetail(
-                                            name,
-                                            key,
-                                            index.toString(),
-                                            date.getValue("Steps").toInt(),
-                                            count.toString(),
-                                            "checked",
-                                            date.getValue("Token")
+                                        userDetail.add(
+                                            UserDetail(
+                                                whichDay,
+                                                key,
+                                                index.toString(),
+                                                date.getValue("Steps").toInt(),
+                                                count.toString(),
+                                                "checked",
+                                                date.getValue("Token")
+                                            )
                                         )
-                                    )
+                                    }
+                                    else{
+                                        userDetail.add(
+                                            UserDetail(
+                                                whichDay,
+                                                key,
+                                                index.toString(),
+                                                date.getValue("Steps").toInt(),
+                                                count.toString(),
+                                                "unchecked",
+                                                date.getValue("Token")
+                                            )
+                                        )
+                                    }
                                 }
                                 else{
                                     userDetail.add(
                                         UserDetail(
-                                            name,
+                                            whichDay,
                                             key,
                                             index.toString(),
                                             date.getValue("Steps").toInt(),
-                                            count.toString(),
+                                            "0",
                                             "unchecked",
                                             date.getValue("Token")
                                         )
                                     )
                                 }
+
                             }
-                            else{
-                                userDetail.add(
-                                    UserDetail(
-                                        name,
-                                        key,
-                                        index.toString(),
-                                        date.getValue("Steps").toInt(),
-                                        "0",
-                                        "unchecked",
-                                        date.getValue("Token")
-                                    )
-                                )
-                            }
+
 
                         }
-
-
+                        index++
                     }
 
-                    index++
+
+
                     Log.i(TAG, "$key: $value")
                     Log.i(TAG, "details: $details")
 
