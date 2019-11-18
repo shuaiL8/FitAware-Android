@@ -20,10 +20,11 @@ import com.vt.fitaware.Communicator
 import android.arch.lifecycle.Observer
 import android.content.SharedPreferences
 import android.preference.PreferenceManager
+import android.support.v4.app.DialogFragment
 import android.widget.*
 
 
-class ProfileFragment : Fragment() {
+class ProfileFragment : DialogFragment () {
 
     private val TAG = "ProfileFragment"
     private lateinit var database: DatabaseReference
@@ -47,32 +48,14 @@ class ProfileFragment : Fragment() {
         setHasOptionsMenu(true)
         initSharedPreferences()
 
-        val toolbarTiltle = activity!!.findViewById<TextView>(R.id.toolbar_title)
-        toolbarTiltle.text = "Profile"
+//        val toolbarTiltle = activity!!.findViewById<TextView>(R.id.toolbar_title)
+//        toolbarTiltle.text = "Profile"
 
-        val model = ViewModelProviders.of(activity!!).get(Communicator::class.java)
-        val `object` = Observer<Any> { o ->
-            // Update the UI
 
-            Log.w(TAG, "allSteps" + o!!.toString())
+        user_id = sharedPreferences!!.getString("user_id", "none")
+        currentStepsGoal = sharedPreferences!!.getString("my_goal", "0")
+        periodical = sharedPreferences!!.getString("periodical", "none")
 
-            val value = o.toString().substring(1, o.toString().length - 1)
-            val keyValuePairs = value.split(",".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-            val allSteps = java.util.HashMap<String, String>()
-
-            for (pair in keyValuePairs) {
-                val entry = pair.split("=".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()
-                allSteps[entry[0].trim { it <= ' ' }] = entry[1].trim { it <= ' ' }
-            }
-
-            Log.w(TAG, "currentStepsGoal" + allSteps["my_goal"]!!)
-            currentStepsGoal = allSteps["my_goal"]!!.toString()
-            user_id = allSteps["user_id"]!!.toString()
-            periodical = allSteps["periodical"]!!.toString()
-
-        }
-
-        model.message.observe(activity!!, `object`)
 
         database = FirebaseDatabase.getInstance().reference
         val arrayPeriodical = resources.getStringArray(R.array.Daily_Weekly_Monthly)
@@ -124,9 +107,12 @@ class ProfileFragment : Fragment() {
             if(err == 0) {
                 val editor = sharedPreferences?.edit()
                 editor!!.putString("my_goal", newStepsGoal)
+                editor!!.putString("periodical", newPeriodical)
+
                 editor.commit()
 
                 writeNewPost(user_id, newPeriodical, newStepsGoal)
+                dismiss()
                 Navigation.findNavController(activity!!, R.id.my_nav_host_fragment).navigate(R.id.settingFragment)
                 showSnackBarMessage("Goal Update Success !")
 

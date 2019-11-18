@@ -18,6 +18,7 @@ import android.content.SharedPreferences
 import android.graphics.*
 import android.preference.PreferenceManager
 import android.provider.MediaStore
+import android.support.v4.app.FragmentManager
 import android.support.v4.widget.SwipeRefreshLayout
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
@@ -83,6 +84,8 @@ class SettingFragment : Fragment() {
 
         val tv_email = view.findViewById<TextView>(R.id.tv_email)
 
+        val tv_captain = view.findViewById<TextView>(R.id.tv_captain)
+
         val tv_group = view.findViewById<TextView>(R.id.tv_group)
 
         settings.clear()
@@ -122,7 +125,9 @@ class SettingFragment : Fragment() {
 
         userListView.onItemClickListener = AdapterView.OnItemClickListener { adapterView, view, position, id ->
             if (position == 0) {
-                Navigation.findNavController(activity!!, R.id.my_nav_host_fragment).navigate(R.id.profileFragment)
+//                Navigation.findNavController(activity!!, R.id.my_nav_host_fragment).navigate(R.id.profileFragment)
+                val profileFragment = ProfileFragment()
+                profileFragment.show(fragmentManager, "ProfileFragment")
             }
             if (position == 2) {
                 showChangepasswordDialog()
@@ -201,14 +206,15 @@ class SettingFragment : Fragment() {
 
                 if(my["team"].toString() != "none") {
                     if(my["captain"].toString() == user_id) {
-                        tv_group.text = "Captain of " + my["team"].toString()
+                        tv_captain.text = "Captain of " + my["team"].toString()
                     }
                     else {
+                        tv_captain.text = "Team captain: " + my["captain"].toString()
                         tv_group.text = "In team: " + my["team"].toString()
                     }
                 }
                 else {
-                    tv_group.text = "Currently not in any team"
+                    tv_captain.text = "Currently not in any team"
 
                 }
             }

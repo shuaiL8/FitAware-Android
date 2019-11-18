@@ -343,6 +343,17 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                             periodical = details["periodical"].toString()
                             team = details["team"].toString()
 
+
+                            val editor = sharedPreferences!!.edit()
+
+                            editor.putString("currentSteps", my_steps.toString())
+                            editor.putString("duration", my_duration.toString())
+                            editor.putString("heartPoints", my_heartPoints.toString())
+                            editor.putString("distance", my_distance.toString())
+                            editor.putString("calories", my_calories.toString())
+
+                            editor.commit()
+
                             iniTeamSteps += my_steps
 
                         }
@@ -638,63 +649,63 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
                         daily_steps.toString(),
                         token)
 
-                    when {
-                        periodical.toLowerCase() == "daily" -> {
-
-                            writeNewPost(
-                                user_id,
-                                daily_steps.toString(),
-                                daily_duration.toString(),
-                                daily_heartPoints.toString(),
-                                daily_distance.toString(),
-                                daily_calories.toString()
-                            )
-
-                        }
-
-                        periodical == "3 days" -> {
-
-                            threeDaysRecord()
-
-                            writeNewPost(
-                                user_id,
-                                threeDays_steps.toString(),
-                                daily_duration.toString(),
-                                daily_heartPoints.toString(),
-                                threeDays_distance.toString(),
-                                threeDays_calories.toString()
-                            )
-
-
-                            Log.i(TAG, "threeDays_steps: $threeDays_steps")
-
-                        }
-                        periodical == "5 days" -> {
-
-                            fiveDaysRecord()
-
-                            writeNewPost(
-                                user_id,
-                                fiveDays_steps.toString(),
-                                daily_duration.toString(),
-                                daily_heartPoints.toString(),
-                                fiveDays_distance.toString(),
-                                fiveDays_calories.toString()
-                            )
-                        }
-                        periodical.toLowerCase() == "weekly" -> {
-                            weeklyRecord()
-
-                            writeNewPost(
-                                user_id,
-                                weekly_steps.toString(),
-                                daily_duration.toString(),
-                                daily_heartPoints.toString(),
-                                weekly_distance.toString(),
-                                weekly_calories.toString()
-                            )
-                        }
-                    }
+//                    when {
+//                        periodical.toLowerCase() == "daily" -> {
+//
+//                            writeNewPost(
+//                                user_id,
+//                                daily_steps.toString(),
+//                                daily_duration.toString(),
+//                                daily_heartPoints.toString(),
+//                                daily_distance.toString(),
+//                                daily_calories.toString()
+//                            )
+//
+//                        }
+//
+//                        periodical == "3 days" -> {
+//
+//                            threeDaysRecord()
+//
+//                            writeNewPost(
+//                                user_id,
+//                                threeDays_steps.toString(),
+//                                daily_duration.toString(),
+//                                daily_heartPoints.toString(),
+//                                threeDays_distance.toString(),
+//                                threeDays_calories.toString()
+//                            )
+//
+//
+//                            Log.i(TAG, "threeDays_steps: $threeDays_steps")
+//
+//                        }
+//                        periodical == "5 days" -> {
+//
+//                            fiveDaysRecord()
+//
+//                            writeNewPost(
+//                                user_id,
+//                                fiveDays_steps.toString(),
+//                                daily_duration.toString(),
+//                                daily_heartPoints.toString(),
+//                                fiveDays_distance.toString(),
+//                                fiveDays_calories.toString()
+//                            )
+//                        }
+//                        periodical.toLowerCase() == "weekly" -> {
+//                            weeklyRecord()
+//
+//                            writeNewPost(
+//                                user_id,
+//                                weekly_steps.toString(),
+//                                daily_duration.toString(),
+//                                daily_heartPoints.toString(),
+//                                weekly_distance.toString(),
+//                                weekly_calories.toString()
+//                            )
+//                        }
+//                    }
 
                 }
             }, delay.toLong(), period.toLong())

@@ -485,63 +485,63 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
             token)
 
 
-        when {
-            periodical.toLowerCase() == "daily" -> {
-
-                writeNewPost(
-                    user_id,
-                    daily_steps.toString(),
-                    daily_duration.toString(),
-                    daily_heartPoints.toString(),
-                    daily_distance.toString(),
-                    daily_calories.toString()
-                )
-
-            }
-
-            periodical == "3 days" -> {
-
-                threeDaysRecord()
-
-                writeNewPost(
-                    user_id,
-                    threeDays_steps.toString(),
-                    daily_duration.toString(),
-                    daily_heartPoints.toString(),
-                    threeDays_distance.toString(),
-                    threeDays_calories.toString()
-                )
-
-
-                Log.i(TAG, "threeDays_steps: $threeDays_steps")
-
-            }
-            periodical == "5 days" -> {
-
-                fiveDaysRecord()
-
-                writeNewPost(
-                    user_id,
-                    fiveDays_steps.toString(),
-                    daily_duration.toString(),
-                    daily_heartPoints.toString(),
-                    fiveDays_distance.toString(),
-                    fiveDays_calories.toString()
-                )
-            }
-            periodical.toLowerCase() == "weekly" -> {
-                weeklyRecord()
-
-                writeNewPost(
-                    user_id,
-                    weekly_steps.toString(),
-                    daily_duration.toString(),
-                    daily_heartPoints.toString(),
-                    weekly_distance.toString(),
-                    weekly_calories.toString()
-                )
-            }
-        }
+//        when {
+//            periodical.toLowerCase() == "daily" -> {
+//
+//                writeNewPost(
+//                    user_id,
+//                    daily_steps.toString(),
+//                    daily_duration.toString(),
+//                    daily_heartPoints.toString(),
+//                    daily_distance.toString(),
+//                    daily_calories.toString()
+//                )
+//
+//            }
+//
+//            periodical == "3 days" -> {
+//
+//                threeDaysRecord()
+//
+//                writeNewPost(
+//                    user_id,
+//                    threeDays_steps.toString(),
+//                    daily_duration.toString(),
+//                    daily_heartPoints.toString(),
+//                    threeDays_distance.toString(),
+//                    threeDays_calories.toString()
+//                )
+//
+//
+//                Log.i(TAG, "threeDays_steps: $threeDays_steps")
+//
+//            }
+//            periodical == "5 days" -> {
+//
+//                fiveDaysRecord()
+//
+//                writeNewPost(
+//                    user_id,
+//                    fiveDays_steps.toString(),
+//                    daily_duration.toString(),
+//                    daily_heartPoints.toString(),
+//                    fiveDays_distance.toString(),
+//                    fiveDays_calories.toString()
+//                )
+//            }
+//            periodical.toLowerCase() == "weekly" -> {
+//                weeklyRecord()
+//
+//                writeNewPost(
+//                    user_id,
+//                    weekly_steps.toString(),
+//                    daily_duration.toString(),
+//                    daily_heartPoints.toString(),
+//                    weekly_distance.toString(),
+//                    weekly_calories.toString()
+//                )
+//            }
+//        }
     }
 
     private fun threeDaysRecord(){

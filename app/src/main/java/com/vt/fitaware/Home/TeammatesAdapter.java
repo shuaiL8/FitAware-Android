@@ -172,24 +172,24 @@ public class TeammatesAdapter extends ArrayAdapter<Teammates>{
         decoView.addEvent(
                 new DecoEvent.Builder(mGoal)
                         .setIndex(mBackIndex)
-                        .setDuration(1000)
-                        .setDelay(100)
+                        .setDuration(0)
+                        .setDelay(0)
                         .build()
         );
 
         decoView.addEvent(
                 new DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_OUT)
                         .setIndex(mSeries1Index)
-                        .setDuration(1000)
-                        .setDelay(300)
+                        .setDuration(0)
+                        .setDelay(0)
                         .build()
         );
 
         decoView.addEvent(
                 new DecoEvent.Builder(mValue)
                         .setIndex(mSeries1Index)
-                        .setDuration(1000)
-                        .setDelay(100)
+                        .setDuration(0)
+                        .setDelay(0)
                         .build()
         );
 

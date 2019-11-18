@@ -43,7 +43,7 @@ class TeamFragment : Fragment() {
         initSharedPreferences()
 
         val toolbarTiltle = activity!!.findViewById<TextView>(R.id.toolbar_title)
-        toolbarTiltle.text = "Team"
+        toolbarTiltle.text = "Teams"
 
         gridOrList = sharedPreferences!!.getString("gridOrList", "list")
         user_id = sharedPreferences!!.getString("user_id", "none")

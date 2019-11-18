@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">FitAware</string>
     <string name="title_home">Home</string>
-    <string name="title_team">Team</string>
+    <string name="title_team">Teams</string>
     <string name="title_awards">Awards</string>
     <string name="title_history">History</string>
     <string name="title_setting">Setting</string>

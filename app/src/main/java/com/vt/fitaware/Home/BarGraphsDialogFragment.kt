@@ -272,7 +272,7 @@ class BarGraphsDialogFragment : DialogFragment() {
                         personalStepsGraph.setDescription("Duration VS Date")  // set the description
                         //barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
                         barDataSet.color = ResourcesCompat.getColor(resources, R.color.colorDis, null)
-                        personalStepsGraph.animateY(5000)
+                        personalStepsGraph.animateY(100)
                     }
 
 
@@ -459,7 +459,7 @@ class BarGraphsDialogFragment : DialogFragment() {
                         personalStepsGraph.setDescription("Steps VS Date")  // set the description
                         //barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
                         barDataSet.color = ResourcesCompat.getColor(resources, R.color.colorCals, null)
-                        personalStepsGraph.animateY(5000)
+                        personalStepsGraph.animateY(100)
                     }
 
 
@@ -650,7 +650,7 @@ class BarGraphsDialogFragment : DialogFragment() {
                         personalStepsGraph.setDescription("HeartPoints VS Date")  // set the description
                         //barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
                         barDataSet.color = ResourcesCompat.getColor(resources, R.color.colorTime, null)
-                        personalStepsGraph.animateY(5000)
+                        personalStepsGraph.animateY(100)
                     }
 
 
@@ -840,7 +840,7 @@ class BarGraphsDialogFragment : DialogFragment() {
                         personalStepsGraph.setDescription("Distance VS Date")  // set the description
                         //barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
                         barDataSet.color = ResourcesCompat.getColor(resources, R.color.colorCals, null)
-                        personalStepsGraph.animateY(5000)
+                        personalStepsGraph.animateY(100)
                     }
 
 
@@ -1030,7 +1030,7 @@ class BarGraphsDialogFragment : DialogFragment() {
                         personalStepsGraph.setDescription("Calories VS Date")  // set the description
                         //barDataSet.setColors(ColorTemplate.COLORFUL_COLORS)
                         barDataSet.color = ResourcesCompat.getColor(resources, R.color.colorCals, null)
-                        personalStepsGraph.animateY(5000)
+                        personalStepsGraph.animateY(100)
                     }
 
                 }

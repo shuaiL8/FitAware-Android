@@ -105,7 +105,7 @@
                         android:layout_height="wrap_content"
                         android:drawableRight="@drawable/ic_steps"
                         android:layout_marginTop="20dp"
-                        android:hint="Daily Steps Goal"
+                        android:hint="Steps Goal"
                         android:inputType="number" />
 
             </android.support.design.widget.TextInputLayout>

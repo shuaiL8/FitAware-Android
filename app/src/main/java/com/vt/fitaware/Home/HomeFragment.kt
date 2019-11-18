@@ -32,6 +32,10 @@ import android.support.design.widget.TabLayout
 import android.support.v4.widget.SwipeRefreshLayout
 import android.widget.*
 import androidx.navigation.Navigation
+import com.anychart.AnyChart
+import com.anychart.AnyChartView
+import com.anychart.chart.common.dataentry.DataEntry
+import com.anychart.chart.common.dataentry.ValueDataEntry
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.StorageReference
 import com.squareup.picasso.Picasso
@@ -172,10 +176,17 @@ class HomeFragment : Fragment(){
         val calendar_frame = view.findViewById<FrameLayout>(R.id.calendar_frame)
         val decoView_frame = view.findViewById<FrameLayout>(R.id.decoView_frame)
         val team_frame = view.findViewById<FrameLayout>(R.id.team_frame)
+        val team_pie_frame = view.findViewById<FrameLayout>(R.id.team_pie_frame)
+        val pie_chart_view = view.findViewById<AnyChartView>(R.id.pie_chart_view)
+        val switchButton = view.findViewById<ImageView>(R.id.switchButton)
+        val switchToTeam = view.findViewById<ImageView>(R.id.switchToTeam)
+        val switchToPie = view.findViewById<ImageView>(R.id.switchToPie)
 
         val scrollView = view.findViewById<ScrollView>(R.id.scrollView)
 
         val dropDownButton = view.findViewById<ImageButton>(R.id.dropDownButton)
+
+        team_pie_frame.visibility = View.GONE
 
 
         mDecoViewTeam = view.findViewById<DecoView>(R.id.dynamicArcViewsTeam)
@@ -391,36 +402,36 @@ class HomeFragment : Fragment(){
         model.message.observe(activity!!, `object`)
 
 
-        val calendarNY = Calendar.getInstance()
-        val mdformatNY = SimpleDateFormat("yyyy-MM-dd")
-//        mdformatNY.timeZone = TimeZone.getTimeZone("America/New_York")
-        val strDate = mdformatNY.format(calendarNY.time)
-
-        initDaily(
-            user_id,
-            strDate,
-            my_calories.toString(),
-            my_goal.toString(),
-            my_heartPoints.toString(),
-            my_duration.toString(),
-            my_distance.toString(),
-            my_steps.toString(),
-            token)
+//        val calendarNY = Calendar.getInstance()
+//        val mdformatNY = SimpleDateFormat("yyyy-MM-dd")
+////        mdformatNY.timeZone = TimeZone.getTimeZone("America/New_York")
+//        val strDate = mdformatNY.format(calendarNY.time)
+//
+//        initDaily(
+//            user_id,
+//            strDate,
+//            my_calories.toString(),
+//            my_goal.toString(),
+//            my_heartPoints.toString(),
+//            my_duration.toString(),
+//            my_distance.toString(),
+//            my_steps.toString(),
+//            token)
 
         val swipeRefresh = view.findViewById<SwipeRefreshLayout>(R.id.swipeRefresh)
         swipeRefresh.setOnRefreshListener {
             Navigation.findNavController(context as Activity, R.id.my_nav_host_fragment).navigate(R.id.homeFragment)
 
-            initDaily(
-                user_id,
-                strDate,
-                my_calories.toString(),
-                my_goal.toString(),
-                my_heartPoints.toString(),
-                my_duration.toString(),
-                my_distance.toString(),
-                my_steps.toString(),
-                token)
+//            initDaily(
+//                user_id,
+//                strDate,
+//                my_calories.toString(),
+//                my_goal.toString(),
+//                my_heartPoints.toString(),
+//                my_duration.toString(),
+//                my_distance.toString(),
+//                my_steps.toString(),
+//                token)
 
         }
 
@@ -499,7 +510,6 @@ class HomeFragment : Fragment(){
 
                         }
 
-
                         index++
                         Log.i(TAG, "iniTeamSteps: $iniTeamSteps")
 
@@ -529,6 +539,17 @@ class HomeFragment : Fragment(){
                         )
                         gridViewDecoViews!!.adapter = teammatesAdapter
                     }
+
+
+                    Log.w(TAG, "test teammates: $teammates")
+                    val pie = AnyChart.pie()
+                    val pieData = ArrayList<DataEntry>()
+                    for (teammate in teammates) {
+                        pieData.add(ValueDataEntry(teammate.name, teammate.steps))
+                    }
+
+                    pie.data(pieData)
+                    pie_chart_view.setChart(pie)
 
 
                 }
@@ -805,6 +826,7 @@ class HomeFragment : Fragment(){
         team_frame.visibility =View.GONE
         gridViewDecoViews!!.visibility = View.GONE
         tabLayoutHome.visibility =View.GONE
+        decoView_frame.visibility = View.GONE
 
         val handler = Handler()
         handler.postDelayed({
@@ -812,6 +834,7 @@ class HomeFragment : Fragment(){
 
             if(team == "none"){
                 decoView_frame.visibility = View.VISIBLE
+                switchButton.visibility = View.GONE
                 team_frame.visibility = View.GONE
                 tabLayoutHome.visibility =View.GONE
                 gridViewDecoViews!!.visibility = View.GONE
@@ -835,26 +858,47 @@ class HomeFragment : Fragment(){
         }, 0)
 
 
-
-        decoView_frame.visibility = View.GONE
         gridViewDecoViews!!.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
 
 
             if(decoView_frame.visibility == View.VISIBLE && newSelected == teammates[position].name) {
                 decoView_frame.visibility = View.GONE
+                team_pie_frame.visibility = View.GONE
+                team_frame.visibility = View.VISIBLE
             }
             else {
+                team_frame.visibility = View.GONE
+                team_pie_frame.visibility = View.GONE
                 decoView_frame.visibility = View.VISIBLE
                 createBackSeries(60F, teammates[position].goal.toFloat(), 10F)
                 createDataSeries(teammates[position].name, "No. "+ teammates[position].rank,60F, teammates[position].goal.toFloat(), 10F)
                 createEvents(60F, teammates[position].goal.toFloat(), 10F)
-                scrollView.scrollTo(0, scrollView.bottom)
+                scrollView.scrollTo(0, scrollView.top)
 
                 newSelected = teammates[position].name
             }
 
             Log.w(TAG, "selectedItemPosition$id")
 
+        }
+
+
+        switchButton.setOnClickListener {
+
+            decoView_frame.visibility = View.GONE
+            team_frame.visibility = View.VISIBLE
+        }
+
+        switchToPie.setOnClickListener {
+
+            team_pie_frame.visibility = View.VISIBLE
+            team_frame.visibility = View.GONE
+        }
+
+        switchToTeam.setOnClickListener {
+
+            team_pie_frame.visibility = View.GONE
+            team_frame.visibility = View.VISIBLE
         }
 
         imageActivity1.setOnClickListener {
