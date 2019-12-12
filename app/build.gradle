@@ -10,8 +10,8 @@ android {
         applicationId "com.vt.fitaware"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 43
-        versionName "5.0"
+        versionCode 45
+        versionName "5.2"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

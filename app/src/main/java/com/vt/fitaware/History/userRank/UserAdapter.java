@@ -132,7 +132,7 @@ public class UserAdapter extends ArrayAdapter<UserDetail> {
                     }
 
                     NOTIFICATION_TITLE = "FitAware";
-                    NOTIFICATION_MESSAGE = user_id + " liked you steps progress!";
+                    NOTIFICATION_MESSAGE = user_id + " liked your steps progress!";
 
                     JSONObject notification = new JSONObject();
                     JSONObject notifcationBody = new JSONObject();

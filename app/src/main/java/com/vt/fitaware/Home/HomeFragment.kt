@@ -1021,18 +1021,18 @@ class HomeFragment : Fragment(){
     }
 
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.share -> {
-            // User chose the "Settings" item, show the app settings UI...
-            true
-        }
-
-        else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            super.onOptionsItemSelected(item)
-        }
-    }
+//    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+//        R.id.share -> {
+//            // User chose the "Settings" item, show the app settings UI...
+//            true
+//        }
+//
+//        else -> {
+//            // If we got here, the user's action was not recognized.
+//            // Invoke the superclass to handle it.
+//            super.onOptionsItemSelected(item)
+//        }
+//    }
 
 
 
@@ -1288,16 +1288,16 @@ class HomeFragment : Fragment(){
         mDecoViewTeam!!.addEvent(
             DecoEvent.Builder(teamGoal)
                 .setIndex(mBackIndex)
-                .setDuration(1000)
-                .setDelay(100)
+                .setDuration(0)
+                .setDelay(0)
                 .build()
         )
 
         mDecoViewTeam!!.addEvent(
             DecoEvent.Builder(DecoDrawEffect.EffectType.EFFECT_SPIRAL_OUT)
                 .setIndex(mSeriesIndexTeam)
-                .setDuration(1000)
-                .setDelay(300)
+                .setDuration(0)
+                .setDelay(0)
                 .build()
         )
     }
@@ -1310,8 +1310,8 @@ class HomeFragment : Fragment(){
         mDecoViewTeam!!.addEvent(
             DecoEvent.Builder(teamSteps)
                 .setIndex(mSeriesIndexTeam)
-                .setDuration(1000)
-                .setDelay(100)
+                .setDuration(500)
+                .setDelay(0)
                 .build()
         )
     }

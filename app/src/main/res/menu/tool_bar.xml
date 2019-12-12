@@ -4,11 +4,11 @@
       xmlns:tools="http://schemas.android.com/tools"
       tools:context="com.vt.fitaware.MainActivity">
 
-    <item
-        android:id="@+id/share"
-        android:icon="@drawable/ic_share_black_24dp"
-        android:title="share"
-        app:showAsAction="always"/>
+<!--    <item-->
+<!--        android:id="@+id/share"-->
+<!--        android:icon="@drawable/ic_share_black_24dp"-->
+<!--        android:title="share"-->
+<!--        app:showAsAction="always"/>-->
 
 
 

@@ -46,18 +46,18 @@ class AwardsFragment : Fragment() {
     }
 
 
-    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
-        R.id.share -> {
-            // User chose the "Settings" item, show the app settings UI...
-            true
-        }
-
-        else -> {
-            // If we got here, the user's action was not recognized.
-            // Invoke the superclass to handle it.
-            super.onOptionsItemSelected(item)
-        }
-    }
+//    override fun onOptionsItemSelected(item: MenuItem) = when (item.itemId) {
+//        R.id.share -> {
+//            // User chose the "Settings" item, show the app settings UI...
+//            true
+//        }
+//
+//        else -> {
+//            // If we got here, the user's action was not recognized.
+//            // Invoke the superclass to handle it.
+//            super.onOptionsItemSelected(item)
+//        }
+//    }
 
     private fun initSharedPreferences() {
 
