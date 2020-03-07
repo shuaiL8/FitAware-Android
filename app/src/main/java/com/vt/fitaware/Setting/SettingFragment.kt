@@ -88,6 +88,9 @@ class SettingFragment : Fragment() {
 
         val tv_group = view.findViewById<TextView>(R.id.tv_group)
 
+        val tv_cycle = view.findViewById<TextView>(R.id.tv_cycle)
+
+
         settings.clear()
 
         settings.add(Settings("Profile", false, false))
@@ -203,10 +206,12 @@ class SettingFragment : Fragment() {
                 }
                 tv_name.text = my["id"].toString()
                 tv_email.text = my["email"].toString()
+                tv_cycle.text = my["periodical"].toString() + " Cycle"
 
                 if(my["team"].toString() != "none") {
                     if(my["captain"].toString() == user_id) {
                         tv_captain.text = "Captain of " + my["team"].toString()
+                        tv_group.text = null
                     }
                     else {
                         tv_captain.text = "Team captain: " + my["captain"].toString()

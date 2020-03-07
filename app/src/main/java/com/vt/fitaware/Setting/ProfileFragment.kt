@@ -33,6 +33,7 @@ class ProfileFragment : DialogFragment () {
     private var currentStepsGoal: String = ""
     private var user_id: String = ""
     private var periodical: String = ""
+    private var periodicalIndex = 0
     private var sharedPreferences: SharedPreferences? = null
     private var ti_stepsGoal : TextInputLayout? = null
 
@@ -55,6 +56,7 @@ class ProfileFragment : DialogFragment () {
         user_id = sharedPreferences!!.getString("user_id", "none")
         currentStepsGoal = sharedPreferences!!.getString("my_goal", "0")
         periodical = sharedPreferences!!.getString("periodical", "none")
+        periodicalIndex = sharedPreferences!!.getInt("periodicalIndex", 0)
 
 
         database = FirebaseDatabase.getInstance().reference
@@ -76,14 +78,9 @@ class ProfileFragment : DialogFragment () {
             mEtSpinner.adapter = adapter
         }
 
-        for(x in 0..3 ){
-            if(periodical == arrayPeriodical[x]) {
-                mEtSpinner.setSelection(x)
-                Log.w(TAG, "arrayPeriodical"+x+arrayPeriodical[x])
 
-            }
-        }
-
+        mEtSpinner.setSelection(periodicalIndex)
+        Log.w(TAG, "arrayPeriodical"+periodicalIndex+arrayPeriodical[periodicalIndex])
 
         et_stepsGoal.hint = "Current Goal: $currentStepsGoal"
 
@@ -108,6 +105,14 @@ class ProfileFragment : DialogFragment () {
                 val editor = sharedPreferences?.edit()
                 editor!!.putString("my_goal", newStepsGoal)
                 editor!!.putString("periodical", newPeriodical)
+
+                for(x in 0..3 ){
+                    if(newPeriodical == arrayPeriodical[x]) {
+
+                        editor!!.putInt("periodicalIndex", x)
+
+                    }
+                }
 
                 editor.commit()
 

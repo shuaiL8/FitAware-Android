@@ -1200,7 +1200,7 @@ class MainActivity : AppCompatActivity(), GoogleApiClient.OnConnectionFailedList
         //get Date and sync data
         mTimer = Timer()
         val delay = 0 // delay for 0 sec.
-        val period = 5000 // repeat 5 sec.
+        val period = 3000 // repeat 5 sec.
 
         mTimer!!.scheduleAtFixedRate(object : TimerTask() {
             override fun run() {

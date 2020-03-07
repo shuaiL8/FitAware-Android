@@ -128,22 +128,22 @@ class MyBackgroundWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
                 stopMyNotificationService()
             }
 
-            val calendar = Calendar.getInstance()
-            val mdformat = SimpleDateFormat("HH:mm:ss")
-            val curTime = mdformat.format(calendar.time).toString()
-            Log.d(TAG, "curTime: $curTime")
-
-            val from =  mdformat.parse("17:00:00").toString()
-            val to = mdformat.parse("19:00:00").toString()
-
-            // Test use
-//            sendNotification()
-
-            if(curTime > from && curTime < to) {
-                Log.d(TAG, "curTime2: $curTime")
-                getReportData()
-                sendNotification()
-            }
+//            val calendar = Calendar.getInstance()
+//            val mdformat = SimpleDateFormat("HH:mm:ss")
+//            val curTime = mdformat.format(calendar.time).toString()
+//            Log.d(TAG, "curTime: $curTime")
+//
+//            val from =  mdformat.parse("17:00:00").toString()
+//            val to = mdformat.parse("19:00:00").toString()
+//
+//            // Test use
+////            sendNotification()
+//
+//            if(curTime > from && curTime < to) {
+//                Log.d(TAG, "curTime2: $curTime")
+//                getReportData()
+//                sendNotification()
+//            }
 
             Result.success()
         } catch (throwable: Throwable) {
